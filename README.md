@@ -18,7 +18,7 @@ Converter converter = new Converter();
 Object value = converter.convert(Schema.OPTIONAL_BOOLEAN_SCHEMA, "true");
 ```
 
-## Nulls are not supported on non optional schemas
+## Optional schemas do not support nulls
 
 ```
 Converter converter = new Converter();
