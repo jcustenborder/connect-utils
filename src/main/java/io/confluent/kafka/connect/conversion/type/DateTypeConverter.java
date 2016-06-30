@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) ${project.inceptionYear} Jeremy Custenborder (jcustenborder@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.confluent.kafka.connect.conversion.type;
 
 import com.google.common.base.Preconditions;
@@ -19,33 +34,33 @@ public class DateTypeConverter implements TypeConverter {
     this.timeZone = timeZone;
   }
 
+  public static DateTypeConverter createDefaultDateConverter() {
+    return new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd"));
+  }
+
+  public static DateTypeConverter createDefaultTimeConverter() {
+    return new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("HH:mm:ss"));
+  }
+
+  public static DateTypeConverter createDefaultTimestampConverter() {
+    return new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss"));
+  }
+
   @Override
   public Object convert(String s) {
     Date date = null;
-    for(SimpleDateFormat dateFormat:this.dateFormats){
+    for (SimpleDateFormat dateFormat : this.dateFormats) {
       try {
         date = dateFormat.parse(s);
         continue;
       } catch (ParseException e) {
-        if(log.isDebugEnabled()){
+        if (log.isDebugEnabled()) {
           log.debug("Could not parse '{}' to java.util.Date", s, date);
         }
       }
     }
 
-    Preconditions.checkState(null!=date, "Could not parse '%s' to java.util.Date", s);
+    Preconditions.checkState(null != date, "Could not parse '%s' to java.util.Date", s);
     return date;
-  }
-
-  public static DateTypeConverter createDefaultDateConverter(){
-    return new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd"));
-  }
-
-  public static DateTypeConverter createDefaultTimeConverter(){
-    return new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("HH:mm:ss"));
-  }
-
-  public static DateTypeConverter createDefaultTimestampConverter(){
-    return new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss"));
   }
 }

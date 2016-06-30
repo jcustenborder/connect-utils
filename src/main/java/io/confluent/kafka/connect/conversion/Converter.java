@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) ${project.inceptionYear} Jeremy Custenborder (jcustenborder@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.confluent.kafka.connect.conversion;
 
 import com.google.common.base.Preconditions;
@@ -39,24 +54,24 @@ public class Converter {
     registerTypeConverter(Timestamp.SCHEMA, DateTypeConverter.createDefaultTimestampConverter());
   }
 
-  public final void registerTypeConverter(Schema schema, TypeConverter typeConverter){
+  public final void registerTypeConverter(Schema schema, TypeConverter typeConverter) {
     this.converters.put(new ConverterKey(schema), typeConverter);
   }
 
-  public Object convert(Schema schema, String input){
+  public Object convert(Schema schema, String input) {
     Preconditions.checkNotNull(schema, "schema cannot be null");
     ConverterKey converterKey = new ConverterKey(schema);
     TypeConverter converter = this.converters.get(converterKey);
 
-    if(!schema.isOptional()){
+    if (!schema.isOptional()) {
       Preconditions.checkNotNull(input, "schema is not optional so input cannot be null.");
     }
 
-    if(null==input && schema.isOptional()){
+    if (null == input && schema.isOptional()) {
       return null;
     }
 
-    if(null==converter){
+    if (null == converter) {
       throw new UnsupportedOperationException(
           String.format("Schema %s(%s) is not supported", schema.type(), schema.name())
       );

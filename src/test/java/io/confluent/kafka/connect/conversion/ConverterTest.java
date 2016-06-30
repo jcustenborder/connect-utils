@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) ${project.inceptionYear} Jeremy Custenborder (jcustenborder@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.confluent.kafka.connect.conversion;
 
 import com.google.common.collect.ImmutableMap;
@@ -24,7 +39,7 @@ public class ConverterTest {
   Calendar calendar;
 
   @Before
-  public void before(){
+  public void before() {
     this.converter = new Converter();
     this.calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
   }
@@ -46,7 +61,7 @@ public class ConverterTest {
         Time.builder().optional().build(),
     };
 
-    for(Schema schema:schemas){
+    for (Schema schema : schemas) {
       Object actual = this.converter.convert(schema, null);
       Assert.assertNull(actual);
     }
@@ -54,7 +69,7 @@ public class ConverterTest {
   }
 
   void assertConversion(Schema schema, final Class expectedClass, Map<String, ?> tests) {
-    for(Map.Entry<String, ?> kvp:tests.entrySet()){
+    for (Map.Entry<String, ?> kvp : tests.entrySet()) {
       Object expected = kvp.getValue();
       Object actual = this.converter.convert(schema, kvp.getKey());
       String message = String.format("Could not parse '%s' to '%s'", kvp.getKey(), expectedClass.getName());
@@ -66,7 +81,7 @@ public class ConverterTest {
   }
 
   @Test
-  public void booleanTests(){
+  public void booleanTests() {
     Map<String, ?> tests = ImmutableMap.of(
         "true", Boolean.TRUE,
         "TRUE", Boolean.TRUE,
@@ -77,7 +92,7 @@ public class ConverterTest {
   }
 
   @Test
-  public void float32Tests(){
+  public void float32Tests() {
     Map<String, ?> tests = ImmutableMap.of(
         new Float(Float.MAX_VALUE).toString(), new Float(Float.MAX_VALUE),
         new Float(Float.MIN_VALUE).toString(), new Float(Float.MIN_VALUE)
@@ -86,7 +101,7 @@ public class ConverterTest {
   }
 
   @Test
-  public void float64Tests(){
+  public void float64Tests() {
     Map<String, ?> tests = ImmutableMap.of(
         new Double(Double.MAX_VALUE).toString(), new Double(Double.MAX_VALUE),
         new Double(Double.MIN_VALUE).toString(), new Double(Double.MIN_VALUE)
@@ -95,7 +110,7 @@ public class ConverterTest {
   }
 
   @Test
-  public void int8Tests(){
+  public void int8Tests() {
     Map<String, ?> tests = ImmutableMap.of(
         new Byte(Byte.MAX_VALUE).toString(), new Byte(Byte.MAX_VALUE),
         new Byte(Byte.MIN_VALUE).toString(), new Byte(Byte.MIN_VALUE)
@@ -104,7 +119,7 @@ public class ConverterTest {
   }
 
   @Test
-  public void int16Tests(){
+  public void int16Tests() {
     Map<String, ?> tests = ImmutableMap.of(
         new Short(Short.MAX_VALUE).toString(), new Short(Short.MAX_VALUE),
         new Short(Short.MIN_VALUE).toString(), new Short(Short.MIN_VALUE)
@@ -113,7 +128,7 @@ public class ConverterTest {
   }
 
   @Test
-  public void int32Tests(){
+  public void int32Tests() {
     Map<String, ?> tests = ImmutableMap.of(
         new Integer(Integer.MAX_VALUE).toString(), new Integer(Integer.MAX_VALUE),
         new Integer(Integer.MIN_VALUE).toString(), new Integer(Integer.MIN_VALUE)
@@ -122,7 +137,7 @@ public class ConverterTest {
   }
 
   @Test
-  public void int64Tests(){
+  public void int64Tests() {
     Map<String, ?> tests = ImmutableMap.of(
         new Long(Long.MAX_VALUE).toString(), new Long(Long.MAX_VALUE),
         new Long(Long.MIN_VALUE).toString(), new Long(Long.MIN_VALUE)
@@ -131,7 +146,7 @@ public class ConverterTest {
   }
 
   @Test
-  public void decimalTests(){
+  public void decimalTests() {
     Map<String, ?> tests = ImmutableMap.of(
         "12345", new BigDecimal("12345"),
         "0", new BigDecimal("0"),
