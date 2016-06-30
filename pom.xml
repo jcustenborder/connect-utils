@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) ${project.inceptionYear} Jeremy Custenborder (jcustenborder@gmail.com)
+    Copyright (C) 2016 Jeremy Custenborder (jcustenborder@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
     <artifactId>kafka-connect-conversion</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <inceptionYear>2016</inceptionYear>
 
     <name>kafka-connect-conversion</name>
 
