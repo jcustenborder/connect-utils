@@ -25,6 +25,7 @@ import io.confluent.kafka.connect.conversion.type.Int16TypeConverter;
 import io.confluent.kafka.connect.conversion.type.Int32TypeConverter;
 import io.confluent.kafka.connect.conversion.type.Int64TypeConverter;
 import io.confluent.kafka.connect.conversion.type.Int8TypeConverter;
+import io.confluent.kafka.connect.conversion.type.StringTypeConverter;
 import io.confluent.kafka.connect.conversion.type.TypeConverter;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
@@ -48,6 +49,7 @@ public class Converter {
     registerTypeConverter(Schema.INT16_SCHEMA, new Int16TypeConverter());
     registerTypeConverter(Schema.INT32_SCHEMA, new Int32TypeConverter());
     registerTypeConverter(Schema.INT64_SCHEMA, new Int64TypeConverter());
+    registerTypeConverter(Schema.STRING_SCHEMA, new StringTypeConverter());
     registerTypeConverter(Decimal.schema(1), new DecimalTypeConverter());
     registerTypeConverter(Date.SCHEMA, DateTypeConverter.createDefaultDateConverter());
     registerTypeConverter(Time.SCHEMA, DateTypeConverter.createDefaultTimeConverter());
