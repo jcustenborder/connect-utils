@@ -56,7 +56,7 @@ public class DateTypeParser implements TypeParser {
         break;
       } catch (ParseException e) {
         if (log.isDebugEnabled()) {
-          log.debug("Could not parse '{}' to java.util.Date", s, date);
+          log.debug("Could not parse '{}' to java.util.Date", s, e);
         }
       }
     }
