@@ -52,7 +52,7 @@ public class DateTypeConverter implements TypeConverter {
     for (SimpleDateFormat dateFormat : this.dateFormats) {
       try {
         date = dateFormat.parse(s);
-        continue;
+        break;
       } catch (ParseException e) {
         if (log.isDebugEnabled()) {
           log.debug("Could not parse '{}' to java.util.Date", s, date);
