@@ -15,11 +15,55 @@
  */
 package io.confluent.kafka.connect.conversion.type;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.apache.kafka.connect.data.Decimal;
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.errors.DataException;
+
 import java.math.BigDecimal;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class DecimalTypeConverter implements TypeConverter {
+  final Cache<Schema, Integer> schemaCache;
+
+  public DecimalTypeConverter() {
+    this.schemaCache = CacheBuilder.newBuilder()
+        .expireAfterWrite(60, TimeUnit.SECONDS)
+        .build();
+
+  }
+
+  private static int scale(Schema schema) {
+    String scaleString = (String) schema.parameters().get("scale");
+    if (scaleString == null) {
+      throw new DataException("Invalid Decimal schema: scale parameter not found.");
+    } else {
+      try {
+        return Integer.parseInt(scaleString);
+      } catch (NumberFormatException var3) {
+        throw new DataException("Invalid scale parameter found in Decimal schema: ", var3);
+      }
+    }
+  }
+
   @Override
-  public Object convert(String s) {
-    return new BigDecimal(s);
+  public Object convert(String s, final Schema schema) {
+    int scale;
+    try {
+      scale = this.schemaCache.get(schema, new Callable<Integer>() {
+        @Override
+        public Integer call() throws Exception {
+          return scale(schema);
+        }
+      });
+    } catch (ExecutionException e) {
+      throw new DataException(e);
+    }
+
+
+    return new BigDecimal(s).setScale(scale);
   }
 }

@@ -15,6 +15,8 @@
  */
 package io.confluent.kafka.connect.conversion.type;
 
+import org.apache.kafka.connect.data.Schema;
+
 public interface TypeConverter {
   /**
    * Method is used to convert a String to an object representation of a Kafka Connect Type
@@ -22,5 +24,5 @@ public interface TypeConverter {
    * @param s input string to convert
    * @return Object representation of the Kafka Connect Type
    */
-  Object convert(String s);
+  Object convert(String s, Schema schema);
 }

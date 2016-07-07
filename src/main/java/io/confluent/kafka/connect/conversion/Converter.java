@@ -78,7 +78,7 @@ public class Converter {
           String.format("Schema %s(%s) is not supported", schema.type(), schema.name())
       );
     }
-    Object result = converter.convert(input);
+    Object result = converter.convert(input, schema);
     return result;
   }
 

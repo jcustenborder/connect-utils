@@ -147,12 +147,14 @@ public class ConverterTest {
 
   @Test
   public void decimalTests() {
-    Map<String, ?> tests = ImmutableMap.of(
-        "12345", new BigDecimal("12345"),
-        "0", new BigDecimal("0"),
-        "-12345.001", new BigDecimal("-12345.001")
-    );
-    assertConversion(Decimal.builder(10).build(), BigDecimal.class, tests);
+    for (int SCALE = 3; SCALE < 30; SCALE++) {
+      Map<String, ?> tests = ImmutableMap.of(
+          "12345", new BigDecimal("12345").setScale(SCALE),
+          "0", new BigDecimal("0").setScale(SCALE),
+          "-12345.001", new BigDecimal("-12345.001").setScale(SCALE)
+      );
+      assertConversion(Decimal.builder(SCALE).build(), BigDecimal.class, tests);
+    }
   }
 
   @Test

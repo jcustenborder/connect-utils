@@ -16,6 +16,7 @@
 package io.confluent.kafka.connect.conversion.type;
 
 import com.google.common.base.Preconditions;
+import org.apache.kafka.connect.data.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public class DateTypeConverter implements TypeConverter {
   }
 
   @Override
-  public Object convert(String s) {
+  public Object convert(String s, final Schema schema) {
     Date date = null;
     for (SimpleDateFormat dateFormat : this.dateFormats) {
       try {

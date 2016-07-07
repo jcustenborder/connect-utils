@@ -15,9 +15,11 @@
  */
 package io.confluent.kafka.connect.conversion.type;
 
+import org.apache.kafka.connect.data.Schema;
+
 public class Float64TypeConverter implements TypeConverter {
   @Override
-  public Object convert(String s) {
+  public Object convert(String s, final Schema schema) {
     return Double.parseDouble(s);
   }
 }
