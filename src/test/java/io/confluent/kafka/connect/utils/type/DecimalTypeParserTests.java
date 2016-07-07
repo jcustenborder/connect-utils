@@ -1,4 +1,4 @@
-package io.confluent.kafka.connect.conversion.type;
+package io.confluent.kafka.connect.utils.type;
 
 
 import org.apache.kafka.connect.data.Decimal;
@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DecimalTypeConverterTests {
+public class DecimalTypeParserTests {
 
   @Test
   public void testSchemaCache() {
@@ -19,11 +19,11 @@ public class DecimalTypeConverterTests {
       schemas.add(Decimal.schema(i));
     }
 
-    DecimalTypeConverter typeConverter = new DecimalTypeConverter();
+    DecimalTypeParser typeConverter = new DecimalTypeParser();
 
     for (int i = 0; i < 1000; i++) {
       for (Schema schema : schemas) {
-        Object value = typeConverter.convert("0", schema);
+        Object value = typeConverter.parseString("0", schema);
       }
     }
 

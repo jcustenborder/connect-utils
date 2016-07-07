@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.conversion.type;
+package io.confluent.kafka.connect.utils.type;
 
 import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Schema;
@@ -25,30 +25,30 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class DateTypeConverter implements TypeConverter {
-  final static Logger log = LoggerFactory.getLogger(DateTypeConverter.class);
+public class DateTypeParser implements TypeParser {
+  final static Logger log = LoggerFactory.getLogger(DateTypeParser.class);
   final SimpleDateFormat[] dateFormats;
   final TimeZone timeZone;
 
-  public DateTypeConverter(TimeZone timeZone, SimpleDateFormat... dateFormats) {
+  public DateTypeParser(TimeZone timeZone, SimpleDateFormat... dateFormats) {
     this.dateFormats = dateFormats;
     this.timeZone = timeZone;
   }
 
-  public static DateTypeConverter createDefaultDateConverter() {
-    return new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd"));
+  public static DateTypeParser createDefaultDateConverter() {
+    return new DateTypeParser(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd"));
   }
 
-  public static DateTypeConverter createDefaultTimeConverter() {
-    return new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("HH:mm:ss"));
+  public static DateTypeParser createDefaultTimeConverter() {
+    return new DateTypeParser(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("HH:mm:ss"));
   }
 
-  public static DateTypeConverter createDefaultTimestampConverter() {
-    return new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss"));
+  public static DateTypeParser createDefaultTimestampConverter() {
+    return new DateTypeParser(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss"));
   }
 
   @Override
-  public Object convert(String s, final Schema schema) {
+  public Object parseString(String s, final Schema schema) {
     Date date = null;
     for (SimpleDateFormat dateFormat : this.dateFormats) {
       try {

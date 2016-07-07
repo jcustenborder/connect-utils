@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.conversion.type;
+package io.confluent.kafka.connect.utils.type;
 
 import org.apache.kafka.connect.data.Schema;
 
-public class StringTypeConverter implements TypeConverter {
+public class StringTypeParser implements TypeParser {
   @Override
-  public Object convert(String s, final Schema schema) {
+  public Object parseString(String s, final Schema schema) {
     return s;
   }
 }

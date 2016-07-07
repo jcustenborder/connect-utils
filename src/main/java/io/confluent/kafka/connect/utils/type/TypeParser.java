@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.conversion.type;
+package io.confluent.kafka.connect.utils.type;
 
 import org.apache.kafka.connect.data.Schema;
 
-public interface TypeConverter {
+public interface TypeParser {
   /**
-   * Method is used to convert a String to an object representation of a Kafka Connect Type
+   * Method is used to parse a String to an object representation of a Kafka Connect Type
    *
-   * @param s input string to convert
+   * @param s input string to parseString
    * @return Object representation of the Kafka Connect Type
    */
-  Object convert(String s, Schema schema);
+  Object parseString(String s, Schema schema);
 }

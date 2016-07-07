@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.conversion.type;
+package io.confluent.kafka.connect.utils.type;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -25,10 +25,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class DecimalTypeConverter implements TypeConverter {
+public class DecimalTypeParser implements TypeParser {
   final Cache<Schema, Integer> schemaCache;
 
-  public DecimalTypeConverter() {
+  public DecimalTypeParser() {
     this.schemaCache = CacheBuilder.newBuilder()
         .expireAfterWrite(60, TimeUnit.SECONDS)
         .build();
@@ -49,7 +49,7 @@ public class DecimalTypeConverter implements TypeConverter {
   }
 
   @Override
-  public Object convert(String s, final Schema schema) {
+  public Object parseString(String s, final Schema schema) {
     int scale;
     try {
       scale = this.schemaCache.get(schema, new Callable<Integer>() {

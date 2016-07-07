@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.conversion;
+package io.confluent.kafka.connect.utils;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.kafka.connect.data.Date;
@@ -33,14 +33,14 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class ConverterTest {
+public class StringParserTest {
 
-  Converter converter;
+  StringParser stringParser;
   Calendar calendar;
 
   @Before
   public void before() {
-    this.converter = new Converter();
+    this.stringParser = new StringParser();
     this.calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
   }
 
@@ -62,7 +62,7 @@ public class ConverterTest {
     };
 
     for (Schema schema : schemas) {
-      Object actual = this.converter.convert(schema, null);
+      Object actual = this.stringParser.parseString(schema, null);
       Assert.assertNull(actual);
     }
 
@@ -71,7 +71,7 @@ public class ConverterTest {
   void assertConversion(Schema schema, final Class expectedClass, Map<String, ?> tests) {
     for (Map.Entry<String, ?> kvp : tests.entrySet()) {
       Object expected = kvp.getValue();
-      Object actual = this.converter.convert(schema, kvp.getKey());
+      Object actual = this.stringParser.parseString(schema, kvp.getKey());
       String message = String.format("Could not parse '%s' to '%s'", kvp.getKey(), expectedClass.getName());
       Assert.assertNotNull(message, actual);
       final Class actualClass = actual.getClass();

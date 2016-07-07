@@ -7,22 +7,22 @@ The purpose of this library is to aid with conversions from strings to the prope
 ## Convert to a schema type
 
 ```
-Converter converter = new Converter();
-Object value = converter.convert(Schema.BOOLEAN_SCHEMA, "true");
+StringParser converter = new StringParser();
+Object value = parse.parseString(Schema.BOOLEAN_SCHEMA, "true");
 ```
 
 ## Nulls are supported too
 
 ```
 Converter converter = new Converter();
-Object value = converter.convert(Schema.OPTIONAL_BOOLEAN_SCHEMA, "true");
+Object value = converter.parseString(Schema.OPTIONAL_BOOLEAN_SCHEMA, "true");
 ```
 
 ## Optional schemas do not support nulls
 
 ```
 Converter converter = new Converter();
-Object value = converter.convert(Schema.BOOLEAN_SCHEMA, null);
+Object value = converter.parseString(Schema.BOOLEAN_SCHEMA, null);
 ```
 
 ## Register your own type converter or an alternate date format 
@@ -30,5 +30,5 @@ Object value = converter.convert(Schema.BOOLEAN_SCHEMA, null);
 ```
 Converter converter = new Converter();
 converter.registerTypeConverter(Timestamp.SCHEMA, new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss")));
-Object value = converter.convert(Schema.BOOLEAN_SCHEMA, null);
+Object value = converter.parseString(Schema.BOOLEAN_SCHEMA, null);
 ```

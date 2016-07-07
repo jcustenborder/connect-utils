@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.conversion.type;
+package io.confluent.kafka.connect.utils.type;
 
 import org.apache.kafka.connect.data.Schema;
 
-public class BooleanConverter implements TypeConverter {
+public class Int32TypeParser implements TypeParser {
   @Override
-  public Object convert(String s, final Schema schema) {
-    return Boolean.parseBoolean(s);
+  public Object parseString(String s, final Schema schema) {
+    return Integer.parseInt(s);
   }
 }

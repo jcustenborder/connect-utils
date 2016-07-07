@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.conversion;
+package io.confluent.kafka.connect.utils;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
@@ -21,15 +21,15 @@ import com.google.common.collect.ComparisonChain;
 import org.apache.kafka.connect.data.Schema;
 
 
-class ConverterKey implements Comparable<ConverterKey> {
+class ParserKey implements Comparable<ParserKey> {
   public final Schema.Type type;
   public final String logicalName;
 
-  ConverterKey(Schema schema) {
+  ParserKey(Schema schema) {
     this(schema.type(), schema.name());
   }
 
-  ConverterKey(Schema.Type type, String logicalName) {
+  ParserKey(Schema.Type type, String logicalName) {
     this.type = type;
     this.logicalName = logicalName == null ? "" : logicalName;
   }
@@ -49,7 +49,7 @@ class ConverterKey implements Comparable<ConverterKey> {
 
 
   @Override
-  public int compareTo(ConverterKey that) {
+  public int compareTo(ParserKey that) {
     if (null == that) {
       return 1;
     }
@@ -61,8 +61,8 @@ class ConverterKey implements Comparable<ConverterKey> {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof ConverterKey) {
-      return compareTo((ConverterKey) obj) == 0;
+    if (obj instanceof ParserKey) {
+      return compareTo((ParserKey) obj) == 0;
     } else {
       return false;
     }
