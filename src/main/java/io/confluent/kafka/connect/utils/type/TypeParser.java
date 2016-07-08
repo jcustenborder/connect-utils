@@ -25,4 +25,12 @@ public interface TypeParser {
    * @return Object representation of the Kafka Connect Type
    */
   Object parseString(String s, Schema schema);
+
+  /**
+   * Method is used to return the expected class for the conversion. This is mainly used for
+   * error messages when a type cannot be parsed.
+   *
+   * @return Class the parser will return.
+   */
+  Class<?> expectedClass();
 }

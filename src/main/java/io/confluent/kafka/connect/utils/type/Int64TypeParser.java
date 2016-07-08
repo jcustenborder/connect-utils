@@ -22,4 +22,9 @@ public class Int64TypeParser implements TypeParser {
   public Object parseString(String s, final Schema schema) {
     return Long.parseLong(s);
   }
+
+  @Override
+  public Class<?> expectedClass() {
+    return Long.class;
+  }
 }

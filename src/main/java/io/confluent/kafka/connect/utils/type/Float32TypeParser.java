@@ -22,4 +22,9 @@ public class Float32TypeParser implements TypeParser {
   public Object parseString(String s, final Schema schema) {
     return Float.parseFloat(s);
   }
+
+  @Override
+  public Class<?> expectedClass() {
+    return Float.class;
+  }
 }

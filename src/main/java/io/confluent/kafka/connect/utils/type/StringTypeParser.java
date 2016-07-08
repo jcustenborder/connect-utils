@@ -22,4 +22,9 @@ public class StringTypeParser implements TypeParser {
   public Object parseString(String s, final Schema schema) {
     return s;
   }
+
+  @Override
+  public Class<?> expectedClass() {
+    return String.class;
+  }
 }

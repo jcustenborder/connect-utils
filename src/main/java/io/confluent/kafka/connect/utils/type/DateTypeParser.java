@@ -64,4 +64,9 @@ public class DateTypeParser implements TypeParser {
     Preconditions.checkState(null != date, "Could not parse '%s' to java.util.Date", s);
     return date;
   }
+
+  @Override
+  public Class<?> expectedClass() {
+    return java.util.Date.class;
+  }
 }

@@ -22,4 +22,9 @@ public class Int16TypeParser implements TypeParser {
   public Object parseString(String s, final Schema schema) {
     return Short.parseShort(s);
   }
+
+  @Override
+  public Class<?> expectedClass() {
+    return Byte.class;
+  }
 }

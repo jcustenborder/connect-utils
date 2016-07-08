@@ -22,4 +22,9 @@ public class BooleanParser implements TypeParser {
   public Object parseString(String s, final Schema schema) {
     return Boolean.parseBoolean(s);
   }
+
+  @Override
+  public Class<?> expectedClass() {
+    return Boolean.class;
+  }
 }

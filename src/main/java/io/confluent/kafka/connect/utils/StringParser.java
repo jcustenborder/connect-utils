@@ -32,6 +32,7 @@ import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
+import org.apache.kafka.connect.errors.DataException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,8 +79,14 @@ public class StringParser {
           String.format("Schema %s(%s) is not supported", schema.type(), schema.name())
       );
     }
-    Object result = parser.parseString(input, schema);
-    return result;
+
+    try {
+      Object result = parser.parseString(input, schema);
+      return result;
+    } catch (Exception ex) {
+      String message = String.format("Could not parse '%s' to '%s'", input, parser.expectedClass());
+      throw new DataException(message, ex);
+    }
   }
 
 }

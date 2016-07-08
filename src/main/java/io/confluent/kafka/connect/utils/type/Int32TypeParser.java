@@ -22,4 +22,9 @@ public class Int32TypeParser implements TypeParser {
   public Object parseString(String s, final Schema schema) {
     return Integer.parseInt(s);
   }
+
+  @Override
+  public Class<?> expectedClass() {
+    return Integer.class;
+  }
 }

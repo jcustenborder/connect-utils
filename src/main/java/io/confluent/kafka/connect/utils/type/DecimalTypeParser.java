@@ -32,7 +32,6 @@ public class DecimalTypeParser implements TypeParser {
     this.schemaCache = CacheBuilder.newBuilder()
         .expireAfterWrite(60, TimeUnit.SECONDS)
         .build();
-
   }
 
   private static int scale(Schema schema) {
@@ -64,5 +63,10 @@ public class DecimalTypeParser implements TypeParser {
 
 
     return new BigDecimal(s).setScale(scale);
+  }
+
+  @Override
+  public Class<?> expectedClass() {
+    return BigDecimal.class;
   }
 }

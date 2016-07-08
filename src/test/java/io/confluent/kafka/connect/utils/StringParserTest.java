@@ -21,6 +21,7 @@ import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
+import org.apache.kafka.connect.errors.DataException;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Before;
@@ -100,6 +101,11 @@ public class StringParserTest {
     assertConversion(Schema.FLOAT32_SCHEMA, Float.class, tests);
   }
 
+  @Test(expected = DataException.class)
+  public void float32BadData() {
+    stringParser.parseString(Schema.FLOAT32_SCHEMA, "asdf");
+  }
+
   @Test
   public void float64Tests() {
     Map<String, ?> tests = ImmutableMap.of(
@@ -107,6 +113,11 @@ public class StringParserTest {
         new Double(Double.MIN_VALUE).toString(), new Double(Double.MIN_VALUE)
     );
     assertConversion(Schema.FLOAT64_SCHEMA, Double.class, tests);
+  }
+
+  @Test(expected = DataException.class)
+  public void float64BadData() {
+    stringParser.parseString(Schema.FLOAT64_SCHEMA, "asdf");
   }
 
   @Test
@@ -118,6 +129,11 @@ public class StringParserTest {
     assertConversion(Schema.INT8_SCHEMA, Byte.class, tests);
   }
 
+  @Test(expected = DataException.class)
+  public void int8BadData() {
+    stringParser.parseString(Schema.INT8_SCHEMA, "asdf");
+  }
+
   @Test
   public void int16Tests() {
     Map<String, ?> tests = ImmutableMap.of(
@@ -125,6 +141,11 @@ public class StringParserTest {
         new Short(Short.MIN_VALUE).toString(), new Short(Short.MIN_VALUE)
     );
     assertConversion(Schema.INT16_SCHEMA, Short.class, tests);
+  }
+
+  @Test(expected = DataException.class)
+  public void int16BadData() {
+    stringParser.parseString(Schema.INT16_SCHEMA, "asdf");
   }
 
   @Test
@@ -136,6 +157,11 @@ public class StringParserTest {
     assertConversion(Schema.INT32_SCHEMA, Integer.class, tests);
   }
 
+  @Test(expected = DataException.class)
+  public void int32BadData() {
+    stringParser.parseString(Schema.INT32_SCHEMA, "asdf");
+  }
+
   @Test
   public void int64Tests() {
     Map<String, ?> tests = ImmutableMap.of(
@@ -143,6 +169,20 @@ public class StringParserTest {
         new Long(Long.MIN_VALUE).toString(), new Long(Long.MIN_VALUE)
     );
     assertConversion(Schema.INT64_SCHEMA, Long.class, tests);
+  }
+
+  @Test(expected = DataException.class)
+  public void int64BadData() {
+    stringParser.parseString(Schema.INT64_SCHEMA, "asdf");
+  }
+
+  @Test
+  public void stringTests() {
+    Map<String, ?> tests = ImmutableMap.of(
+        "", "",
+        "mirror", "mirror"
+    );
+    assertConversion(Schema.STRING_SCHEMA, String.class, tests);
   }
 
   @Test

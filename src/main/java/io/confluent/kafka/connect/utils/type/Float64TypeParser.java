@@ -22,4 +22,9 @@ public class Float64TypeParser implements TypeParser {
   public Object parseString(String s, final Schema schema) {
     return Double.parseDouble(s);
   }
+
+  @Override
+  public Class<?> expectedClass() {
+    return Double.class;
+  }
 }

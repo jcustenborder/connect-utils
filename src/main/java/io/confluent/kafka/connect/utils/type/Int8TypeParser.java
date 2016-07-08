@@ -22,4 +22,9 @@ public class Int8TypeParser implements TypeParser {
   public Object parseString(String s, final Schema schema) {
     return Byte.parseByte(s);
   }
+
+  @Override
+  public Class<?> expectedClass() {
+    return Byte.class;
+  }
 }
