@@ -32,10 +32,17 @@
         <confluent.maven.repo>http://packages.confluent.io/maven/</confluent.maven.repo>
         <kafka.version>0.10.0.0-cp1</kafka.version>
         <guava.version>18.0</guava.version>
+        <jackson.version>2.6.3</jackson.version>
         <junit.version>4.12</junit.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -53,6 +60,11 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.4.3</version>
         </dependency>
     </dependencies>
 

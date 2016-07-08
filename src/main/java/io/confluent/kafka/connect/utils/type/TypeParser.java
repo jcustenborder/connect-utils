@@ -15,6 +15,7 @@
  */
 package io.confluent.kafka.connect.utils.type;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.kafka.connect.data.Schema;
 
 public interface TypeParser {
@@ -33,4 +34,6 @@ public interface TypeParser {
    * @return Class the parser will return.
    */
   Class<?> expectedClass();
+
+  Object parseJsonNode(JsonNode input, Schema schema);
 }

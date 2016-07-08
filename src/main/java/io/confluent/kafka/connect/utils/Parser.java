@@ -33,14 +33,16 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
 import org.apache.kafka.connect.errors.DataException;
+import com.fasterxml.jackson.databind.JsonNode;
+
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class StringParser {
+public class Parser {
   final Map<ParserKey, TypeParser> typeParsers;
 
-  public StringParser() {
+  public Parser() {
     this.typeParsers = new HashMap<>();
     registerTypeParser(Schema.BOOLEAN_SCHEMA, new BooleanParser());
     registerTypeParser(Schema.BOOLEAN_SCHEMA, new BooleanParser());
@@ -80,29 +82,55 @@ public class StringParser {
    * @exception NullPointerException Exception is thrown if the schema passed is not optional and a null input value is passed.
    */
   public Object parseString(Schema schema, String input) {
-    Preconditions.checkNotNull(schema, "schema cannot be null");
-    ParserKey parserKey = new ParserKey(schema);
-    TypeParser parser = this.typeParsers.get(parserKey);
+    checkSchemaAndInput(schema, input);
 
-    if (!schema.isOptional()) {
-      Preconditions.checkNotNull(input, "schema is not optional so input cannot be null.");
-    }
-
-    if (null == input && schema.isOptional()) {
+    if (null == input) {
       return null;
     }
 
-    if (null == parser) {
-      throw new UnsupportedOperationException(
-          String.format("Schema %s(%s) is not supported", schema.type(), schema.name())
-      );
-    }
+    TypeParser parser = findParser(schema);
 
     try {
       Object result = parser.parseString(input, schema);
       return result;
     } catch (Exception ex) {
-      String message = String.format("Could not parse '%s' to '%s'", input, parser.expectedClass());
+      String message = String.format("Could not parse '%s' to '%s'", input, parser.expectedClass().getSimpleName());
+      throw new DataException(message, ex);
+    }
+  }
+
+  void checkSchemaAndInput(Schema schema, Object input) {
+    Preconditions.checkNotNull(schema, "schema cannot be null");
+    if (!schema.isOptional()) {
+      Preconditions.checkNotNull(input, "schema is not optional so input cannot be null.");
+    }
+  }
+
+  TypeParser findParser(Schema schema) {
+    ParserKey parserKey = new ParserKey(schema);
+    TypeParser parser = this.typeParsers.get(parserKey);
+    if (null == parser) {
+      throw new UnsupportedOperationException(
+          String.format("Schema %s(%s) is not supported", schema.type(), schema.name())
+      );
+    }
+    return parser;
+  }
+
+  public Object parseJsonNode(Schema schema, JsonNode input) {
+    checkSchemaAndInput(schema, input);
+
+    if (null == input) {
+      return null;
+    }
+
+    TypeParser parser = findParser(schema);
+
+    try {
+      Object result = parser.parseJsonNode(input, schema);
+      return result;
+    } catch (Exception ex) {
+      String message = String.format("Could not parse '%s' to '%s'", input, parser.expectedClass().getSimpleName());
       throw new DataException(message, ex);
     }
   }

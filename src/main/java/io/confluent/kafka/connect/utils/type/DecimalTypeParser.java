@@ -15,6 +15,8 @@
  */
 package io.confluent.kafka.connect.utils.type;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.apache.kafka.connect.data.Schema;
@@ -47,8 +49,7 @@ public class DecimalTypeParser implements TypeParser {
     }
   }
 
-  @Override
-  public Object parseString(String s, final Schema schema) {
+  int getScale(final Schema schema) {
     int scale;
     try {
       scale = this.schemaCache.get(schema, new Callable<Integer>() {
@@ -60,13 +61,24 @@ public class DecimalTypeParser implements TypeParser {
     } catch (ExecutionException e) {
       throw new DataException(e);
     }
+    return scale;
+  }
 
-
+  @Override
+  public Object parseString(String s, Schema schema) {
+    int scale = getScale(schema);
     return new BigDecimal(s).setScale(scale);
   }
 
   @Override
   public Class<?> expectedClass() {
     return BigDecimal.class;
+  }
+
+  @Override
+  public Object parseJsonNode(JsonNode input, Schema schema) {
+    Preconditions.checkState(input.isBigDecimal(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
+    int scale = getScale(schema);
+    return input.decimalValue().setScale(scale);
   }
 }

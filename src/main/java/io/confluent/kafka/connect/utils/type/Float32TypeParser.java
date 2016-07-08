@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,8 @@
  */
 package io.confluent.kafka.connect.utils.type;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Schema;
 
 public class Float32TypeParser implements TypeParser {
@@ -26,5 +28,11 @@ public class Float32TypeParser implements TypeParser {
   @Override
   public Class<?> expectedClass() {
     return Float.class;
+  }
+
+  @Override
+  public Object parseJsonNode(JsonNode input, Schema schema) {
+    Preconditions.checkState(input.isFloat() || input.isDouble(), "'%s' is not a '%s'", input.asText(), expectedClass().getSimpleName());
+    return input.decimalValue().floatValue();
   }
 }

@@ -15,6 +15,8 @@
  */
 package io.confluent.kafka.connect.utils.type;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Schema;
 
 public class Float64TypeParser implements TypeParser {
@@ -26,5 +28,11 @@ public class Float64TypeParser implements TypeParser {
   @Override
   public Class<?> expectedClass() {
     return Double.class;
+  }
+
+  @Override
+  public Object parseJsonNode(JsonNode input, Schema schema) {
+    Preconditions.checkState(input.isFloat() || input.isDouble(), "'%s' is not a '%s'", input.asText(), expectedClass().getSimpleName());
+    return input.decimalValue().doubleValue();
   }
 }

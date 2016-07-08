@@ -10,28 +10,44 @@ transform Strings to Integers. The current code supports nullable schemas. An ex
 ## Convert to a schema type
 
 ```
-StringParser parser = new StringParser();
+Parser parser = new Parser();
 Object value = parser.parseString(Schema.BOOLEAN_SCHEMA, "true");
+```
+
+```
+Parser parser = new Parser();
+Object value = parser.parseJson(Schema.BOOLEAN_SCHEMA, objectMapper.valueToTree(true));
 ```
 
 ## Nulls are supported too
 
 ```
-StringParser parser = new StringParser();
-Object value = parser.parseString(Schema.OPTIONAL_BOOLEAN_SCHEMA, "true");
+Parser parser = new Parser();
+Object value = parser.parseString(Schema.OPTIONAL_BOOLEAN_SCHEMA, null);
 ```
 
-## Optional schemas do not support nulls
+```
+Parser parser = new Parser();
+Object value = parser.parseJson(Schema.OPTIONAL_BOOLEAN_SCHEMA, null);
+```
+
+## Schemas without optional set do not support nulls
+
+If you pass in a null to a schema that is not optional, you're going to have a bad time.
 
 ```
-StringParser parser = new StringParser();
+Parser parser = new Parser();
 Object value = parser.parseString(Schema.BOOLEAN_SCHEMA, null);
+```
+
+```
+Parser parser = new Parser();
+Object value = parser.parseJson(Schema.BOOLEAN_SCHEMA, null);
 ```
 
 ## Register your own type converter or an alternate date format 
 
 ```
-StringParser parser = new StringParser();
+Parser parser = new Parser();
 parser.registerTypeParser(Timestamp.SCHEMA, new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss")));
-Object value = parser.parseString(Schema.BOOLEAN_SCHEMA, null);
 ```

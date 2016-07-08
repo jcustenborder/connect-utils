@@ -15,6 +15,7 @@
  */
 package io.confluent.kafka.connect.utils.type;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.kafka.connect.data.Schema;
 
 public class StringTypeParser implements TypeParser {
@@ -26,5 +27,10 @@ public class StringTypeParser implements TypeParser {
   @Override
   public Class<?> expectedClass() {
     return String.class;
+  }
+
+  @Override
+  public Object parseJsonNode(JsonNode input, Schema schema) {
+    return input.textValue();
   }
 }

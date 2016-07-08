@@ -15,6 +15,7 @@
  */
 package io.confluent.kafka.connect.utils.type;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Schema;
 import org.slf4j.Logger;
@@ -68,5 +69,11 @@ public class DateTypeParser implements TypeParser {
   @Override
   public Class<?> expectedClass() {
     return java.util.Date.class;
+  }
+
+  @Override
+  public Object parseJsonNode(JsonNode input, Schema schema) {
+    Preconditions.checkState(input.isLong() || input.isInt(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
+    return new java.util.Date(input.longValue());
   }
 }
