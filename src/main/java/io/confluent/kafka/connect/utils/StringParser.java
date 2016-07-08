@@ -57,10 +57,28 @@ public class StringParser {
     registerTypeParser(Timestamp.SCHEMA, DateTypeParser.createDefaultTimestampConverter());
   }
 
+  /**
+   * Method is used to register a TypeParser for a given schema. If the schema is already registered, the new TypeParser
+   * will replace the existing one.
+   *
+   * @param schema     Schema to register to. This supports any logical type by checking Schema.name() and schema.type().
+   * @param typeParser
+   */
   public final void registerTypeParser(Schema schema, TypeParser typeParser) {
+    Preconditions.checkNotNull(schema, "schema cannot be null.");
+    Preconditions.checkNotNull(typeParser, "typeParser cannot be null.");
     this.typeParsers.put(new ParserKey(schema), typeParser);
   }
 
+  /**
+   * Method is used to parse String data to the proper Java types.
+   * @param schema Input schema to parse the String data by.
+   * @param input Java type specific to the schema supplied.
+   * @return Java type for the
+   * @exception DataException Exception is thrown when there is an exception thrown while parsing the input string.
+   * @exception UnsupportedOperationException Exception is thrown if there is no type parser registered for the schema.
+   * @exception NullPointerException Exception is thrown if the schema passed is not optional and a null input value is passed.
+   */
   public Object parseString(Schema schema, String input) {
     Preconditions.checkNotNull(schema, "schema cannot be null");
     ParserKey parserKey = new ParserKey(schema);
