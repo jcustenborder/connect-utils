@@ -27,6 +27,24 @@
 
     <name>connect-utils</name>
 
+    <issueManagement>
+        <url>https://github.com/jcustenborder/connect-utils/issues</url>
+        <system>github</system>
+    </issueManagement>
+
+    <scm>
+        <url>scm:git:git://git@github.com:jcustenborder/connect-utils.git</url>
+    </scm>
+
+    <contributors>
+        <contributor>
+            <name>Jeremy Custenborder</name>
+            <email>jeremy@confluent.io</email>
+            <organization>Confluent</organization>
+            <organizationUrl>http://www.confluent.io/</organizationUrl>
+        </contributor>
+    </contributors>
+
     <properties>
         <confluent.version>3.0.0</confluent.version>
         <confluent.maven.repo>http://packages.confluent.io/maven/</confluent.maven.repo>
@@ -35,6 +53,13 @@
         <jackson.version>2.6.3</jackson.version>
         <junit.version>4.12</junit.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>confluent</id>
+            <url>http://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -60,11 +85,6 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.4.3</version>
         </dependency>
     </dependencies>
 
