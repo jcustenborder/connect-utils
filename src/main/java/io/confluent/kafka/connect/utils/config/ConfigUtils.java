@@ -19,6 +19,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.AbstractConfig;
 
+import java.io.File;
+
 public class ConfigUtils {
   private ConfigUtils() {
   }
@@ -70,4 +72,20 @@ public class ConfigUtils {
     Preconditions.checkState(enumClass.isEnum(), "enumClass must be an enum.");
     return Joiner.on(", ").join(enumClass.getEnumConstants());
   }
+
+  /**
+   * Method is used to return a File checking to ensure that it is an absolute path.
+   *
+   * @param config config to read the value from
+   * @param key    key for the value
+   * @return File for the config value.
+   */
+  public static File getAbsoluteFile(AbstractConfig config, String key) {
+    Preconditions.checkNotNull(config, "config cannot be null");
+    String path = config.getString(key);
+    File file = new File(path);
+    Preconditions.checkState(file.isAbsolute(), "'%s' must be an absolute path.", key);
+    return new File(path);
+  }
+
 }
