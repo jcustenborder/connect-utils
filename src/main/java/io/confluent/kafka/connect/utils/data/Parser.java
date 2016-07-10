@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.utils;
+package io.confluent.kafka.connect.utils.data;
 
 import com.google.common.base.Preconditions;
-import io.confluent.kafka.connect.utils.type.BooleanParser;
-import io.confluent.kafka.connect.utils.type.DateTypeParser;
-import io.confluent.kafka.connect.utils.type.DecimalTypeParser;
-import io.confluent.kafka.connect.utils.type.Float32TypeParser;
-import io.confluent.kafka.connect.utils.type.Float64TypeParser;
-import io.confluent.kafka.connect.utils.type.Int16TypeParser;
-import io.confluent.kafka.connect.utils.type.Int32TypeParser;
-import io.confluent.kafka.connect.utils.type.Int64TypeParser;
-import io.confluent.kafka.connect.utils.type.Int8TypeParser;
-import io.confluent.kafka.connect.utils.type.StringTypeParser;
-import io.confluent.kafka.connect.utils.type.TypeParser;
+import io.confluent.kafka.connect.utils.data.type.BooleanParser;
+import io.confluent.kafka.connect.utils.data.type.DateTypeParser;
+import io.confluent.kafka.connect.utils.data.type.DecimalTypeParser;
+import io.confluent.kafka.connect.utils.data.type.Float32TypeParser;
+import io.confluent.kafka.connect.utils.data.type.Float64TypeParser;
+import io.confluent.kafka.connect.utils.data.type.Int16TypeParser;
+import io.confluent.kafka.connect.utils.data.type.Int32TypeParser;
+import io.confluent.kafka.connect.utils.data.type.Int64TypeParser;
+import io.confluent.kafka.connect.utils.data.type.Int8TypeParser;
+import io.confluent.kafka.connect.utils.data.type.StringTypeParser;
+import io.confluent.kafka.connect.utils.data.type.TypeParser;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;

@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.utils.type;
+package io.confluent.kafka.connect.utils.data.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Schema;
 
-public class Int8TypeParser implements TypeParser {
+public class Float32TypeParser implements TypeParser {
   @Override
   public Object parseString(String s, final Schema schema) {
-    return Byte.parseByte(s);
+    return Float.parseFloat(s);
   }
 
   @Override
   public Class<?> expectedClass() {
-    return Byte.class;
+    return Float.class;
   }
 
   @Override
   public Object parseJsonNode(JsonNode input, Schema schema) {
-    Preconditions.checkState(input.isInt(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
-    return input.bigIntegerValue().byteValue();
+    Preconditions.checkState(input.isFloat() || input.isDouble(), "'%s' is not a '%s'", input.asText(), expectedClass().getSimpleName());
+    return input.decimalValue().floatValue();
   }
 }

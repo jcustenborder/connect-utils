@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.utils;
+package io.confluent.kafka.connect.utils.data.type;
 
 import com.google.common.collect.ImmutableMap;
+import io.confluent.kafka.connect.utils.data.Parser;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;

@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.utils.type;
+package io.confluent.kafka.connect.utils.data.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Schema;
 
-public class Float32TypeParser implements TypeParser {
-  @Override
-  public Object parseString(String s, final Schema schema) {
-    return Float.parseFloat(s);
-  }
+public interface TypeParser {
+  /**
+   * Method is used to parse a String to an object representation of a Kafka Connect Type
+   *
+   * @param s input string to parseString
+   * @return Object representation of the Kafka Connect Type
+   */
+  Object parseString(String s, Schema schema);
 
-  @Override
-  public Class<?> expectedClass() {
-    return Float.class;
-  }
+  /**
+   * Method is used to return the expected class for the conversion. This is mainly used for
+   * error messages when a type cannot be parsed.
+   *
+   * @return Class the parser will return.
+   */
+  Class<?> expectedClass();
 
-  @Override
-  public Object parseJsonNode(JsonNode input, Schema schema) {
-    Preconditions.checkState(input.isFloat() || input.isDouble(), "'%s' is not a '%s'", input.asText(), expectedClass().getSimpleName());
-    return input.decimalValue().floatValue();
-  }
+  Object parseJsonNode(JsonNode input, Schema schema);
 }

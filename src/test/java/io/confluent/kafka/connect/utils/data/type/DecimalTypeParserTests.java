@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.utils.type;
+package io.confluent.kafka.connect.utils.data.type;
 
 
 import org.apache.kafka.connect.data.Decimal;

@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.utils.type;
+package io.confluent.kafka.connect.utils.data.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Schema;
 
-public class Int16TypeParser implements TypeParser {
+public class Int64TypeParser implements TypeParser {
   @Override
   public Object parseString(String s, final Schema schema) {
-    return Short.parseShort(s);
+    return Long.parseLong(s);
   }
 
   @Override
   public Class<?> expectedClass() {
-    return Short.class;
+    return Long.class;
   }
 
   @Override
   public Object parseJsonNode(JsonNode input, Schema schema) {
-    Preconditions.checkState(input.isInt(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
-    return input.shortValue();
+    Preconditions.checkState(input.isLong(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
+    return input.longValue();
   }
 }

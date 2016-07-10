@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.confluent.kafka.connect.utils.type;
+package io.confluent.kafka.connect.utils.data.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Schema;
 
-public class BooleanParser implements TypeParser {
+public class Int16TypeParser implements TypeParser {
   @Override
   public Object parseString(String s, final Schema schema) {
-    return Boolean.parseBoolean(s);
+    return Short.parseShort(s);
   }
 
   @Override
   public Class<?> expectedClass() {
-    return Boolean.class;
+    return Short.class;
   }
 
   @Override
   public Object parseJsonNode(JsonNode input, Schema schema) {
-    Preconditions.checkState(input.isBoolean(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
-    return input.asBoolean();
+    Preconditions.checkState(input.isInt(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
+    return input.shortValue();
   }
 }
