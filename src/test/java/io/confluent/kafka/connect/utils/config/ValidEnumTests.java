@@ -17,7 +17,7 @@ package io.confluent.kafka.connect.utils.config;
 
 import org.junit.Test;
 
-public class EnumValidatorTests {
+public class ValidEnumTests {
 
   public enum TestEnum {
     one,
@@ -28,14 +28,14 @@ public class EnumValidatorTests {
 
   @Test
   public void valid() {
-    EnumValidator enumValidator = EnumValidator.of(TestEnum.class);
-    enumValidator.ensureValid("testing", TestEnum.one.name());
+    ValidEnum validEnum = ValidEnum.of(TestEnum.class);
+    validEnum.ensureValid("testing", TestEnum.one.name());
   }
 
   @Test(expected = IllegalStateException.class)
   public void invalid() {
-    EnumValidator enumValidator = EnumValidator.of(TestEnum.class);
-    enumValidator.ensureValid("testing", "missing");
+    ValidEnum validEnum = ValidEnum.of(TestEnum.class);
+    validEnum.ensureValid("testing", "missing");
   }
 
 }

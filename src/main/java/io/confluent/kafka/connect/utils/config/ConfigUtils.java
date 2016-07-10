@@ -50,7 +50,7 @@ public class ConfigUtils {
    * @param key       key for the value
    * @param <T>
    * @return enum value for the given key.
-   * @see EnumValidator
+   * @see ValidEnum
    */
   public static <T extends Enum<T>> T getEnum(Class<T> enumClass, AbstractConfig config, String key) {
     Preconditions.checkNotNull(enumClass, "enumClass cannot be null");

@@ -25,15 +25,15 @@ import java.util.Set;
 /**
  * Validator is used to ensure that the input string is an element in the enum.
  */
-public class EnumValidator implements ConfigDef.Validator {
+public class ValidEnum implements ConfigDef.Validator {
   final Set<String> validEnums;
   final Class<?> enumClass;
 
-  public static EnumValidator of(Class<?> enumClass) {
-    return new EnumValidator(enumClass);
+  public static ValidEnum of(Class<?> enumClass) {
+    return new ValidEnum(enumClass);
   }
 
-  private EnumValidator(Class<?> enumClass) {
+  private ValidEnum(Class<?> enumClass) {
     Preconditions.checkNotNull(enumClass, "enumClass cannot be null");
     Preconditions.checkState(enumClass.isEnum(), "enumClass must be an enum.");
     Set<String> validEnums = new HashSet<>();
