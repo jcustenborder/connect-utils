@@ -15,7 +15,6 @@
  */
 package io.confluent.kafka.connect.utils.config;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef;
