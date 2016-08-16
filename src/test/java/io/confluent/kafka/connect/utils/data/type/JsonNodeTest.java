@@ -17,6 +17,7 @@ package io.confluent.kafka.connect.utils.data.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.confluent.kafka.connect.utils.data.Parser;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
@@ -49,6 +50,7 @@ public class JsonNodeTest {
   @Before
   public void before() {
     this.parser = new Parser();
+    this.parser.registerTypeParser(Timestamp.SCHEMA, new DateTypeParser(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSS'Z'")));
     this.calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
     this.random = new Random();
   }
@@ -84,13 +86,24 @@ public class JsonNodeTest {
 
   void assertConversion(Schema schema, final Class expectedClass, List<?> tests) {
     for (Object expected : tests) {
-      JsonNode input = objectMapper.valueToTree(expected);
-      Assert.assertNotNull("Could not create input value", input);
-      Object actual = this.parser.parseJsonNode(schema, input);
-      String message = String.format("Could not parse '%s' to '%s'", input, expectedClass.getName());
+
+      JsonNode valueNode = objectMapper.valueToTree(expected);
+      ObjectNode objectNode = objectMapper.createObjectNode();
+      objectNode.set("foo", valueNode);
+
+      JsonNode propertyNode = objectNode.findValue("foo");
+      Object actual = this.parser.parseJsonNode(schema, propertyNode);
+      Assert.assertNotNull("Could not create valueNode value", valueNode);
+      String message = String.format("Could not parse '%s' to '%s'", valueNode, expectedClass.getName());
       Assert.assertNotNull(message, actual);
-      final Class actualClass = actual.getClass();
-      Assert.assertThat(message, actualClass, IsEqual.equalTo(expectedClass));
+      Assert.assertThat(message, actual.getClass(), IsEqual.equalTo(expectedClass));
+      Assert.assertEquals(message, expected, actual);
+
+      actual = this.parser.parseJsonNode(schema, valueNode);
+      Assert.assertNotNull("Could not create valueNode value", valueNode);
+      message = String.format("Could not parse '%s' to '%s'", valueNode, expectedClass.getName());
+      Assert.assertNotNull(message, actual);
+      Assert.assertThat(message, actual.getClass(), IsEqual.equalTo(expectedClass));
       Assert.assertEquals(message, expected, actual);
     }
   }
@@ -230,6 +243,14 @@ public class JsonNodeTest {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
     List<?> tests = Arrays.asList(dateFormat.parse("2001-07-04 12:08:56"));
     assertConversion(Timestamp.SCHEMA, java.util.Date.class, tests);
+    final long expected = 1451275679192L;
+
+    ObjectNode inputNode = objectMapper.createObjectNode();
+    inputNode.put("foo", "2016-08-15T22:07:59.192Z");
+
+    final Object actual = this.parser.parseJsonNode(Timestamp.SCHEMA, inputNode.findValue("foo"));
+    final java.util.Date actualDate = (java.util.Date) actual;
+    Assert.assertEquals(expected, actualDate.getTime());
   }
 
   @Test

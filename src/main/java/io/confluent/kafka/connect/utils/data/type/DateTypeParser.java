@@ -73,7 +73,22 @@ public class DateTypeParser implements TypeParser {
 
   @Override
   public Object parseJsonNode(JsonNode input, Schema schema) {
-    Preconditions.checkState(input.isLong() || input.isInt(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
-    return new java.util.Date(input.longValue());
+    Object result;
+    if (input.isNumber()) {
+      result = new java.util.Date(input.longValue());
+    } else if (input.isTextual()) {
+      result = parseString(input.textValue(), schema);
+    } else {
+      throw new IllegalStateException(
+          String.format(
+              "NodeType:%s '%s' could not be converted to %s",
+              input.getNodeType(),
+              input.textValue(),
+              expectedClass().getSimpleName()
+          )
+      );
+    }
+
+    return result;
   }
 }
