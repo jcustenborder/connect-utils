@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,7 +54,7 @@ public class JsonNodeTest {
   }
 
   @Test
-  public void nullableTests() {
+  public void nullableTests() throws IOException {
     final Schema[] schemas = new Schema[]{
         Schema.OPTIONAL_BOOLEAN_SCHEMA,
         Schema.OPTIONAL_FLOAT32_SCHEMA,
@@ -70,7 +71,12 @@ public class JsonNodeTest {
     };
 
     for (Schema schema : schemas) {
-      Object actual = this.parser.parseJsonNode(schema, null);
+      JsonNode inputNode = null;
+      Object actual = this.parser.parseJsonNode(schema, inputNode);
+      Assert.assertNull(actual);
+      inputNode = objectMapper.readTree("{\"foo\": null}");
+      inputNode = inputNode.findValue("foo");
+      actual = this.parser.parseJsonNode(schema, inputNode);
       Assert.assertNull(actual);
     }
 
