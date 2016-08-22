@@ -241,6 +241,7 @@ public class JsonNodeTest {
   @Test
   public void timestampTests() throws ParseException {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     List<?> tests = Arrays.asList(dateFormat.parse("2001-07-04 12:08:56"));
     assertConversion(Timestamp.SCHEMA, java.util.Date.class, tests);
   }
