@@ -14,18 +14,12 @@ node {
     stage 'build'
     sh "${mvnHome}/bin/mvn -B -P maven-central clean verify"
 
-    if (env.BRANCH_NAME == 'master') {
-        stage 'versioning'
-        sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=0.1.${env.BUILD_NUMBER}"
-    }
-
     junit '**/target/surefire-reports/TEST-*.xml'
 
     if (env.BRANCH_NAME == 'master') {
         stage 'publishing'
+        sh "git tag ${mvnBuildNumber}"
         sh "${mvnHome}/bin/mvn -B -P maven-central deploy"
+        sh "git push origin ${mvnBuildNumber}"
     }
-
-    sh "git tag ${mvnBuildNumber}"
-    sh "git push origin ${mvnBuildNumber}"
 }
