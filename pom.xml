@@ -21,29 +21,41 @@
 
     <groupId>io.confluent.kafka</groupId>
     <artifactId>connect-utils</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
     <inceptionYear>2016</inceptionYear>
 
     <name>connect-utils</name>
+    <description>A quickstart for building Kafka Connect connectors.</description>
+    <url>https://github.com/jcustenborder/kafka-connect-archtype</url>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>jcustenborder</id>
+            <name>Jeremy Custenborder</name>
+            <email>jcustenborder@gmail.com</email>
+            <timezone>America/Chicago</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/jcustenborder/connect-utils</url>
+        <connection>scm:git:git://github.com/jcustenborder/connect-utils.git</connection>
+        <developerConnection>scm:git:git://git@github.com:jcustenborder/connect-utils.git</developerConnection>
+    </scm>
 
     <issueManagement>
         <url>https://github.com/jcustenborder/connect-utils/issues</url>
         <system>github</system>
     </issueManagement>
-
-    <scm>
-        <url>scm:git:git://git@github.com:jcustenborder/connect-utils.git</url>
-    </scm>
-
-    <contributors>
-        <contributor>
-            <name>Jeremy Custenborder</name>
-            <email>jeremy@confluent.io</email>
-            <organization>Confluent</organization>
-            <organizationUrl>http://www.confluent.io/</organizationUrl>
-        </contributor>
-    </contributors>
 
     <properties>
         <confluent.version>3.0.0</confluent.version>
@@ -140,9 +152,37 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
         </plugins>
-
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -150,5 +190,62 @@
             </resource>
         </resources>
     </build>
-
+    <profiles>
+        <profile>
+            <id>maven-central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <keyname>${gpg.keyname}</keyname>
+                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>oss.sonatype.org</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <description>${project.version}</description>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>deploy-to-sonatype</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                    <goal>release</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <repository>
+                    <id>oss.sonatype.org</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>oss.sonatype.org</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>

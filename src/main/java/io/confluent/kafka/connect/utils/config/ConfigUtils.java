@@ -32,8 +32,9 @@ public class ConfigUtils {
    * @param config   config that has the class setting
    * @param key      key to read
    * @param expected expected parent class or interface
-   * @param <T>
-   * @return
+   * @param <T>      Class type to return.
+   * @return Returns a class if it's assignable from the specified class.
+   * @exception IllegalStateException Thrown if it fails expected.isAssignableFrom(cls).
    */
   public static <T> Class<T> getClass(AbstractConfig config, String key, Class<T> expected) {
     Preconditions.checkNotNull(config, "config cannot be null");
@@ -50,7 +51,7 @@ public class ConfigUtils {
    * @param enumClass Class for the resulting enum value
    * @param config    config to read the value from
    * @param key       key for the value
-   * @param <T>
+   * @param <T>       Enum class to return type for.
    * @return enum value for the given key.
    * @see ValidEnum
    */
@@ -65,7 +66,7 @@ public class ConfigUtils {
    * Method is used to return the values for an enum.
    *
    * @param enumClass Enum class to return the constants for.
-   * @return
+   * @return Returns a comma seperated string of all of the values in the enum.
    */
   public static String enumValues(Class<?> enumClass) {
     Preconditions.checkNotNull(enumClass, "enumClass cannot be null");

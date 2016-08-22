@@ -63,7 +63,7 @@ public class Parser {
    * will replace the existing one.
    *
    * @param schema     Schema to register to. This supports any logical type by checking Schema.name() and schema.type().
-   * @param typeParser
+   * @param typeParser The type parser to register for schema.
    */
   public final void registerTypeParser(Schema schema, TypeParser typeParser) {
     Preconditions.checkNotNull(schema, "schema cannot be null.");
