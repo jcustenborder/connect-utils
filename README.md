@@ -1,4 +1,5 @@
 # Overview
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.confluent.kafka/connect-utils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.confluent.kafka/connect-utils)
 
 The purpose of this library is to aid with conversions from strings to the proper Kafka Connect data types. Hopefully this library can be usedful in reducing the amount of mind numbing string parsing code.
 
