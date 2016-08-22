@@ -23,6 +23,7 @@ public interface TypeParser {
    * Method is used to parse a String to an object representation of a Kafka Connect Type
    *
    * @param s input string to parseString
+   * @param schema Schema to parse the JsonNode for.
    * @return Object representation of the Kafka Connect Type
    */
   Object parseString(String s, Schema schema);
@@ -35,5 +36,12 @@ public interface TypeParser {
    */
   Class<?> expectedClass();
 
+  /**
+   * Method is used to parse a JsonNode to an object representation of a Kafka Connect Type.
+   *
+   * @param input  JsonNode containing the value to be parsed.
+   * @param schema Schema to parse the JsonNode for.
+   * @return Object representation of the Kafka Connect Type
+   */
   Object parseJsonNode(JsonNode input, Schema schema);
 }
