@@ -8,7 +8,7 @@ node {
 
     if (env.BRANCH_NAME == 'master') {
         stage 'versioning'
-        sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion={mvnBuildNumber}"
+        sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${mvnBuildNumber}"
     }
 
     stage 'build'
