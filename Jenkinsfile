@@ -1,6 +1,14 @@
+#!groovy
 node {
-  git url: 'https://github.com/jcustenborder/connect-utils.git'
-  def mvnHome = tool 'M3'
-  sh "${mvnHome}/bin/mvn -B clean package"
-  step([$class: 'JUnitResultArchiver', testResults:'**/target/surefire-reports/TEST-*.xml'])
+    def mvnHome = tool 'M3'
+    checkout scm
+
+    if (env.BRANCH_NAME == 'master') {
+        stage 'versioning'
+        sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=0.1.${env.BUILD_NUMBER}"
+    }
+    stage 'build'
+
+    sh "${mvnHome}/bin/mvn -B clean package"
+    junit '**/target/surefire-reports/TEST-*.xml'
 }

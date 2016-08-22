@@ -241,16 +241,9 @@ public class JsonNodeTest {
   @Test
   public void timestampTests() throws ParseException {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     List<?> tests = Arrays.asList(dateFormat.parse("2001-07-04 12:08:56"));
     assertConversion(Timestamp.SCHEMA, java.util.Date.class, tests);
-    final long expected = 1451275679192L;
-
-    ObjectNode inputNode = objectMapper.createObjectNode();
-    inputNode.put("foo", "2016-08-15T22:07:59.192Z");
-
-    final Object actual = this.parser.parseJsonNode(Timestamp.SCHEMA, inputNode.findValue("foo"));
-    final java.util.Date actualDate = (java.util.Date) actual;
-    Assert.assertEquals(expected, actualDate.getTime());
   }
 
   @Test
