@@ -246,7 +246,7 @@ public class JsonNodeTest {
     final long expected = 1451275679192L;
 
     ObjectNode inputNode = objectMapper.createObjectNode();
-    inputNode.put("foo", "2016-08-15T22:07:59.192Z");
+    inputNode.put("foo", "2016-12-28T20:07:59.192Z");
 
     final Object actual = this.parser.parseJsonNode(Timestamp.SCHEMA, inputNode.findValue("foo"));
     final java.util.Date actualDate = (java.util.Date) actual;
