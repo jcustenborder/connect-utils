@@ -243,14 +243,6 @@ public class JsonNodeTest {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
     List<?> tests = Arrays.asList(dateFormat.parse("2001-07-04 12:08:56"));
     assertConversion(Timestamp.SCHEMA, java.util.Date.class, tests);
-    final long expected = 1451275679192L;
-
-    ObjectNode inputNode = objectMapper.createObjectNode();
-    inputNode.put("foo", "2016-12-28T20:07:59.192Z");
-
-    final Object actual = this.parser.parseJsonNode(Timestamp.SCHEMA, inputNode.findValue("foo"));
-    final java.util.Date actualDate = (java.util.Date) actual;
-    Assert.assertEquals(expected, actualDate.getTime());
   }
 
   @Test
