@@ -26,6 +26,6 @@ node {
         sh "${mvnHome}/bin/mvn -B -P maven-central deploy"
     }
 
-    sh "git tag ${mvnBuildNumber} ${env.BRANCH_NAME}"
+    sh "git tag ${mvnBuildNumber}"
     sh "git push origin ${mvnBuildNumber}"
 }
