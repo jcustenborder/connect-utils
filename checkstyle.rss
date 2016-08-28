@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>connect-utils - Checkstyle report</title>
+    <link>https://github.com/jcustenborder/connect-utils</link>
+    <description>connect-utils - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2016</copyright>
+    <item>
+      <title>File: 18,
+             Errors: 243,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>https://github.com/jcustenborder/connect-utils/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.config.ConfigUtils.java">io/confluent/kafka/connect/utils/config/ConfigUtils.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  22
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.config.ValidEnum.java">io/confluent/kafka/connect/utils/config/ValidEnum.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.config.ValidPattern.java">io/confluent/kafka/connect/utils/config/ValidPattern.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  15
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.Int16TypeParser.java">io/confluent/kafka/connect/utils/data/type/Int16TypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.Int8TypeParser.java">io/confluent/kafka/connect/utils/data/type/Int8TypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.config.MarkdownFormatter.java">io/confluent/kafka/connect/utils/config/MarkdownFormatter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  43
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.Float32TypeParser.java">io/confluent/kafka/connect/utils/data/type/Float32TypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.Int64TypeParser.java">io/confluent/kafka/connect/utils/data/type/Int64TypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.StringTypeParser.java">io/confluent/kafka/connect/utils/data/type/StringTypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  7
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.BooleanParser.java">io/confluent/kafka/connect/utils/data/type/BooleanParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  9
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.DecimalTypeParser.java">io/confluent/kafka/connect/utils/data/type/DecimalTypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  19
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.Float64TypeParser.java">io/confluent/kafka/connect/utils/data/type/Float64TypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.config.ValidPort.java">io/confluent/kafka/connect/utils/config/ValidPort.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  30
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.Int32TypeParser.java">io/confluent/kafka/connect/utils/data/type/Int32TypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.DateTypeParser.java">io/confluent/kafka/connect/utils/data/type/DateTypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  26
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.ParserKey.java">io/confluent/kafka/connect/utils/data/ParserKey.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  15
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.Parser.java">io/confluent/kafka/connect/utils/data/Parser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.TypeParser.java">io/confluent/kafka/connect/utils/data/type/TypeParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  5
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+
