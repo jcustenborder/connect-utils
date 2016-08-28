@@ -197,20 +197,6 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.config.ValidPort.java">io/confluent/kafka/connect/utils/config/ValidPort.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  30
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.type.Int32TypeParser.java">io/confluent/kafka/connect/utils/data/type/Int32TypeParser.java</a>
                 </td>
                 <td>
@@ -221,6 +207,20 @@
                 </td>
                 <td>
                   8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.config.ValidPort.java">io/confluent/kafka/connect/utils/config/ValidPort.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  30
                 </td>
               </tr>
                           <tr>
@@ -248,7 +248,7 @@
                   0
                 </td>
                 <td>
-                  15
+                  16
                 </td>
               </tr>
                           <tr>
@@ -262,7 +262,7 @@
                   0
                 </td>
                 <td>
-                  2
+                  1
                 </td>
               </tr>
                           <tr>
