@@ -19,7 +19,7 @@ node {
     if (env.BRANCH_NAME == 'master') {
         stage 'publishing'
         sh "git tag ${mvnBuildNumber}"
-        sh "${mvnHome}/bin/mvn -B -P maven-central deploy"
+        sh "${mvnHome}/bin/mvn -B -P maven-central site deploy"
         sh "git push origin ${mvnBuildNumber}"
     }
 }
