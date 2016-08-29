@@ -8,8 +8,8 @@
     <language>en-us</language>
     <copyright>&#169;2016</copyright>
     <item>
-      <title>File: 18,
-             Errors: 243,
+      <title>File: 19,
+             Errors: 258,
              Warnings: 0,
              Infos: 0
       </title>
@@ -58,6 +58,20 @@
                           <tr>
                 <td>
                   <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.config.ValidPattern.java">io/confluent/kafka/connect/utils/config/ValidPattern.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  15
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.data.SourceRecordConcurrentLinkedDeque.java">io/confluent/kafka/connect/utils/data/SourceRecordConcurrentLinkedDeque.java</a>
                 </td>
                 <td>
                   0
