@@ -29,6 +29,27 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class SourceRecordConcurrentLinkedDeque extends ConcurrentLinkedDeque<SourceRecord> {
   private static final Logger log = LoggerFactory.getLogger(SourceRecordConcurrentLinkedDeque.class);
 
+  private final int batchSize;
+  private final int timeout;
+
+  /**
+   * Constructor creates a new instance of the SourceRecordConcurrentLinkedDeque
+   *
+   * @param batchSize The maximum number of records to return per batch.
+   * @param timeout   The amount of time to wait if no batch was returned.
+   */
+  public SourceRecordConcurrentLinkedDeque(int batchSize, int timeout) {
+    this.batchSize = batchSize;
+    this.timeout = timeout;
+  }
+
+  /**
+   * Constructor creates a new instance of the SourceRecordConcurrentLinkedDeque with a batchSize of 1024 and timeout of 0.
+   */
+  public SourceRecordConcurrentLinkedDeque() {
+    this(1024, 0);
+  }
+
   /**
    * Method is used to drain the records from the deque in order and add them to the supplied list.
    *
@@ -37,7 +58,7 @@ public class SourceRecordConcurrentLinkedDeque extends ConcurrentLinkedDeque<Sou
    * @throws InterruptedException Thrown if the thread is killed while sleeping.
    */
   public boolean drain(List<SourceRecord> records) throws InterruptedException {
-    return drain(records, 0);
+    return drain(records, this.timeout);
   }
 
   /**
@@ -53,7 +74,11 @@ public class SourceRecordConcurrentLinkedDeque extends ConcurrentLinkedDeque<Sou
     Preconditions.checkNotNull(records, "records cannot be null");
     Preconditions.checkArgument(timeout >= 0, "timeout should be greater than or equal to 0.");
 
-    int count = this.size();
+    if (log.isDebugEnabled()) {
+      log.debug("determining size for this run. batchSize={}, records.size()={}", this.batchSize, records.size());
+    }
+
+    int count = Math.min(this.batchSize, this.size());
 
     if (log.isDebugEnabled()) {
       log.debug("Draining {} record(s).", count);
