@@ -8,8 +8,8 @@
     <language>en-us</language>
     <copyright>&#169;2016</copyright>
     <item>
-      <title>File: 19,
-             Errors: 269,
+      <title>File: 23,
+             Errors: 295,
              Warnings: 0,
              Infos: 0
       </title>
@@ -67,6 +67,34 @@
                 </td>
                 <td>
                   15
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.template.ConnectTemplateHashModel.java">io/confluent/kafka/connect/utils/template/ConnectTemplateHashModel.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  13
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.template.MissingValueHashWrapper.java">io/confluent/kafka/connect/utils/template/MissingValueHashWrapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
                 </td>
               </tr>
                           <tr>
@@ -151,6 +179,20 @@
                 </td>
                 <td>
                   8
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.template.StructTemplate.java">io/confluent/kafka/connect/utils/template/StructTemplate.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
                 </td>
               </tr>
                           <tr>
@@ -291,6 +333,20 @@
                 </td>
                 <td>
                   5
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/jcustenborder/connect-utils/checkstyle.html#io.confluent.kafka.connect.utils.template.ConnectObjectWrapper.java">io/confluent/kafka/connect/utils/template/ConnectObjectWrapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  4
                 </td>
               </tr>
                       </tbody>
