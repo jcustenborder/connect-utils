@@ -16,27 +16,20 @@
 package io.confluent.kafka.connect.utils.data.type;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class DateTypeParser extends BaseDateTypeParser {
-  public DateTypeParser() {
-    super(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd"));
+public class TimeTypeParser extends BaseDateTypeParser {
+  public TimeTypeParser(TimeZone timeZone, SimpleDateFormat... dateFormats) {
+    super(timeZone, dateFormats);
   }
 
-  public DateTypeParser(TimeZone timeZone, SimpleDateFormat... dateFormats) {
-    super(timeZone, dateFormats);
+  public TimeTypeParser() {
+    this(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("HH:mm:ss"));
   }
 
   @Override
   Date process(Date date) {
-    Calendar calendar = Calendar.getInstance(this.timeZone);
-    calendar.setTime(date);
-    calendar.set(11, 0);
-    calendar.set(12, 0);
-    calendar.set(13, 0);
-    calendar.set(14, 0);
-    return calendar.getTime();
+    return date;
   }
 }

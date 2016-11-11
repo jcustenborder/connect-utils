@@ -1,12 +1,12 @@
 /**
  * Copyright © 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,6 +27,8 @@ import io.confluent.kafka.connect.utils.data.type.Int32TypeParser;
 import io.confluent.kafka.connect.utils.data.type.Int64TypeParser;
 import io.confluent.kafka.connect.utils.data.type.Int8TypeParser;
 import io.confluent.kafka.connect.utils.data.type.StringTypeParser;
+import io.confluent.kafka.connect.utils.data.type.TimeTypeParser;
+import io.confluent.kafka.connect.utils.data.type.TimestampTypeParser;
 import io.confluent.kafka.connect.utils.data.type.TypeParser;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
@@ -53,9 +55,9 @@ public class Parser {
     registerTypeParser(Schema.INT64_SCHEMA, new Int64TypeParser());
     registerTypeParser(Schema.STRING_SCHEMA, new StringTypeParser());
     registerTypeParser(Decimal.schema(1), new DecimalTypeParser());
-    registerTypeParser(Date.SCHEMA, DateTypeParser.createDefaultDateConverter());
-    registerTypeParser(Time.SCHEMA, DateTypeParser.createDefaultTimeConverter());
-    registerTypeParser(Timestamp.SCHEMA, DateTypeParser.createDefaultTimestampConverter());
+    registerTypeParser(Date.SCHEMA, new DateTypeParser());
+    registerTypeParser(Time.SCHEMA, new TimeTypeParser());
+    registerTypeParser(Timestamp.SCHEMA, new TimestampTypeParser());
   }
 
   /**
