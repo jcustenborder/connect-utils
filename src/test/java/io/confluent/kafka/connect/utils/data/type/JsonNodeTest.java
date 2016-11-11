@@ -1,12 +1,12 @@
 /**
  * Copyright © 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +50,6 @@ public class JsonNodeTest {
   @Before
   public void before() {
     this.parser = new Parser();
-    this.parser.registerTypeParser(Timestamp.SCHEMA, new DateTypeParser(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.SSS'Z'")));
     this.calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
     this.random = new Random();
   }
@@ -241,7 +240,8 @@ public class JsonNodeTest {
   @Test
   public void timestampTests() throws ParseException {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//    this.calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
     List<?> tests = Arrays.asList(dateFormat.parse("2001-07-04 12:08:56"));
     assertConversion(Timestamp.SCHEMA, java.util.Date.class, tests);
   }
@@ -249,6 +249,7 @@ public class JsonNodeTest {
   @Test
   public void dateTests() throws ParseException {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     this.calendar.set(Calendar.HOUR, 0);
     this.calendar.set(Calendar.MINUTE, 0);
     this.calendar.set(Calendar.SECOND, 0);

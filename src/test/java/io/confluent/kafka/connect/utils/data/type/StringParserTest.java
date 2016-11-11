@@ -1,12 +1,12 @@
 /**
  * Copyright © 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,6 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
 import org.apache.kafka.connect.errors.DataException;
-import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +31,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -70,16 +70,19 @@ public class StringParserTest {
 
   }
 
-  void assertConversion(Schema schema, final Class expectedClass, Map<String, ?> tests) {
+  <T> Map<String, T> assertConversion(Schema schema, final Class<T> expectedClass, Map<String, ?> tests) {
+    Map<String, T> results = new LinkedHashMap<>();
     for (Map.Entry<String, ?> kvp : tests.entrySet()) {
       Object expected = kvp.getValue();
       Object actual = this.parser.parseString(schema, kvp.getKey());
       String message = String.format("Could not parse '%s' to '%s'", kvp.getKey(), expectedClass.getName());
       Assert.assertNotNull(message, actual);
-      final Class actualClass = actual.getClass();
-      Assert.assertThat(message, actualClass, IsEqual.equalTo(expectedClass));
+      final Class<?> actualClass = actual.getClass();
+      Assert.assertEquals(message, actualClass, expectedClass);
       Assert.assertEquals(message, expected, actual);
+      results.put(kvp.getKey(), (T) actual);
     }
+    return results;
   }
 
   @Test
@@ -201,7 +204,7 @@ public class StringParserTest {
   @Test
   public void timestampTests() throws ParseException {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-    Map<String, ?> tests = ImmutableMap.of(
+    Map<String, java.util.Date> tests = ImmutableMap.of(
         "2001-07-04 12:08:56", dateFormat.parse("2001-07-04 12:08:56")
     );
     assertConversion(Timestamp.SCHEMA, java.util.Date.class, tests);
@@ -210,6 +213,7 @@ public class StringParserTest {
   @Test
   public void dateTests() throws ParseException {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     this.calendar.set(Calendar.HOUR, 0);
     this.calendar.set(Calendar.MINUTE, 0);
     this.calendar.set(Calendar.SECOND, 0);
@@ -217,7 +221,10 @@ public class StringParserTest {
     Map<String, ?> tests = ImmutableMap.of(
         "2001-07-04", dateFormat.parse("2001-07-04")
     );
-    assertConversion(Date.SCHEMA, java.util.Date.class, tests);
+    Map<String, java.util.Date> results = assertConversion(Date.SCHEMA, java.util.Date.class, tests);
+    for (Map.Entry<String, java.util.Date> kvp : results.entrySet()) {
+      Date.fromLogical(Date.SCHEMA, kvp.getValue());
+    }
   }
 
   @Test
@@ -227,6 +234,9 @@ public class StringParserTest {
     Map<String, ?> tests = ImmutableMap.of(
         "12:08:56", dateFormat.parse("12:08:56")
     );
-    assertConversion(Time.SCHEMA, java.util.Date.class, tests);
+    Map<String, java.util.Date> results = assertConversion(Time.SCHEMA, java.util.Date.class, tests);
+    for (Map.Entry<String, java.util.Date> kvp : results.entrySet()) {
+      Time.fromLogical(Time.SCHEMA, kvp.getValue());
+    }
   }
 }
