@@ -2,3 +2,4 @@ io.confluent.kafka.connect.utils.config
 io.confluent.kafka.connect.utils.data
 io.confluent.kafka.connect.utils.data.type
 io.confluent.kafka.connect.utils.template
+io.confluent.kafka.connect.utils.util

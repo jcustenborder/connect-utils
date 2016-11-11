@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>connect-utils &#x2013; Project Dependencies</title>
+    <title>connect-utils-parent &#x2013; Project Dependencies</title>
     <style type="text/css" media="all">
       @import url("./css/maven-base.css");
       @import url("./css/maven-theme.css");
@@ -16,7 +16,7 @@
   <body class="composite">
     <div id="banner">
                     <div id="bannerLeft">
-                connect-utils
+                connect-utils-parent
                 </div>
                     <div class="clear">
         <hr/>
@@ -26,9 +26,9 @@
           
                 <div class="xleft">
         <span id="publishDate">Last Published: 2016-11-11</span>
-                  &nbsp;| <span id="projectVersion">Version: 0.1.16</span>
+                  &nbsp;| <span id="projectVersion">Version: 0.1.18</span>
                       </div>
-            <div class="xright">                    <a href="./" title="connect-utils">connect-utils</a>
+            <div class="xright">                    <a href="./" title="connect-utils-parent">connect-utils-parent</a>
             
       </div>
       <div class="clear">
@@ -38,9 +38,21 @@
     <div id="leftColumn">
       <div id="navcolumn">
            
-                                          <h5>Project Documentation</h5>
+                                          <h5>Modules</h5>
                   <ul>
-                                                                                                                                                                                                                                                                  <li class="expanded">
+                  <li class="none">
+                          <a href="connect-utils/index.html" title="connect-utils">connect-utils</a>
+            </li>
+                  <li class="none">
+                          <a href="connect-assemblies/index.html" title="connect-assemblies">connect-assemblies</a>
+            </li>
+                  <li class="none">
+                          <a href="connect-checkstyle/index.html" title="connect-checkstyle">connect-checkstyle</a>
+            </li>
+          </ul>
+                       <h5>Project Documentation</h5>
+                  <ul>
+                                                                                                                                                                                                                                                                                                      <li class="expanded">
                           <a href="project-info.html" title="Project Information">Project Information</a>
                     <ul>
                       <li class="none">
@@ -62,6 +74,9 @@
                           <a href="plugins.html" title="Project Plugins">Project Plugins</a>
             </li>
                       <li class="none">
+                          <a href="dependency-convergence.html" title="Dependency Convergence">Dependency Convergence</a>
+            </li>
+                      <li class="none">
                           <a href="project-summary.html" title="Project Summary">Project Summary</a>
             </li>
                       <li class="none">
@@ -71,6 +86,9 @@
                           <a href="license.html" title="Project License">Project License</a>
             </li>
                       <li class="none">
+                          <a href="modules.html" title="Project Modules">Project Modules</a>
+            </li>
+                      <li class="none">
                           <a href="team-list.html" title="Project Team">Project Team</a>
             </li>
                       <li class="none">
@@ -78,7 +96,7 @@
             </li>
               </ul>
         </li>
-                                                                                                                                                                                <li class="collapsed">
+                                                                                                                                                              <li class="collapsed">
                           <a href="project-reports.html" title="Project Reports">Project Reports</a>
                   </li>
           </ul>
@@ -103,6 +121,11 @@
 <th>Version</th>
 <th>Type</th></tr>
 <tr class="b">
+<td>com.google.guava</td>
+<td><a class="externalLink" href="http://code.google.com/p/guava-libraries/guava">guava</a></td>
+<td>18.0</td>
+<td>jar</td></tr>
+<tr class="a">
 <td>org.freemarker</td>
 <td><a class="externalLink" href="http://freemarker.org/">freemarker</a></td>
 <td>2.3.25-incubating</td>
@@ -141,14 +164,9 @@
 <td>2.6.3</td>
 <td>jar</td></tr>
 <tr class="a">
-<td>com.google.guava</td>
-<td><a class="externalLink" href="http://code.google.com/p/guava-libraries/guava">guava</a></td>
-<td>18.0</td>
-<td>jar</td></tr>
-<tr class="b">
 <td>org.apache.kafka</td>
 <td><a class="externalLink" href="http://kafka.apache.org">connect-api</a></td>
-<td>0.10.0.0-cp1</td>
+<td>0.10.1.0-cp1</td>
 <td>jar</td></tr></table></div></div><a name="Project_Transitive_Dependencies"></a>
 <div class="section">
 <h2><a name="Project_Transitive_Dependencies"></a>Project Transitive Dependencies</h2>
@@ -199,7 +217,7 @@
 <tr class="a">
 <td>org.apache.kafka</td>
 <td><a class="externalLink" href="http://kafka.apache.org">kafka-clients</a></td>
-<td>0.10.0.0-cp1</td>
+<td>0.10.1.0-cp1</td>
 <td>jar</td></tr>
 <tr class="b">
 <td>org.slf4j</td>
@@ -209,7 +227,7 @@
 <tr class="a">
 <td>org.xerial.snappy</td>
 <td><a class="externalLink" href="https://github.com/xerial/snappy-java">snappy-java</a></td>
-<td>1.1.2.4</td>
+<td>1.1.2.6</td>
 <td>jar</td></tr></table></div></div><a name="Project_Dependency_Graph"></a>
 <div class="section">
 <h2><a name="Project_Dependency_Graph"></a>Project Dependency Graph</h2><script language="javascript" type="text/javascript">
@@ -233,17 +251,17 @@
 <div class="section">
 <h3><a name="Dependency_Tree"></a>Dependency Tree</h3>
 <ul>
-<li>io.confluent.kafka:connect-utils:jar:0.1.16 <img id="_1752298026" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1450620451', '_1752298026' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1450620451" style="display:none">
+<li>io.confluent.kafka:connect-utils-parent:pom:0.1.18 <img id="_1012306256" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_629114797', '_1012306256' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_629114797" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
-<th>connect-utils</th></tr>
+<th>connect-utils-parent</th></tr>
 <tr class="b">
 <td>
 <p><b>Description: </b>A helper library for building Kafka Connect Connectors.</p>
 <p><b>URL: </b><a class="externalLink" href="https://github.com/jcustenborder/connect-utils">https://github.com/jcustenborder/connect-utils</a></p>
 <p><b>Project License: </b><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0">The Apache License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>com.fasterxml.jackson.core:jackson-databind:jar:2.6.3 (provided) <img id="_103714470" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_857018023', '_103714470' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_857018023" style="display:none">
+<li>com.fasterxml.jackson.core:jackson-databind:jar:2.6.3 (provided) <img id="_1884913946" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_42522097', '_1884913946' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_42522097" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>jackson-databind</th></tr>
@@ -253,7 +271,7 @@
 <p><b>URL: </b><a class="externalLink" href="http://github.com/FasterXML/jackson">http://github.com/FasterXML/jackson</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>com.fasterxml.jackson.core:jackson-annotations:jar:2.6.0 (provided) <img id="_1938174962" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1794814513', '_1938174962' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1794814513" style="display:none">
+<li>com.fasterxml.jackson.core:jackson-annotations:jar:2.6.0 (provided) <img id="_1055106062" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_12905589', '_1055106062' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_12905589" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Jackson-annotations</th></tr>
@@ -262,7 +280,7 @@
 <p><b>Description: </b>Core annotations used for value types, used by Jackson data binding package.</p>
 <p><b>URL: </b><a class="externalLink" href="http://github.com/FasterXML/jackson">http://github.com/FasterXML/jackson</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></p></td></tr></table></div></li>
-<li>com.fasterxml.jackson.core:jackson-core:jar:2.6.3 (provided) <img id="_1970825669" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1848240941', '_1970825669' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1848240941" style="display:none">
+<li>com.fasterxml.jackson.core:jackson-core:jar:2.6.3 (provided) <img id="_1316336940" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1903709450', '_1316336940' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1903709450" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Jackson-core</th></tr>
@@ -271,7 +289,7 @@
 <p><b>Description: </b>Core Jackson abstractions, basic JSON streaming API implementation</p>
 <p><b>URL: </b><a class="externalLink" href="https://github.com/FasterXML/jackson-core">https://github.com/FasterXML/jackson-core</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></p></td></tr></table></div></li></ul></li>
-<li>com.google.guava:guava:jar:18.0 (provided) <img id="_382974836" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_279566832', '_382974836' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_279566832" style="display:none">
+<li>com.google.guava:guava:jar:18.0 (compile) <img id="_1648188498" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_748651876', '_1648188498' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_748651876" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Guava: Google Core Libraries for Java</th></tr>
@@ -285,7 +303,7 @@
     per the JSR-305 spec.</p>
 <p><b>URL: </b><a class="externalLink" href="http://code.google.com/p/guava-libraries/guava">http://code.google.com/p/guava-libraries/guava</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></p></td></tr></table></div></li>
-<li>org.apache.kafka:connect-api:jar:0.10.0.0-cp1 (provided) <img id="_1118649486" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1979977438', '_1118649486' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1979977438" style="display:none">
+<li>org.apache.kafka:connect-api:jar:0.10.1.0-cp1 (provided) <img id="_1210846513" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_802617890', '_1210846513' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_802617890" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Apache Kafka</th></tr>
@@ -295,7 +313,7 @@
 <p><b>URL: </b><a class="externalLink" href="http://kafka.apache.org">http://kafka.apache.org</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>org.apache.kafka:kafka-clients:jar:0.10.0.0-cp1 (provided) <img id="_2107092527" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_53587147', '_2107092527' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_53587147" style="display:none">
+<li>org.apache.kafka:kafka-clients:jar:0.10.1.0-cp1 (provided) <img id="_781108541" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_923398415', '_781108541' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_923398415" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Apache Kafka</th></tr>
@@ -305,7 +323,7 @@
 <p><b>URL: </b><a class="externalLink" href="http://kafka.apache.org">http://kafka.apache.org</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>net.jpountz.lz4:lz4:jar:1.3.0 (provided) <img id="_856412709" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_155878958', '_856412709' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_155878958" style="display:none">
+<li>net.jpountz.lz4:lz4:jar:1.3.0 (provided) <img id="_1517284676" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_38844784', '_1517284676' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_38844784" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>LZ4 and xxHash</th></tr>
@@ -314,7 +332,7 @@
 <p><b>Description: </b>Java ports and bindings of the LZ4 compression algorithm and the xxHash hashing algorithm</p>
 <p><b>URL: </b><a class="externalLink" href="https://github.com/jpountz/lz4-java">https://github.com/jpountz/lz4-java</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></p></td></tr></table></div></li>
-<li>org.xerial.snappy:snappy-java:jar:1.1.2.4 (provided) <img id="_2079880684" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1160300913', '_2079880684' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1160300913" style="display:none">
+<li>org.xerial.snappy:snappy-java:jar:1.1.2.6 (provided) <img id="_236187684" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_682255784', '_236187684' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_682255784" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>snappy-java</th></tr>
@@ -323,7 +341,7 @@
 <p><b>Description: </b>snappy-java: A fast compression/decompression library</p>
 <p><b>URL: </b><a class="externalLink" href="https://github.com/xerial/snappy-java">https://github.com/xerial/snappy-java</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></p></td></tr></table></div></li>
-<li>org.slf4j:slf4j-api:jar:1.7.21 (provided) <img id="_720174361" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_230056066', '_720174361' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_230056066" style="display:none">
+<li>org.slf4j:slf4j-api:jar:1.7.21 (provided) <img id="_1615281268" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_2134512601', '_1615281268' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_2134512601" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>SLF4J API Module</th></tr>
@@ -332,7 +350,7 @@
 <p><b>Description: </b>The slf4j API</p>
 <p><b>URL: </b><a class="externalLink" href="http://www.slf4j.org">http://www.slf4j.org</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></p></td></tr></table></div></li></ul></li>
-<li>org.slf4j:slf4j-api:jar:1.7.21 (provided) <img id="_940309369" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1164549677', '_940309369' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1164549677" style="display:none">
+<li>org.slf4j:slf4j-api:jar:1.7.21 (provided) <img id="_1789636065" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1043634005', '_1789636065' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1043634005" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>SLF4J API Module</th></tr>
@@ -341,7 +359,7 @@
 <p><b>Description: </b>The slf4j API</p>
 <p><b>URL: </b><a class="externalLink" href="http://www.slf4j.org">http://www.slf4j.org</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></p></td></tr></table></div></li></ul></li>
-<li>org.freemarker:freemarker:jar:2.3.25-incubating (compile) <img id="_161341582" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1507148335', '_161341582' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1507148335" style="display:none">
+<li>org.freemarker:freemarker:jar:2.3.25-incubating (compile) <img id="_2044551586" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_355097315', '_2044551586' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_355097315" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Apache FreeMarker</th></tr>
@@ -350,7 +368,7 @@
 <p><b>Description: </b>FreeMarker is a &quot;template engine&quot;; a generic tool to generate text output based on templates.</p>
 <p><b>URL: </b><a class="externalLink" href="http://freemarker.org/">http://freemarker.org/</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div></li>
-<li>junit:junit:jar:4.12 (test) <img id="_1586830711" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_548487616', '_1586830711' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_548487616" style="display:none">
+<li>junit:junit:jar:4.12 (test) <img id="_343945498" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_534929991', '_343945498' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_534929991" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>JUnit</th></tr>
@@ -360,7 +378,7 @@
 <p><b>URL: </b><a class="externalLink" href="http://junit.org">http://junit.org</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License 1.0</a></p></td></tr></table></div>
 <ul>
-<li>org.hamcrest:hamcrest-core:jar:1.3 (test) <img id="_1400576428" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1200077498', '_1400576428' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1200077498" style="display:none">
+<li>org.hamcrest:hamcrest-core:jar:1.3 (test) <img id="_1610198666" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_681086448', '_1610198666' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_681086448" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Hamcrest Core</th></tr>
@@ -369,7 +387,7 @@
 <p><b>Description: </b>This is the core API of hamcrest matcher framework to be used by third-party framework providers. This includes the a foundation set of matcher implementations for common operations.</p>
 <p><b>URL: </b><a class="externalLink" href="https://github.com/hamcrest/JavaHamcrest/hamcrest-core">https://github.com/hamcrest/JavaHamcrest/hamcrest-core</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.opensource.org/licenses/bsd-license.php">New BSD License</a></p></td></tr></table></div></li></ul></li>
-<li>ch.qos.logback:logback-classic:jar:1.1.7 (test) <img id="_1776399416" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_2088535798', '_1776399416' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_2088535798" style="display:none">
+<li>ch.qos.logback:logback-classic:jar:1.1.7 (test) <img id="_1068730455" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_1671958471', '_1068730455' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_1671958471" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Logback Classic Module</th></tr>
@@ -379,7 +397,7 @@
 <p><b>URL: </b><a class="externalLink" href="http://logback.qos.ch/logback-classic">http://logback.qos.ch/logback-classic</a></p>
 <p><b>Project License: </b><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License - v 1.0</a><a class="externalLink" href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU Lesser General Public License</a></p></td></tr></table></div>
 <ul>
-<li>ch.qos.logback:logback-core:jar:1.1.7 (test) <img id="_57926807" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_2080792108', '_57926807' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_2080792108" style="display:none">
+<li>ch.qos.logback:logback-core:jar:1.1.7 (test) <img id="_126240131" src="./images/icon_info_sml.gif" alt="Information" onclick="toggleDependencyDetail( '_60104923', '_126240131' );" style="cursor: pointer;vertical-align:text-bottom;"></img><div id="_60104923" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Logback Core Module</th></tr>
@@ -390,7 +408,7 @@
 <p><b>Project License: </b><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License - v 1.0</a><a class="externalLink" href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU Lesser General Public License</a></p></td></tr></table></div></li></ul></li></ul></li></ul></div></div><a name="Licenses"></a>
 <div class="section">
 <h2><a name="Licenses"></a>Licenses</h2>
-<p><b>The Apache License, Version 2.0: </b>connect-utils</p>
+<p><b>The Apache License, Version 2.0: </b>connect-utils-parent</p>
 <p><b>Eclipse Public License 1.0: </b>JUnit</p>
 <p><b>MIT License: </b>SLF4J API Module</p>
 <p><b>Apache License, Version 2.0: </b>Apache FreeMarker</p>
@@ -474,18 +492,18 @@
 <td>1.6</td>
 <td>debug</td></tr>
 <tr class="b">
-<td>connect-api-0.10.0.0-cp1.jar</td>
-<td>45.64 kB</td>
+<td>connect-api-0.10.1.0-cp1.jar</td>
+<td>46.28 kB</td>
 <td>52</td>
 <td>39</td>
 <td>7</td>
 <td>1.6</td>
 <td>debug</td></tr>
 <tr class="a">
-<td>kafka-clients-0.10.0.0-cp1.jar</td>
-<td>726.30 kB</td>
-<td>494</td>
-<td>458</td>
+<td>kafka-clients-0.10.1.0-cp1.jar</td>
+<td>779.04 kB</td>
+<td>523</td>
+<td>487</td>
 <td>27</td>
 <td>1.6</td>
 <td>debug</td></tr>
@@ -514,7 +532,7 @@
 <td>1.5</td>
 <td>debug</td></tr>
 <tr class="a">
-<td>snappy-java-1.1.2.4.jar</td>
+<td>snappy-java-1.1.2.6.jar</td>
 <td>1.01 MB</td>
 <td>72</td>
 <td>25</td>
@@ -531,20 +549,20 @@
 <th>Debug</th></tr>
 <tr class="a">
 <td>14</td>
-<td>8.09 MB</td>
-<td>5,398</td>
-<td>4,999</td>
+<td>8.14 MB</td>
+<td>5,427</td>
+<td>5,028</td>
 <td>202</td>
 <td>1.6</td>
 <td>14</td></tr>
 <tr class="b">
-<td>compile: 1</td>
-<td>compile: 1.42 MB</td>
-<td>compile: 1,121</td>
-<td>compile: 1,091</td>
-<td>compile: 17</td>
+<td>compile: 2</td>
+<td>compile: 3.58 MB</td>
+<td>compile: 2,840</td>
+<td>compile: 2,781</td>
+<td>compile: 34</td>
 <td>-</td>
-<td>compile: 1</td></tr>
+<td>compile: 2</td></tr>
 <tr class="a">
 <td>test: 4</td>
 <td>test: 1.08 MB</td>
@@ -554,13 +572,13 @@
 <td>-</td>
 <td>test: 4</td></tr>
 <tr class="b">
-<td>provided: 9</td>
-<td>provided: 5.59 MB</td>
-<td>provided: 3,253</td>
-<td>provided: 3,030</td>
-<td>provided: 90</td>
+<td>provided: 8</td>
+<td>provided: 3.49 MB</td>
+<td>provided: 1,563</td>
+<td>provided: 1,369</td>
+<td>provided: 73</td>
 <td>-</td>
-<td>provided: 9</td></tr></table></div><a name="Dependency_Repository_Locations"></a>
+<td>provided: 8</td></tr></table></div><a name="Dependency_Repository_Locations"></a>
 <div class="section">
 <h2><a name="Dependency_Repository_Locations"></a>Dependency Repository Locations</h2>
 <table border="0" class="bodyTable">
@@ -651,13 +669,13 @@
 <td>-</td>
 <td>-</td></tr>
 <tr class="b">
-<td>org.apache.kafka:connect-api:jar:0.10.0.0-cp1</td>
+<td>org.apache.kafka:connect-api:jar:0.10.1.0-cp1</td>
 <td>-</td>
 <td>-</td>
 <td>-</td>
 <td>-</td></tr>
 <tr class="a">
-<td>org.apache.kafka:kafka-clients:jar:0.10.0.0-cp1</td>
+<td>org.apache.kafka:kafka-clients:jar:0.10.1.0-cp1</td>
 <td>-</td>
 <td>-</td>
 <td>-</td>
@@ -681,7 +699,7 @@
 <td>-</td>
 <td>-</td></tr>
 <tr class="a">
-<td>org.xerial.snappy:snappy-java:jar:1.1.2.4</td>
+<td>org.xerial.snappy:snappy-java:jar:1.1.2.6</td>
 <td>-</td>
 <td>-</td>
 <td>-</td>
@@ -693,7 +711,7 @@
 <th>sonatype-nexus-snapshots</th>
 <th>apache.snapshots</th></tr>
 <tr class="a">
-<td>14 (compile: 1, test: 4, provided: 9)</td>
+<td>14 (compile: 2, test: 4, provided: 8)</td>
 <td>0</td>
 <td>0</td>
 <td>0</td>
