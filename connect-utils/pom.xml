@@ -20,16 +20,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.confluent.kafka</groupId>
-    <artifactId>connect-utils-parent</artifactId>
+    <artifactId>connect-utils</artifactId>
     <version>0.1.0</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <inceptionYear>2016</inceptionYear>
 
     <prerequisites>
         <maven>3.0.4</maven>
     </prerequisites>
 
-    <name>connect-utils-parent</name>
+    <name>connect-utils</name>
     <description>A helper library for building Kafka Connect Connectors.</description>
     <url>https://github.com/jcustenborder/connect-utils</url>
 
@@ -62,9 +62,9 @@
     </issueManagement>
 
     <properties>
-        <confluent.version>3.1.0</confluent.version>
+        <confluent.version>3.0.0</confluent.version>
         <confluent.maven.repo>http://packages.confluent.io/maven/</confluent.maven.repo>
-        <kafka.version>0.10.1.0-cp1</kafka.version>
+        <kafka.version>0.10.0.0-cp1</kafka.version>
         <guava.version>18.0</guava.version>
         <jackson.version>2.6.3</jackson.version>
         <junit.version>4.12</junit.version>
@@ -77,12 +77,6 @@
         </repository>
     </repositories>
 
-    <modules>
-        <module>connect-utils</module>
-        <module>connect-assemblies</module>
-        <module>connect-checkstyle</module>
-    </modules>
-
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -94,6 +88,7 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -149,7 +144,7 @@
                         <id>validate</id>
                         <phase>validate</phase>
                         <configuration>
-                            <configLocation>checkstyle/checkstyle.xml</configLocation>
+                            <configLocation>../checkstyle/checkstyle.xml</configLocation>
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
