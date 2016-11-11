@@ -21,13 +21,18 @@
 
     <groupId>io.confluent.kafka</groupId>
     <artifactId>connect-utils</artifactId>
-    <version>0.1.0</version>
     <packaging>jar</packaging>
     <inceptionYear>2016</inceptionYear>
 
     <prerequisites>
         <maven>3.0.4</maven>
     </prerequisites>
+
+    <parent>
+        <groupId>io.confluent.kafka</groupId>
+        <artifactId>connect-utils-parent</artifactId>
+        <version>0.1.0</version>
+    </parent>
 
     <name>connect-utils</name>
     <description>A helper library for building Kafka Connect Connectors.</description>
