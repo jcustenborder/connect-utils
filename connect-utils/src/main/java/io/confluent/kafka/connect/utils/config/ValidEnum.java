@@ -19,7 +19,8 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef;
 
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -29,18 +30,26 @@ public class ValidEnum implements ConfigDef.Validator {
   final Set<String> validEnums;
   final Class<?> enumClass;
 
-  public static ValidEnum of(Class<?> enumClass) {
-    return new ValidEnum(enumClass);
+  /**
+   * Method is used to create a new instance of the enum validator.
+   *
+   * @param enumClass Enum class with the entries to validate for.
+   * @param excludes  Enum entries to exclude from the validator.
+   * @return ValidEnum
+   */
+  public static ValidEnum of(Class<?> enumClass, String... excludes) {
+    return new ValidEnum(enumClass, excludes);
   }
 
-  private ValidEnum(Class<?> enumClass) {
+  private ValidEnum(Class<?> enumClass, String... excludes) {
     Preconditions.checkNotNull(enumClass, "enumClass cannot be null");
     Preconditions.checkState(enumClass.isEnum(), "enumClass must be an enum.");
-    Set<String> validEnums = new HashSet<>();
+    Set<String> validEnums = new LinkedHashSet<>();
     for (Object o : enumClass.getEnumConstants()) {
       String key = o.toString();
       validEnums.add(key);
     }
+    validEnums.removeAll(Arrays.asList(excludes));
     this.validEnums = validEnums;
     this.enumClass = enumClass;
   }
@@ -58,8 +67,8 @@ public class ValidEnum implements ConfigDef.Validator {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-        .add("enumClass", this.enumClass.getSimpleName())
-        .add("validEnums", this.validEnums)
+        .add("enum", this.enumClass.getSimpleName())
+        .add("allowed", this.validEnums)
         .toString();
   }
 }

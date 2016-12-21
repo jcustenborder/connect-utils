@@ -38,4 +38,9 @@ public class ValidEnumTests {
     validEnum.ensureValid("testing", "missing");
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void excluded() {
+    ValidEnum validEnum = ValidEnum.of(TestEnum.class, "two");
+    validEnum.ensureValid("testing", "two");
+  }
 }
