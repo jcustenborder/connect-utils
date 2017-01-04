@@ -25,7 +25,7 @@ node {
                    stage('deploy') {
                         sh "git tag ${maven_build_number}"
                         sh "mvn -Dgpg.homedir=/tmp/.gnupg -Dgpg.keyname=${gpg_key} -Dgpg.passphraseServerId=${gpg_key} -Dgpg.publicKeyring=${gpg_pubring} -Dgpg.secretKeyring=${gpg_secring} -B -s ${maven_settings} -P maven-central site deploy"
-                        sh "git push origin ${maven_build_number}"
+                        // sh "git push origin ${maven_build_number}"
                    }
                 }
             }
