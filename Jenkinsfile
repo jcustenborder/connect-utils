@@ -1,25 +1,34 @@
 #!groovy
 node {
-    def mvnBuildNumber = "0.1.${env.BUILD_NUMBER}"
-
-    def mvnHome = tool 'M3'
+    def jdk8_docker_image = 'maven:3.3.3-jdk-8'
+    def maven_build_number = "0.0.1.${env.BUILD_NUMBER}"
 
     checkout scm
 
-    if (env.BRANCH_NAME == 'master') {
-        stage 'versioning'
-        sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${mvnBuildNumber}"
-    }
+    withCredentials([
+        usernamePassword(credentialsId: 'gpg_passphrase',
+        passwordVariable: 'gpg_passphrase', usernameVariable: 'gpg_key'),
+        file(credentialsId: 'gpg_pubring', variable: 'gpg_pubring'),
+        file(credentialsId: 'gpg_secring', variable: 'gpg_secring')]
+    ) {
+        configFileProvider([configFile(fileId: 'mavenSettings', variable: 'maven_settings')]) {
+            docker.image(jdk8_docker_image).inside {
+                stage('build') {
+                    if (env.BRANCH_NAME == 'master') {
+                        sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${maven_build_number}"
+                    }
 
-    stage 'build'
-    sh "${mvnHome}/bin/mvn -B -P maven-central clean verify"
-
-    junit '**/target/surefire-reports/TEST-*.xml'
-
-    if (env.BRANCH_NAME == 'master') {
-        stage 'publishing'
-        sh "git tag ${mvnBuildNumber}"
-        sh "${mvnHome}/bin/mvn -B -P maven-central site deploy"
-        sh "git push origin ${mvnBuildNumber}"
+                    sh "mvn -B -s ${maven_settings} -Dgpg.keyname=${gpg_key} -Dgpg.passphraseServerId=${gpg_key} -Dgpg.publicKeyring=${gpg_pubring} -Dgpg.secretKeyring=${gpg_secring} clean package"
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                }
+                if (env.BRANCH_NAME == 'master') {
+                   stage('deploy') {
+                        sh "git tag ${maven_build_number}"
+                        sh "mvn -B -s ${maven_settings} -Dgpg.keyname=${gpg_key} -Dgpg.passphraseServerId=${gpg_key} -Dgpg.publicKeyring=${gpg_pubring} -Dgpg.secretKeyring=${gpg_secring} -P maven-central site deploy"
+                        sh "git push origin ${maven_build_number}"
+                   }
+                }
+            }
+        }
     }
 }
