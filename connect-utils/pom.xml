@@ -66,59 +66,12 @@
         <system>github</system>
     </issueManagement>
 
-    <properties>
-        <confluent.version>3.0.0</confluent.version>
-        <confluent.maven.repo>http://packages.confluent.io/maven/</confluent.maven.repo>
-        <kafka.version>0.10.0.0-cp1</kafka.version>
-        <guava.version>18.0</guava.version>
-        <jackson.version>2.6.3</jackson.version>
-        <junit.version>4.12</junit.version>
-    </properties>
-
     <repositories>
         <repository>
             <id>confluent</id>
             <url>http://packages.confluent.io/maven/</url>
         </repository>
     </repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>connect-api</artifactId>
-            <version>${kafka.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.25-incubating</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.7</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
@@ -284,27 +237,27 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>com.github.github</groupId>
-                        <artifactId>site-maven-plugin</artifactId>
-                        <version>0.12</version>
-                        <configuration>
-                            <skip>true</skip>
-                            <message>Creating site for ${project.version}</message>
-                            <!--<dryRun>true</dryRun>-->
-                            <merge>true</merge>
-                            <!--<path>${project.name}</path>-->
-                            <server>github</server>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>site</goal>
-                                </goals>
-                                <phase>site</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!--<plugin>-->
+                    <!--<groupId>com.github.github</groupId>-->
+                    <!--<artifactId>site-maven-plugin</artifactId>-->
+                    <!--<version>0.12</version>-->
+                    <!--<configuration>-->
+                    <!--<skip>true</skip>-->
+                    <!--<message>Creating site for ${project.version}</message>-->
+                    <!--&lt;!&ndash;<dryRun>true</dryRun>&ndash;&gt;-->
+                    <!--<merge>true</merge>-->
+                    <!--&lt;!&ndash;<path>${project.name}</path>&ndash;&gt;-->
+                    <!--<server>github</server>-->
+                    <!--</configuration>-->
+                    <!--<executions>-->
+                    <!--<execution>-->
+                    <!--<goals>-->
+                    <!--<goal>site</goal>-->
+                    <!--</goals>-->
+                    <!--<phase>site</phase>-->
+                    <!--</execution>-->
+                    <!--</executions>-->
+                    <!--</plugin>-->
                 </plugins>
             </build>
             <distributionManagement>
