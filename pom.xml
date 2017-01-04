@@ -267,26 +267,26 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>com.github.github</groupId>
-                        <artifactId>site-maven-plugin</artifactId>
-                        <version>0.12</version>
-                        <configuration>
-                            <message>Creating site for ${project.version}</message>
-                            <!--<dryRun>true</dryRun>-->
-                            <merge>true</merge>
-                            <!--<path>${project.name}</path>-->
-                            <server>github</server>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>site</goal>
-                                </goals>
-                                <phase>site</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!--<plugin>-->
+                    <!--<groupId>com.github.github</groupId>-->
+                    <!--<artifactId>site-maven-plugin</artifactId>-->
+                    <!--<version>0.12</version>-->
+                    <!--<configuration>-->
+                    <!--<message>Creating site for ${project.version}</message>-->
+                    <!--&lt;!&ndash;<dryRun>true</dryRun>&ndash;&gt;-->
+                    <!--<merge>true</merge>-->
+                    <!--&lt;!&ndash;<path>${project.name}</path>&ndash;&gt;-->
+                    <!--<server>github</server>-->
+                    <!--</configuration>-->
+                    <!--<executions>-->
+                    <!--<execution>-->
+                    <!--<goals>-->
+                    <!--<goal>site</goal>-->
+                    <!--</goals>-->
+                    <!--<phase>site</phase>-->
+                    <!--</execution>-->
+                    <!--</executions>-->
+                    <!--</plugin>-->
                 </plugins>
             </build>
             <distributionManagement>
