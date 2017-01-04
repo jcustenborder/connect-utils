@@ -18,13 +18,13 @@ node {
                         sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${maven_build_number}"
                     }
 
-                    sh "mvn -B -s ${maven_settings} -Dgpg.keyname=${gpg_key} -Dgpg.passphraseServerId=${gpg_key} -Dgpg.publicKeyring=${gpg_pubring} -Dgpg.secretKeyring=${gpg_secring} clean package"
+                    sh "mvn -Dgpg.homedir=/tmp/.gnupg -Dgpg.keyname=${gpg_key} -Dgpg.passphraseServerId=${gpg_key} -Dgpg.publicKeyring=${gpg_pubring} -Dgpg.secretKeyring=${gpg_secring} -B -s ${maven_settings} clean package"
                     junit '**/target/surefire-reports/TEST-*.xml'
                 }
                 if (env.BRANCH_NAME == 'master') {
                    stage('deploy') {
                         sh "git tag ${maven_build_number}"
-                        sh "mvn -B -s ${maven_settings} -Dgpg.keyname=${gpg_key} -Dgpg.passphraseServerId=${gpg_key} -Dgpg.publicKeyring=${gpg_pubring} -Dgpg.secretKeyring=${gpg_secring} -P maven-central site deploy"
+                        sh "mvn -Dgpg.homedir=/tmp/.gnupg -Dgpg.keyname=${gpg_key} -Dgpg.passphraseServerId=${gpg_key} -Dgpg.publicKeyring=${gpg_pubring} -Dgpg.secretKeyring=${gpg_secring} -B -s ${maven_settings} -P maven-central site deploy"
                         sh "git push origin ${maven_build_number}"
                    }
                 }
