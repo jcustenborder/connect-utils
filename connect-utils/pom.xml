@@ -289,6 +289,7 @@
                         <artifactId>site-maven-plugin</artifactId>
                         <version>0.12</version>
                         <configuration>
+                            <skip>true</skip>
                             <message>Creating site for ${project.version}</message>
                             <!--<dryRun>true</dryRun>-->
                             <merge>true</merge>
