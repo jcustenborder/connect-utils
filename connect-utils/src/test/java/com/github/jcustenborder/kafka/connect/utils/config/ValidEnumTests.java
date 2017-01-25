@@ -15,7 +15,9 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ValidEnumTests {
 
@@ -32,15 +34,19 @@ public class ValidEnumTests {
     validEnum.ensureValid("testing", TestEnum.one.name());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void invalid() {
-    ValidEnum validEnum = ValidEnum.of(TestEnum.class);
-    validEnum.ensureValid("testing", "missing");
+    assertThrows(IllegalStateException.class, () -> {
+      ValidEnum validEnum = ValidEnum.of(TestEnum.class);
+      validEnum.ensureValid("testing", "missing");
+    });
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void excluded() {
-    ValidEnum validEnum = ValidEnum.of(TestEnum.class, "two");
-    validEnum.ensureValid("testing", "two");
+    assertThrows(IllegalStateException.class, () -> {
+      ValidEnum validEnum = ValidEnum.of(TestEnum.class, "two");
+      validEnum.ensureValid("testing", "two");
+    });
   }
 }

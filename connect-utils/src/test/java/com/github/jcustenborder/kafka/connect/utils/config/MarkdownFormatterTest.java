@@ -16,9 +16,9 @@
 package com.github.jcustenborder.kafka.connect.utils.config;
 
 import org.apache.kafka.common.config.ConfigDef;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class MarkdownFormatterTest {

@@ -1,12 +1,12 @@
 /**
  * Copyright © 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,24 +23,31 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
 import org.apache.kafka.connect.errors.DataException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class StringParserTest {
 
   Parser parser;
   Calendar calendar;
 
-  @Before
+  @BeforeEach
   public void before() {
     this.parser = new Parser();
     this.calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -65,7 +72,7 @@ public class StringParserTest {
 
     for (Schema schema : schemas) {
       Object actual = this.parser.parseString(schema, null);
-      Assert.assertNull(actual);
+      assertNull(actual);
     }
 
   }
@@ -76,10 +83,10 @@ public class StringParserTest {
       Object expected = kvp.getValue();
       Object actual = this.parser.parseString(schema, kvp.getKey());
       String message = String.format("Could not parse '%s' to '%s'", kvp.getKey(), expectedClass.getName());
-      Assert.assertNotNull(message, actual);
+      assertNotNull(actual, message);
       final Class<?> actualClass = actual.getClass();
-      Assert.assertEquals(message, actualClass, expectedClass);
-      Assert.assertEquals(message, expected, actual);
+      assertEquals(expectedClass, actualClass, message);
+      assertEquals(expected, actual, message);
       results.put(kvp.getKey(), (T) actual);
     }
     return results;
@@ -105,9 +112,24 @@ public class StringParserTest {
     assertConversion(Schema.FLOAT32_SCHEMA, Float.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void float32BadData() {
-    parser.parseString(Schema.FLOAT32_SCHEMA, "asdf");
+  @TestFactory
+  Stream<DynamicTest> badData() {
+    List<Schema> schemas = Arrays.asList(
+        Schema.INT8_SCHEMA,
+        Schema.INT16_SCHEMA,
+        Schema.INT32_SCHEMA,
+        Schema.INT64_SCHEMA,
+        Schema.FLOAT32_SCHEMA,
+        Schema.FLOAT64_SCHEMA
+    );
+
+    return schemas.stream().map(schema ->
+        dynamicTest(schema.type().name(), () -> {
+          assertThrows(DataException.class, () -> {
+            parser.parseString(schema, "asdf");
+          });
+        })
+    );
   }
 
   @Test
@@ -119,11 +141,6 @@ public class StringParserTest {
     assertConversion(Schema.FLOAT64_SCHEMA, Double.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void float64BadData() {
-    parser.parseString(Schema.FLOAT64_SCHEMA, "asdf");
-  }
-
   @Test
   public void int8Tests() {
     Map<String, ?> tests = ImmutableMap.of(
@@ -133,10 +150,6 @@ public class StringParserTest {
     assertConversion(Schema.INT8_SCHEMA, Byte.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void int8BadData() {
-    parser.parseString(Schema.INT8_SCHEMA, "asdf");
-  }
 
   @Test
   public void int16Tests() {
@@ -147,10 +160,6 @@ public class StringParserTest {
     assertConversion(Schema.INT16_SCHEMA, Short.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void int16BadData() {
-    parser.parseString(Schema.INT16_SCHEMA, "asdf");
-  }
 
   @Test
   public void int32Tests() {
@@ -161,10 +170,6 @@ public class StringParserTest {
     assertConversion(Schema.INT32_SCHEMA, Integer.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void int32BadData() {
-    parser.parseString(Schema.INT32_SCHEMA, "asdf");
-  }
 
   @Test
   public void int64Tests() {
@@ -175,10 +180,6 @@ public class StringParserTest {
     assertConversion(Schema.INT64_SCHEMA, Long.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void int64BadData() {
-    parser.parseString(Schema.INT64_SCHEMA, "asdf");
-  }
 
   @Test
   public void stringTests() {

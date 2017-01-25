@@ -1,12 +1,12 @@
 /**
  * Copyright © 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,18 +16,18 @@
 package com.github.jcustenborder.kafka.connect.utils.data;
 
 import org.apache.kafka.connect.source.SourceRecord;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SourceRecordConcurrentLinkedDequeTest {
   SourceRecordConcurrentLinkedDeque sourceRecords;
 
-  @Before
+  @BeforeEach
   public void before() {
     this.sourceRecords = new SourceRecordConcurrentLinkedDeque();
   }
@@ -35,8 +35,8 @@ public class SourceRecordConcurrentLinkedDequeTest {
   @Test
   public void drain() throws InterruptedException {
     List<SourceRecord> records = new ArrayList<>(256);
-    assertFalse("drain should return false", this.sourceRecords.drain(records));
-    assertTrue("records should be empty", records.isEmpty());
+    assertFalse(this.sourceRecords.drain(records), "drain should return false");
+    assertTrue(records.isEmpty(), "records should be empty");
 
     final int EXPECTED_COUNT = 5;
     for (int i = 0; i < EXPECTED_COUNT; i++) {
@@ -44,9 +44,10 @@ public class SourceRecordConcurrentLinkedDequeTest {
       this.sourceRecords.add(record);
     }
 
-    assertEquals("sourceRecords.size() should match.", EXPECTED_COUNT, this.sourceRecords.size());
-    assertTrue("drain should return true", this.sourceRecords.drain(records));
-    assertTrue("drain should have emptied the deque.", this.sourceRecords.isEmpty());
-    assertEquals("records.size()", EXPECTED_COUNT, records.size());
+    assertEquals(EXPECTED_COUNT, this.sourceRecords.size(), "sourceRecords.size() should match.");
+    assertTrue(this.sourceRecords.drain(records), "drain should return true");
+    assertTrue(this.sourceRecords.isEmpty(), "drain should have emptied the deque.");
+    assertEquals(EXPECTED_COUNT, records.size(), "records.size()");
   }
+
 }

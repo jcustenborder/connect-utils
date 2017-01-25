@@ -15,7 +15,9 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ValidPortTest {
 
@@ -25,30 +27,42 @@ public class ValidPortTest {
     range.ensureValid("port", 1025);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void ensureValid_low() {
-    ValidPort range = ValidPort.of();
-    range.ensureValid("port", 1);
+    assertThrows(IllegalStateException.class, () -> {
+      ValidPort range = ValidPort.of();
+      range.ensureValid("port", 1);
+    });
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void ensureValid_high() {
-    ValidPort range = ValidPort.of();
-    range.ensureValid("port", 65536);
+    assertThrows(IllegalStateException.class, () -> {
+      ValidPort range = ValidPort.of();
+      range.ensureValid("port", 65536);
+    });
+
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void constructor_high() {
-    ValidPort range = ValidPort.of(1, Integer.MAX_VALUE);
+    assertThrows(IllegalStateException.class, () -> {
+      ValidPort range = ValidPort.of(1, Integer.MAX_VALUE);
+    });
+
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void constructor_low() {
-    ValidPort range = ValidPort.of(Integer.MIN_VALUE, 65535);
+    assertThrows(IllegalStateException.class, () -> {
+      ValidPort range = ValidPort.of(Integer.MIN_VALUE, 65535);
+    });
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void constructor_lowgreaterthanhi() {
-    ValidPort range = ValidPort.of(2, 1);
+    assertThrows(IllegalStateException.class, () -> {
+      ValidPort range = ValidPort.of(2, 1);
+    });
   }
 }

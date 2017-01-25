@@ -1,12 +1,12 @@
 /**
  * Copyright © 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,10 +25,10 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
 import org.apache.kafka.connect.errors.DataException;
-import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -40,6 +40,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class JsonNodeTest {
   Parser parser;
@@ -47,7 +51,7 @@ public class JsonNodeTest {
 
   Random random;
 
-  @Before
+  @BeforeEach
   public void before() {
     this.parser = new Parser();
     this.calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -74,11 +78,11 @@ public class JsonNodeTest {
     for (Schema schema : schemas) {
       JsonNode inputNode = null;
       Object actual = this.parser.parseJsonNode(schema, inputNode);
-      Assert.assertNull(actual);
+      assertNull(actual);
       inputNode = objectMapper.readTree("{\"foo\": null}");
       inputNode = inputNode.findValue("foo");
       actual = this.parser.parseJsonNode(schema, inputNode);
-      Assert.assertNull(actual);
+      assertNull(actual);
     }
 
   }
@@ -92,25 +96,28 @@ public class JsonNodeTest {
 
       JsonNode propertyNode = objectNode.findValue("foo");
       Object actual = this.parser.parseJsonNode(schema, propertyNode);
-      Assert.assertNotNull("Could not create valueNode value", valueNode);
+      assertNotNull(valueNode, "Could not create valueNode value");
       String message = String.format("Could not parse '%s' to '%s'", valueNode, expectedClass.getName());
-      Assert.assertNotNull(message, actual);
-      Assert.assertThat(message, actual.getClass(), IsEqual.equalTo(expectedClass));
-      Assert.assertEquals(message, expected, actual);
+      assertNotNull(actual, message);
+      assertEquals(expectedClass, actual.getClass(), message);
+      assertEquals(expected, actual, message);
 
       actual = this.parser.parseJsonNode(schema, valueNode);
-      Assert.assertNotNull("Could not create valueNode value", valueNode);
+      assertNotNull(valueNode, "Could not create valueNode value");
       message = String.format("Could not parse '%s' to '%s'", valueNode, expectedClass.getName());
-      Assert.assertNotNull(message, actual);
-      Assert.assertThat(message, actual.getClass(), IsEqual.equalTo(expectedClass));
-      Assert.assertEquals(message, expected, actual);
+      assertNotNull(actual, message);
+      assertEquals(expectedClass, actual.getClass(), message);
+      assertEquals(expected, actual, message);
     }
   }
+
 
   static final ObjectMapper objectMapper = new ObjectMapper();
 
   void badDataTest(Schema schema) {
-    parser.parseJsonNode(schema, objectMapper.valueToTree("bad"));
+    assertThrows(DataException.class, () -> {
+      parser.parseJsonNode(schema, objectMapper.valueToTree("bad"));
+    });
   }
 
   @Test
@@ -130,11 +137,6 @@ public class JsonNodeTest {
     assertConversion(Schema.FLOAT32_SCHEMA, Float.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void float32BadData() {
-    badDataTest(Schema.FLOAT32_SCHEMA);
-  }
-
   @Test
   public void float64Tests() {
     List<Double> tests = new ArrayList<>();
@@ -145,11 +147,6 @@ public class JsonNodeTest {
       tests.add(this.random.nextDouble());
     }
     assertConversion(Schema.FLOAT64_SCHEMA, Double.class, tests);
-  }
-
-  @Test(expected = DataException.class)
-  public void float64BadData() {
-    badDataTest(Schema.FLOAT64_SCHEMA);
   }
 
   @Test
@@ -165,10 +162,24 @@ public class JsonNodeTest {
     assertConversion(Schema.INT8_SCHEMA, Byte.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void int8BadData() {
-    badDataTest(Schema.INT8_SCHEMA);
+  @TestFactory
+  Stream<DynamicTest> badData() {
+    List<Schema> schemas = Arrays.asList(
+        Schema.INT8_SCHEMA,
+        Schema.INT16_SCHEMA,
+        Schema.INT32_SCHEMA,
+        Schema.INT64_SCHEMA,
+        Schema.FLOAT32_SCHEMA,
+        Schema.FLOAT64_SCHEMA
+    );
+
+    return schemas.stream().map(schema ->
+        dynamicTest(schema.type().name(), () -> {
+          badDataTest(schema);
+        })
+    );
   }
+
 
   @Test
   public void int16Tests() {
@@ -179,11 +190,6 @@ public class JsonNodeTest {
       tests.add((short) this.random.nextInt(Short.MAX_VALUE));
     }
     assertConversion(Schema.INT16_SCHEMA, Short.class, tests);
-  }
-
-  @Test(expected = DataException.class)
-  public void int16BadData() {
-    badDataTest(Schema.INT16_SCHEMA);
   }
 
   @Test
@@ -197,10 +203,6 @@ public class JsonNodeTest {
     assertConversion(Schema.INT32_SCHEMA, Integer.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void int32BadData() {
-    badDataTest(Schema.INT32_SCHEMA);
-  }
 
   @Test
   public void int64Tests() {
@@ -213,10 +215,6 @@ public class JsonNodeTest {
     assertConversion(Schema.INT64_SCHEMA, Long.class, tests);
   }
 
-  @Test(expected = DataException.class)
-  public void int64BadData() {
-    badDataTest(Schema.INT64_SCHEMA);
-  }
 
   @Test
   public void stringTests() {
