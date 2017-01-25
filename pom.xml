@@ -246,7 +246,6 @@
                             <serverId>oss.sonatype.org</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                             <description>${project.version}</description>
-                            <stagingRepositoryId>com.github.jcustenborder</stagingRepositoryId>
                         </configuration>
                     </plugin>
                 </plugins>
