@@ -25,7 +25,6 @@
     <artifactId>connect-utils-parent</artifactId>
     <version>0.2-SNAPSHOT</version>
   </parent>
-  <groupId>io.confluent.kafka</groupId>
   <artifactId>connect-utils</artifactId>
   <name>connect-utils</name>
   <description>A helper library for building Kafka Connect Connectors.</description>
@@ -64,6 +63,9 @@
       <url>http://packages.confluent.io/maven/</url>
     </repository>
   </repositories>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <build>
     <resources>
       <resource>
@@ -72,24 +74,6 @@
       </resource>
     </resources>
     <plugins>
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>3.0</version>
-        <configuration>
-          <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
-          <properties>
-            <owner>Jeremy Custenborder</owner>
-            <email>jcustenborder@gmail.com</email>
-          </properties>
-          <excludes>
-            <exclude>**/README</exclude>
-            <exclude>src/test/resources/**</exclude>
-            <exclude>src/main/resources/**</exclude>
-            <exclude>src/assembly/**</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>2.17</version>
@@ -111,129 +95,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <inherited>true</inherited>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.1</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.4</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <reportPlugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-project-info-reports-plugin</artifactId>
-              <version>2.2</version>
-              <configuration>
-                <dependencyDetailsEnabled>true</dependencyDetailsEnabled>
-                <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
-              </configuration>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <version>2.7</version>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-report-plugin</artifactId>
-              <version>2.6</version>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-checkstyle-plugin</artifactId>
-              <version>2.6</version>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-changelog-plugin</artifactId>
-              <version>2.3</version>
-            </plugin>
-          </reportPlugins>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>maven-central</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.7</version>
-            <extensions>true</extensions>
-            <executions>
-              <execution>
-                <id>deploy-to-sonatype</id>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>deploy</goal>
-                  <goal>release</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <serverId>oss.sonatype.org</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <description>${project.version}</description>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      <distributionManagement>
-        <repository>
-          <id>oss.sonatype.org</id>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <snapshotRepository>
-          <id>oss.sonatype.org</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-      </distributionManagement>
-    </profile>
-  </profiles>
 </project>

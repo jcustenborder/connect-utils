@@ -63,6 +63,7 @@
         <jackson.version>2.6.3</jackson.version>
         <kafka.version>0.10.1.0-cp1</kafka.version>
         <junit.version>4.12</junit.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>
