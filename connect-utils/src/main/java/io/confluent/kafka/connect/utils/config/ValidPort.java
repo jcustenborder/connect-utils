@@ -15,6 +15,7 @@
  */
 package io.confluent.kafka.connect.utils.config;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef;
 
@@ -71,5 +72,13 @@ public class ValidPort implements ConfigDef.Validator {
     Preconditions.checkState(value instanceof Integer, "%s must be an integer.", setting);
     Integer port = (Integer) value;
     Preconditions.checkState(port >= this.start && port <= this.end, "'%s'(%s) must be between %s and %s.", setting, port, this.start, this.end);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("start", this.start)
+        .add("end", this.end)
+        .toString();
   }
 }
