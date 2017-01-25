@@ -66,6 +66,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.jcustenborder.kafka.connect</groupId>
+            <artifactId>connect-utils-testing</artifactId>
+            <version>${parent.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
     <build>
         <resources>
             <resource>

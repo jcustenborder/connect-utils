@@ -1,12 +1,12 @@
 /**
  * Copyright © 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,16 +43,20 @@ public class SchemaSerializationModule extends SimpleModule {
   }
 
   public static class Storage {
-    String name;
-    String doc;
-    Schema.Type type;
-    Object defaultValue;
-    Integer version;
-    Map<String, String> parameters;
-    boolean isOptional;
-    Schema keySchema;
-    Schema valueSchema;
-    Map<String, Schema> fieldSchemas;
+    public String name;
+    public String doc;
+    public Schema.Type type;
+    public Object defaultValue;
+    public Integer version;
+    public Map<String, String> parameters;
+    public boolean isOptional;
+    public Schema keySchema;
+    public Schema valueSchema;
+    public Map<String, Schema> fieldSchemas;
+
+    public Storage() {
+
+    }
 
     Storage(Schema schema) {
       this.name = schema.name();
@@ -110,7 +114,31 @@ public class SchemaSerializationModule extends SimpleModule {
       }
 
       if (null != this.defaultValue) {
-        builder.defaultValue(this.defaultValue);
+        Object value;
+        switch (this.type) {
+          case INT8:
+            value = ((Number) this.defaultValue).byteValue();
+            break;
+          case INT16:
+            value = ((Number) this.defaultValue).shortValue();
+            break;
+          case INT32:
+            value = ((Number) this.defaultValue).intValue();
+            break;
+          case INT64:
+            value = ((Number) this.defaultValue).longValue();
+            break;
+          case FLOAT32:
+            value = ((Number) this.defaultValue).floatValue();
+            break;
+          case FLOAT64:
+            value = ((Number) this.defaultValue).doubleValue();
+            break;
+          default:
+            value = this.defaultValue;
+            break;
+        }
+        builder.defaultValue(value);
       }
 
       if (null != this.parameters) {
