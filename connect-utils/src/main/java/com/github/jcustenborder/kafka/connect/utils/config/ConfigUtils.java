@@ -22,9 +22,6 @@ import org.apache.kafka.common.config.AbstractConfig;
 import java.io.File;
 
 public class ConfigUtils {
-  private ConfigUtils() {
-  }
-
   /**
    * Method is used to return a class that should be assignable to the expected class. For example when a user implements
    * an interface that is loaded at runtime. It is good to ensure that the proper interface has been implemented.

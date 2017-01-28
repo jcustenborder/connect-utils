@@ -16,18 +16,18 @@
 package com.github.jcustenborder.kafka.connect.utils.data;
 
 import org.apache.kafka.connect.source.SourceRecord;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SourceRecordConcurrentLinkedDequeTest {
   SourceRecordConcurrentLinkedDeque sourceRecords;
 
-  @Before
+  @BeforeEach
   public void before() {
     this.sourceRecords = new SourceRecordConcurrentLinkedDeque();
   }
@@ -35,8 +35,8 @@ public class SourceRecordConcurrentLinkedDequeTest {
   @Test
   public void drain() throws InterruptedException {
     List<SourceRecord> records = new ArrayList<>(256);
-    assertFalse("drain should return false", this.sourceRecords.drain(records));
-    assertTrue("records should be empty", records.isEmpty());
+    assertFalse(this.sourceRecords.drain(records), "drain should return false");
+    assertTrue(records.isEmpty(), "records should be empty");
 
     final int EXPECTED_COUNT = 5;
     for (int i = 0; i < EXPECTED_COUNT; i++) {
@@ -44,9 +44,10 @@ public class SourceRecordConcurrentLinkedDequeTest {
       this.sourceRecords.add(record);
     }
 
-    assertEquals("sourceRecords.size() should match.", EXPECTED_COUNT, this.sourceRecords.size());
-    assertTrue("drain should return true", this.sourceRecords.drain(records));
-    assertTrue("drain should have emptied the deque.", this.sourceRecords.isEmpty());
-    assertEquals("records.size()", EXPECTED_COUNT, records.size());
+    assertEquals(EXPECTED_COUNT, this.sourceRecords.size(), "sourceRecords.size() should match.");
+    assertTrue(this.sourceRecords.drain(records), "drain should return true");
+    assertTrue(this.sourceRecords.isEmpty(), "drain should have emptied the deque.");
+    assertEquals(EXPECTED_COUNT, records.size(), "records.size()");
   }
+
 }

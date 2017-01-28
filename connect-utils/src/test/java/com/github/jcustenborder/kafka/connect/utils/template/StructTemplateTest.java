@@ -21,19 +21,20 @@ import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.DataException;
 import org.apache.kafka.connect.sink.SinkRecord;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StructTemplateTest {
 
   Struct struct;
   StructTemplate structTemplate;
 
-  @Before
+  @BeforeEach
   public void before() {
     this.structTemplate = new StructTemplate();
 
@@ -49,9 +50,11 @@ public class StructTemplateTest {
   }
 
 
-  @Test(expected = DataException.class)
+  @Test
   public void missingTemplate() {
-    this.structTemplate.execute("missingTemplate", ImmutableMap.of("String", "String"));
+    assertThrows(DataException.class, () -> {
+      this.structTemplate.execute("missingTemplate", ImmutableMap.of("String", "String"));
+    });
   }
 
   @Test

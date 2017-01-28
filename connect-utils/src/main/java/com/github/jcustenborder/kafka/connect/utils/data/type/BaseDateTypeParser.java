@@ -46,8 +46,8 @@ public abstract class BaseDateTypeParser implements TypeParser {
         date = dateFormat.parse(s);
         break;
       } catch (ParseException e) {
-        if (log.isDebugEnabled()) {
-          log.debug("Could not parse '{}' to java.util.Date", s, e);
+        if (log.isTraceEnabled()) {
+          log.trace("Could not parse '{}' to java.util.Date", s, e);
         }
       }
     }

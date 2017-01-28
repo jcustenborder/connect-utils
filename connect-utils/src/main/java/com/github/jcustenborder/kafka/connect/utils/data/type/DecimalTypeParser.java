@@ -19,12 +19,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.errors.DataException;
 
 import java.math.BigDecimal;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class DecimalTypeParser implements TypeParser {
@@ -36,29 +35,38 @@ public class DecimalTypeParser implements TypeParser {
         .build();
   }
 
-  private static int scale(Schema schema) {
-    String scaleString = (String) schema.parameters().get("scale");
+  static final String NOT_FOUND_MESSAGE = String.format(
+      "Invalid Decimal schema: %s parameter not found.",
+      Decimal.SCALE_FIELD
+  );
+
+  static final String NOT_PARSABLE_MESSAGE = String.format(
+      "Invalid Decimal schema: %s parameter could not be converted to an integer.",
+      Decimal.SCALE_FIELD
+  );
+
+  private static int scaleInternal(Schema schema) {
+    if (null == schema.parameters()) {
+      throw new DataException(NOT_FOUND_MESSAGE);
+    }
+
+    String scaleString = schema.parameters().get(Decimal.SCALE_FIELD);
     if (scaleString == null) {
-      throw new DataException("Invalid Decimal schema: scale parameter not found.");
+      throw new DataException(NOT_FOUND_MESSAGE);
     } else {
       try {
         return Integer.parseInt(scaleString);
       } catch (NumberFormatException var3) {
-        throw new DataException("Invalid scale parameter found in Decimal schema: ", var3);
+        throw new DataException(NOT_PARSABLE_MESSAGE, var3);
       }
     }
   }
 
-  int getScale(final Schema schema) {
+  int scale(final Schema schema) {
     int scale;
     try {
-      scale = this.schemaCache.get(schema, new Callable<Integer>() {
-        @Override
-        public Integer call() throws Exception {
-          return scale(schema);
-        }
-      });
-    } catch (ExecutionException e) {
+      scale = this.schemaCache.get(schema, () -> scaleInternal(schema));
+    } catch (Exception e) {
       throw new DataException(e);
     }
     return scale;
@@ -66,7 +74,7 @@ public class DecimalTypeParser implements TypeParser {
 
   @Override
   public Object parseString(String s, Schema schema) {
-    int scale = getScale(schema);
+    int scale = scale(schema);
     return new BigDecimal(s).setScale(scale);
   }
 
@@ -78,7 +86,7 @@ public class DecimalTypeParser implements TypeParser {
   @Override
   public Object parseJsonNode(JsonNode input, Schema schema) {
     Preconditions.checkState(input.isBigDecimal(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
-    int scale = getScale(schema);
+    int scale = scale(schema);
     return input.decimalValue().setScale(scale);
   }
 }

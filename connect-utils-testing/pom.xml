@@ -25,8 +25,8 @@
         <artifactId>connect-utils-parent</artifactId>
         <version>0.2-SNAPSHOT</version>
     </parent>
-    <artifactId>connect-utils</artifactId>
-    <name>connect-utils</name>
+    <artifactId>connect-utils-testing</artifactId>
+    <name>connect-utils-testing</name>
     <description>A helper library for building Kafka Connect Connectors.</description>
     <url>https://github.com/jcustenborder/connect-utils</url>
     <inceptionYear>2016</inceptionYear>
@@ -68,10 +68,19 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.github.jcustenborder.kafka.connect</groupId>
-            <artifactId>connect-utils-testing</artifactId>
-            <version>${parent.version}</version>
-            <scope>test</scope>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
         </dependency>
     </dependencies>
     <build>

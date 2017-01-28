@@ -48,6 +48,7 @@
     </prerequisites>
     <modules>
         <module>connect-utils</module>
+        <module>connect-utils-testing</module>
     </modules>
     <scm>
         <connection>scm:git:https://github.com/jcustenborder/connect-utils.git</connection>
@@ -62,7 +63,9 @@
         <guava.version>18.0</guava.version>
         <jackson.version>2.6.3</jackson.version>
         <kafka.version>0.10.1.0-cp1</kafka.version>
-        <junit.version>4.12</junit.version>
+        <mockito.version>2.6.3</mockito.version>
+        <junit.version>5.0.0-M3</junit.version>
+        <junit.surefire.plugin.version>1.0.0-M3</junit.surefire.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
@@ -88,10 +91,24 @@
             <artifactId>freemarker</artifactId>
             <version>2.3.25-incubating</version>
         </dependency>
+
+
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -116,6 +133,18 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>${junit.surefire.plugin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>3.0</version>
@@ -138,8 +167,8 @@
                 <version>3.5.1</version>
                 <inherited>true</inherited>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>

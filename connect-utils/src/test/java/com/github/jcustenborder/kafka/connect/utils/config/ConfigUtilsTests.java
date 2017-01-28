@@ -16,7 +16,9 @@
 package com.github.jcustenborder.kafka.connect.utils.config;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ConfigUtilsTests {
 
@@ -26,10 +28,13 @@ public class ConfigUtilsTests {
     Class<ConfigUtilsTestInterface> actual = ConfigUtils.getClass(config, ConfigUtilsTestConfig.TEST_CLASS_CONF, ConfigUtilsTestInterface.class);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void getClassInValid() {
-    ConfigUtilsTestConfig config = new ConfigUtilsTestConfig(ImmutableMap.of());
-    Class<String> actual = ConfigUtils.getClass(config, ConfigUtilsTestConfig.TEST_CLASS_CONF, String.class);
+    assertThrows(IllegalStateException.class, () -> {
+      ConfigUtilsTestConfig config = new ConfigUtilsTestConfig(ImmutableMap.of());
+      Class<String> actual = ConfigUtils.getClass(config, ConfigUtilsTestConfig.TEST_CLASS_CONF, String.class);
+    });
+
   }
 
 }
