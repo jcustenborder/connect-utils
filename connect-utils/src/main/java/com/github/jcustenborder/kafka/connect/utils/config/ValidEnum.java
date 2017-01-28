@@ -31,7 +31,7 @@ public class ValidEnum implements ConfigDef.Validator {
   final Class<?> enumClass;
 
   /**
-   * Method is used to create a new instance of the enum validator.
+   * Method is used to create a new INSTANCE of the enum validator.
    *
    * @param enumClass Enum class with the entries to validate for.
    * @param excludes  Enum entries to exclude from the validator.

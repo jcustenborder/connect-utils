@@ -22,7 +22,7 @@ import java.util.TimeZone;
 
 public class DateTypeParser extends BaseDateTypeParser {
   public DateTypeParser() {
-    super(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd"));
+    this(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd"));
   }
 
   public DateTypeParser(TimeZone timeZone, SimpleDateFormat... dateFormats) {

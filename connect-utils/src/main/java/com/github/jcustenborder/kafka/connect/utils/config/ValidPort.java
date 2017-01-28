@@ -39,7 +39,7 @@ public class ValidPort implements ConfigDef.Validator {
   }
 
   /**
-   * Creates a default instance of the validator in the non privileged port range of 1025 through 65535.
+   * Creates a default INSTANCE of the validator in the non privileged port range of 1025 through 65535.
    *
    * @return ConfigDef.Validator checking for ports in the range of 1025 through 65535.
    */

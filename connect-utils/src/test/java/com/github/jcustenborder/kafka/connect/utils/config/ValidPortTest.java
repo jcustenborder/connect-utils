@@ -17,6 +17,7 @@ package com.github.jcustenborder.kafka.connect.utils.config;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ValidPortTest {
@@ -65,4 +66,12 @@ public class ValidPortTest {
       ValidPort range = ValidPort.of(2, 1);
     });
   }
+
+  @Test
+  public void display() {
+    final String expected = "ValidPort{start=1025, end=65535}";
+    ValidPort range = ValidPort.of();
+    assertEquals(expected, range.toString());
+  }
+
 }

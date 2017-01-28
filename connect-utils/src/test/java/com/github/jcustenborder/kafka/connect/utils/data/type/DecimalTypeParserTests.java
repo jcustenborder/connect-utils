@@ -16,16 +16,39 @@
 package com.github.jcustenborder.kafka.connect.utils.data.type;
 
 
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.errors.DataException;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DecimalTypeParserTests {
+
+  @Test
+  public void scaleInvalid() {
+    assertThrows(DataException.class, () -> {
+      Schema schema = Schema.BYTES_SCHEMA;
+      DecimalTypeParser parser = new DecimalTypeParser();
+      parser.scale(schema);
+    });
+    assertThrows(DataException.class, () -> {
+      Schema schema = SchemaBuilder.bytes().parameter(Decimal.SCALE_FIELD, "");
+      DecimalTypeParser parser = new DecimalTypeParser();
+      parser.scale(schema);
+    });
+    assertThrows(DataException.class, () -> {
+      Schema schema = SchemaBuilder.bytes().parameter("sdfg", "");
+      DecimalTypeParser parser = new DecimalTypeParser();
+      parser.scale(schema);
+    });
+  }
 
   @Test
   public void testSchemaCache() {

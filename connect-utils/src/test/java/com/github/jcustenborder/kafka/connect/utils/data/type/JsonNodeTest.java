@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jcustenborder.kafka.connect.utils.data.Parser;
+import com.google.common.base.MoreObjects;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
@@ -29,10 +30,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,10 +44,14 @@ import java.util.Random;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class JsonNodeTest {
+  private static final Logger log = LoggerFactory.getLogger(JsonNodeTest.class);
   Parser parser;
   Calendar calendar;
 
@@ -87,31 +93,6 @@ public class JsonNodeTest {
 
   }
 
-  void assertConversion(Schema schema, final Class expectedClass, List<?> tests) {
-    for (Object expected : tests) {
-
-      JsonNode valueNode = objectMapper.valueToTree(expected);
-      ObjectNode objectNode = objectMapper.createObjectNode();
-      objectNode.set("foo", valueNode);
-
-      JsonNode propertyNode = objectNode.findValue("foo");
-      Object actual = this.parser.parseJsonNode(schema, propertyNode);
-      assertNotNull(valueNode, "Could not create valueNode value");
-      String message = String.format("Could not parse '%s' to '%s'", valueNode, expectedClass.getName());
-      assertNotNull(actual, message);
-      assertEquals(expectedClass, actual.getClass(), message);
-      assertEquals(expected, actual, message);
-
-      actual = this.parser.parseJsonNode(schema, valueNode);
-      assertNotNull(valueNode, "Could not create valueNode value");
-      message = String.format("Could not parse '%s' to '%s'", valueNode, expectedClass.getName());
-      assertNotNull(actual, message);
-      assertEquals(expectedClass, actual.getClass(), message);
-      assertEquals(expected, actual, message);
-    }
-  }
-
-
   static final ObjectMapper objectMapper = new ObjectMapper();
 
   void badDataTest(Schema schema) {
@@ -120,46 +101,149 @@ public class JsonNodeTest {
     });
   }
 
-  @Test
-  public void booleanTests() {
-    List<?> tests = Arrays.asList(Boolean.TRUE, Boolean.FALSE);
-    assertConversion(Schema.BOOLEAN_SCHEMA, Boolean.class, tests);
-  }
+  static class TestCase {
+    public final Class<?> expectedClass;
+    public final Schema schema;
+    public final Object input;
+    public final Object expected;
 
-  @Test
-  public void float32Tests() {
-    List<Float> tests = new ArrayList<>();
-    tests.add(Float.MAX_VALUE);
-    tests.add(Float.MIN_VALUE);
-    for (int i = 0; i < 30; i++) {
-      tests.add(this.random.nextFloat());
+    TestCase(Class<?> expectedClass, Schema schema, Object input, Object expected) {
+      this.expectedClass = expectedClass;
+      this.schema = schema;
+      this.input = input;
+      this.expected = expected;
     }
-    assertConversion(Schema.FLOAT32_SCHEMA, Float.class, tests);
-  }
 
-  @Test
-  public void float64Tests() {
-    List<Double> tests = new ArrayList<>();
-    tests.add(Double.MAX_VALUE);
-    tests.add(Double.MIN_VALUE);
-
-    for (int i = 0; i < 30; i++) {
-      tests.add(this.random.nextDouble());
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this)
+          .add("expectedClass", this.expectedClass.getSimpleName())
+          .add("schemaType", this.schema.type())
+          .add("schemaName", this.schema.name())
+          .add("expected", this.expected)
+          .omitNullValues()
+          .toString();
     }
-    assertConversion(Schema.FLOAT64_SCHEMA, Double.class, tests);
   }
 
-  @Test
-  public void int8Tests() {
-    List<Byte> tests = new ArrayList<>();
-    tests.add(Byte.MAX_VALUE);
-    tests.add(Byte.MIN_VALUE);
+  static void of(List<TestCase> tests, Class<?> expectedClass, Schema schema, Object expected) {
+    TestCase testCase = new TestCase(expectedClass, schema, expected, expected);
+    tests.add(testCase);
+  }
+
+  static void of(List<TestCase> tests, Class<?> expectedClass, Schema schema, Object input, Object expected) {
+    TestCase testCase = new TestCase(expectedClass, schema, input, expected);
+    tests.add(testCase);
+  }
+
+  void parseJsonNode(TestCase testCase) {
+    JsonNode valueNode = objectMapper.valueToTree(testCase.input);
+    ObjectNode objectNode = objectMapper.createObjectNode();
+    objectNode.set("foo", valueNode);
+
+    JsonNode propertyNode = objectNode.findValue("foo");
+    Object actual = this.parser.parseJsonNode(testCase.schema, propertyNode);
+    assertNotNull(valueNode, "Could not create valueNode value");
+    String message = String.format("Could not parse '%s' to '%s'", valueNode, testCase.expectedClass.getSimpleName());
+    assertNotNull(actual, message);
+    assertEquals(testCase.expectedClass, actual.getClass(), message);
+    assertEquals(testCase.expected, actual, message);
+
+    actual = this.parser.parseJsonNode(testCase.schema, valueNode);
+    assertNotNull(valueNode, "Could not create valueNode value");
+    message = String.format("Could not parse '%s' to '%s'", valueNode, testCase.expectedClass.getName());
+    assertNotNull(actual, message);
+    assertEquals(testCase.expectedClass, actual.getClass(), message);
+    assertEquals(testCase.expected, actual, message);
+  }
+
+
+  @TestFactory
+  public Stream<DynamicTest> parseJsonNode() {
+    List<TestCase> tests = new ArrayList<>();
+    of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.TRUE);
+    of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.FALSE);
+
+    //FLOAT32
+    of(tests, Float.class, Schema.FLOAT32_SCHEMA, Float.MAX_VALUE);
+    of(tests, Float.class, Schema.FLOAT32_SCHEMA, Float.MIN_VALUE);
+    for (int i = 0; i < 30; i++) {
+      of(tests, Float.class, Schema.FLOAT32_SCHEMA, this.random.nextFloat());
+    }
+
+    //FLOAT64
+    of(tests, Double.class, Schema.FLOAT64_SCHEMA, Double.MAX_VALUE);
+    of(tests, Double.class, Schema.FLOAT64_SCHEMA, Double.MIN_VALUE);
+    for (int i = 0; i < 30; i++) {
+      of(tests, Double.class, Schema.FLOAT64_SCHEMA, this.random.nextDouble());
+    }
+
+    //INT8
+    of(tests, Byte.class, Schema.INT8_SCHEMA, Byte.MAX_VALUE);
+    of(tests, Byte.class, Schema.INT8_SCHEMA, Byte.MIN_VALUE);
     byte[] buffer = new byte[30];
     this.random.nextBytes(buffer);
     for (Byte b : buffer) {
-      tests.add(b);
+      of(tests, Byte.class, Schema.INT8_SCHEMA, b);
     }
-    assertConversion(Schema.INT8_SCHEMA, Byte.class, tests);
+
+    //INT16
+    of(tests, Short.class, Schema.INT16_SCHEMA, Short.MAX_VALUE);
+    of(tests, Short.class, Schema.INT16_SCHEMA, Short.MIN_VALUE);
+    for (int i = 0; i < 30; i++) {
+      of(tests, Short.class, Schema.INT16_SCHEMA, (short) this.random.nextInt(Short.MAX_VALUE));
+    }
+
+    //INT32
+    of(tests, Integer.class, Schema.INT32_SCHEMA, Integer.MAX_VALUE);
+    of(tests, Integer.class, Schema.INT32_SCHEMA, Integer.MIN_VALUE);
+    for (int i = 0; i < 30; i++) {
+      of(tests, Integer.class, Schema.INT32_SCHEMA, this.random.nextInt());
+    }
+
+    //INT64
+    of(tests, Long.class, Schema.INT64_SCHEMA, Long.MAX_VALUE);
+    of(tests, Long.class, Schema.INT64_SCHEMA, Long.MIN_VALUE);
+    for (int i = 0; i < 30; i++) {
+      of(tests, Long.class, Schema.INT64_SCHEMA, this.random.nextLong());
+    }
+
+    //String
+    of(tests, String.class, Schema.STRING_SCHEMA, "");
+    of(tests, String.class, Schema.STRING_SCHEMA, "This is a string");
+
+    //Decimal
+    for (int SCALE = 3; SCALE < 30; SCALE++) {
+      of(tests, BigDecimal.class, Decimal.schema(SCALE), new BigDecimal("12345").setScale(SCALE));
+      of(tests, BigDecimal.class, Decimal.schema(SCALE), new BigDecimal("0").setScale(SCALE));
+      of(tests, BigDecimal.class, Decimal.schema(SCALE), new BigDecimal("-12345.001").setScale(SCALE));
+    }
+
+    //Timestamp
+    java.util.Date expectedDate = new java.util.Date(994204800000L);
+    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+    of(tests, java.util.Date.class, Timestamp.SCHEMA, expectedDate);
+    of(tests, java.util.Date.class, Timestamp.SCHEMA, inputFormat.format(expectedDate), expectedDate);
+    of(tests, java.util.Date.class, Timestamp.SCHEMA, expectedDate.getTime(), expectedDate);
+
+    //Date
+    expectedDate = new java.util.Date(994204800000L);
+    inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+    inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    of(tests, java.util.Date.class, Date.SCHEMA, expectedDate);
+    of(tests, java.util.Date.class, Date.SCHEMA, inputFormat.format(expectedDate), expectedDate);
+    of(tests, java.util.Date.class, Date.SCHEMA, expectedDate.getTime(), expectedDate);
+
+    //Time
+    expectedDate = new java.util.Date(65336000L);
+    inputFormat = new SimpleDateFormat("HH:mm:ss");
+    of(tests, java.util.Date.class, Time.SCHEMA, new java.util.Date(65336000L));
+    of(tests, java.util.Date.class, Time.SCHEMA, inputFormat.format(expectedDate), expectedDate);
+    of(tests, java.util.Date.class, Time.SCHEMA, expectedDate.getTime(), expectedDate);
+
+    return tests.stream().map(testCase -> dynamicTest(testCase.toString(), () -> {
+      parseJsonNode(testCase);
+    }));
   }
 
   @TestFactory
@@ -178,88 +262,5 @@ public class JsonNodeTest {
           badDataTest(schema);
         })
     );
-  }
-
-
-  @Test
-  public void int16Tests() {
-    List<Short> tests = new ArrayList<>();
-    tests.add(Short.MAX_VALUE);
-    tests.add(Short.MIN_VALUE);
-    for (int i = 0; i < 30; i++) {
-      tests.add((short) this.random.nextInt(Short.MAX_VALUE));
-    }
-    assertConversion(Schema.INT16_SCHEMA, Short.class, tests);
-  }
-
-  @Test
-  public void int32Tests() {
-    List<Integer> tests = new ArrayList<>();
-    tests.add(Integer.MIN_VALUE);
-    tests.add(Integer.MIN_VALUE);
-    for (int i = 0; i < 30; i++) {
-      tests.add(this.random.nextInt());
-    }
-    assertConversion(Schema.INT32_SCHEMA, Integer.class, tests);
-  }
-
-
-  @Test
-  public void int64Tests() {
-    List<Long> tests = new ArrayList<>();
-    tests.add(Long.MAX_VALUE);
-    tests.add(Long.MIN_VALUE);
-    for (int i = 0; i < 30; i++) {
-      tests.add(this.random.nextLong());
-    }
-    assertConversion(Schema.INT64_SCHEMA, Long.class, tests);
-  }
-
-
-  @Test
-  public void stringTests() {
-    List<?> tests = Arrays.asList("", "mirror");
-    assertConversion(Schema.STRING_SCHEMA, String.class, tests);
-  }
-
-  @Test
-  public void decimalTests() {
-    for (int SCALE = 3; SCALE < 30; SCALE++) {
-      List<?> tests = Arrays.asList(
-          new BigDecimal("12345").setScale(SCALE),
-          new BigDecimal("0").setScale(SCALE),
-          new BigDecimal("-12345.001").setScale(SCALE)
-      );
-
-      assertConversion(Decimal.builder(SCALE).build(), BigDecimal.class, tests);
-    }
-  }
-
-  @Test
-  public void timestampTests() throws ParseException {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-//    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-//    this.calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-    List<?> tests = Arrays.asList(dateFormat.parse("2001-07-04 12:08:56"));
-    assertConversion(Timestamp.SCHEMA, java.util.Date.class, tests);
-  }
-
-  @Test
-  public void dateTests() throws ParseException {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    this.calendar.set(Calendar.HOUR, 0);
-    this.calendar.set(Calendar.MINUTE, 0);
-    this.calendar.set(Calendar.SECOND, 0);
-
-    List<?> tests = Arrays.asList(dateFormat.parse("2001-07-04"));
-    assertConversion(Date.SCHEMA, java.util.Date.class, tests);
-  }
-
-  @Test
-  public void timeTests() throws ParseException {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-    List<?> tests = Arrays.asList(dateFormat.parse("12:08:56"));
-    assertConversion(Time.SCHEMA, java.util.Date.class, tests);
   }
 }

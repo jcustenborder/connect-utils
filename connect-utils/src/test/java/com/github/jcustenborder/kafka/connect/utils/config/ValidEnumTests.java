@@ -17,6 +17,7 @@ package com.github.jcustenborder.kafka.connect.utils.config;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ValidEnumTests {
@@ -26,7 +27,6 @@ public class ValidEnumTests {
     two,
     three
   }
-
 
   @Test
   public void valid() {
@@ -48,5 +48,12 @@ public class ValidEnumTests {
       ValidEnum validEnum = ValidEnum.of(TestEnum.class, "two");
       validEnum.ensureValid("testing", "two");
     });
+  }
+
+  @Test
+  public void display() {
+    final String expected = "ValidEnum{enum=TestEnum, allowed=[one, two, three]}";
+    ValidEnum validEnum = ValidEnum.of(TestEnum.class);
+    assertEquals(expected, validEnum.toString());
   }
 }

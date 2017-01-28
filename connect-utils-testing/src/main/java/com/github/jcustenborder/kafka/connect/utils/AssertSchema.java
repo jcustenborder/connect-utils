@@ -36,7 +36,13 @@ public class AssertSchema {
   }
 
   public static void assertSchema(final Schema expected, final Schema actual, String message) {
-    String prefix = Strings.isNullOrEmpty(message) ? "" : message + ": ";
+    final String prefix = Strings.isNullOrEmpty(message) ? "" : message + ": ";
+
+    if (null == expected) {
+      assertNull(actual, prefix + "actual should not be null.");
+      return;
+    }
+
     assertNotNull(expected, prefix + "expected schema should not be null.");
     assertNotNull(actual, prefix + "actual schema should not be null.");
     assertEquals(expected.name(), actual.name(), prefix + "schema.name() should match.");
