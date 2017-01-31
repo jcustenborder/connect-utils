@@ -70,7 +70,7 @@
         <dependency>
             <groupId>com.github.jcustenborder.kafka.connect</groupId>
             <artifactId>connect-utils-testing</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
