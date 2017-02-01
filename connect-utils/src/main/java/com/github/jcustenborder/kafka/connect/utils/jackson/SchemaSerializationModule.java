@@ -29,13 +29,15 @@ import com.google.common.base.Strings;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SchemaSerializationModule extends SimpleModule {
-
+  private static final Logger log = LoggerFactory.getLogger(SchemaSerializationModule.class);
   public SchemaSerializationModule() {
     super();
     addSerializer(Schema.class, new Serializer());
@@ -82,6 +84,7 @@ public class SchemaSerializationModule extends SimpleModule {
     }
 
     public Schema build() {
+      log.trace(this.toString());
       SchemaBuilder builder;
 
       switch (this.type) {
@@ -185,6 +188,7 @@ public class SchemaSerializationModule extends SimpleModule {
     @Override
     public Schema deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
       Storage storage = jsonParser.readValueAs(Storage.class);
+
       return storage.build();
     }
   }

@@ -35,7 +35,7 @@ public class TimeSerializationModule extends SimpleModule {
     addDeserializer(Time.class, new Deserializer());
   }
 
-  public static class Storage implements Time {
+  public static class Storage {
     public long milliseconds;
     public long nanoseconds;
 
@@ -46,26 +46,6 @@ public class TimeSerializationModule extends SimpleModule {
     public Storage(Time time) {
       this.milliseconds = time.milliseconds();
       this.nanoseconds = time.nanoseconds();
-    }
-
-
-    @Override
-    public long milliseconds() {
-      return this.milliseconds;
-    }
-
-    @Override
-    public long nanoseconds() {
-      return this.nanoseconds;
-    }
-
-    @Override
-    public void sleep(long l) {
-      try {
-        Thread.sleep(l);
-      } catch (InterruptedException e) {
-
-      }
     }
   }
 
@@ -81,8 +61,28 @@ public class TimeSerializationModule extends SimpleModule {
 
     @Override
     public Time deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-      Storage storage = jsonParser.readValueAs(Storage.class);
-      return storage;
+      final Storage storage = jsonParser.readValueAs(Storage.class);
+
+      return new Time() {
+        @Override
+        public long milliseconds() {
+          return storage.milliseconds;
+        }
+
+        @Override
+        public long nanoseconds() {
+          return storage.nanoseconds;
+        }
+
+        @Override
+        public void sleep(long l) {
+          try {
+            Thread.sleep(l);
+          } catch (InterruptedException e) {
+
+          }
+        }
+      };
     }
   }
 }

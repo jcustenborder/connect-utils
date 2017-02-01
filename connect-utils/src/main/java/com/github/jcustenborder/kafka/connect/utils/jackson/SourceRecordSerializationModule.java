@@ -48,6 +48,23 @@ public class SourceRecordSerializationModule extends SimpleModule {
     public Object value;
     public Long timestamp;
 
+    public Object value() {
+      if (this.valueSchema != null) {
+        return ValueHelper.value(this.valueSchema, this.value);
+      } else {
+        return this.value;
+      }
+    }
+
+    public Object key() {
+      if (this.keySchema != null) {
+        return ValueHelper.value(this.keySchema, this.key);
+      } else {
+        return this.key;
+      }
+    }
+
+
     public SourceRecord build() {
       return new SourceRecord(
           sourcePartition,
@@ -55,9 +72,9 @@ public class SourceRecordSerializationModule extends SimpleModule {
           topic,
           kafkaPartition,
           keySchema,
-          key,
+          key(),
           valueSchema,
-          value,
+          value(),
           timestamp
       );
     }

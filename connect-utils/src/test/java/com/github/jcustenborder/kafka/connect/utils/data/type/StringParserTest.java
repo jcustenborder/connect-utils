@@ -16,6 +16,7 @@
 package com.github.jcustenborder.kafka.connect.utils.data.type;
 
 import com.github.jcustenborder.kafka.connect.utils.data.Parser;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.TestFactory;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
@@ -132,74 +134,64 @@ public class StringParserTest {
     );
   }
 
-  @Test
-  public void float64Tests() {
-    Map<String, ?> tests = ImmutableMap.of(
-        new Double(Double.MAX_VALUE).toString(), new Double(Double.MAX_VALUE),
-        new Double(Double.MIN_VALUE).toString(), new Double(Double.MIN_VALUE)
-    );
-    assertConversion(Schema.FLOAT64_SCHEMA, Double.class, tests);
-  }
+  class TestCase {
+    public final Schema schema;
+    public final String input;
+    public final Object expected;
 
-  @Test
-  public void int8Tests() {
-    Map<String, ?> tests = ImmutableMap.of(
-        new Byte(Byte.MAX_VALUE).toString(), new Byte(Byte.MAX_VALUE),
-        new Byte(Byte.MIN_VALUE).toString(), new Byte(Byte.MIN_VALUE)
-    );
-    assertConversion(Schema.INT8_SCHEMA, Byte.class, tests);
-  }
-
-
-  @Test
-  public void int16Tests() {
-    Map<String, ?> tests = ImmutableMap.of(
-        new Short(Short.MAX_VALUE).toString(), new Short(Short.MAX_VALUE),
-        new Short(Short.MIN_VALUE).toString(), new Short(Short.MIN_VALUE)
-    );
-    assertConversion(Schema.INT16_SCHEMA, Short.class, tests);
-  }
-
-
-  @Test
-  public void int32Tests() {
-    Map<String, ?> tests = ImmutableMap.of(
-        new Integer(Integer.MAX_VALUE).toString(), new Integer(Integer.MAX_VALUE),
-        new Integer(Integer.MIN_VALUE).toString(), new Integer(Integer.MIN_VALUE)
-    );
-    assertConversion(Schema.INT32_SCHEMA, Integer.class, tests);
-  }
-
-
-  @Test
-  public void int64Tests() {
-    Map<String, ?> tests = ImmutableMap.of(
-        new Long(Long.MAX_VALUE).toString(), new Long(Long.MAX_VALUE),
-        new Long(Long.MIN_VALUE).toString(), new Long(Long.MIN_VALUE)
-    );
-    assertConversion(Schema.INT64_SCHEMA, Long.class, tests);
-  }
-
-
-  @Test
-  public void stringTests() {
-    Map<String, ?> tests = ImmutableMap.of(
-        "", "",
-        "mirror", "mirror"
-    );
-    assertConversion(Schema.STRING_SCHEMA, String.class, tests);
-  }
-
-  @Test
-  public void decimalTests() {
-    for (int SCALE = 3; SCALE < 30; SCALE++) {
-      Map<String, ?> tests = ImmutableMap.of(
-          "12345", new BigDecimal("12345").setScale(SCALE),
-          "0", new BigDecimal("0").setScale(SCALE),
-          "-12345.001", new BigDecimal("-12345.001").setScale(SCALE)
-      );
-      assertConversion(Decimal.builder(SCALE).build(), BigDecimal.class, tests);
+    TestCase(Schema schema, String input, Object expected) {
+      this.schema = schema;
+      this.input = input;
+      this.expected = expected;
     }
+
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(TestCase.class)
+          .omitNullValues()
+          .add("schemaType", schema.type())
+          .add("schemaName", schema.name())
+          .add("input", input)
+          .toString();
+    }
+  }
+
+  void of(List<TestCase> tests, Schema schema, String input, Object expected) {
+    tests.add(new TestCase(schema, input, expected));
+  }
+
+  @TestFactory
+  Stream<DynamicTest> parseString() {
+    List<TestCase> tests = new ArrayList<>();
+    of(tests, Schema.FLOAT64_SCHEMA, new Double(Double.MAX_VALUE).toString(), new Double(Double.MAX_VALUE));
+    of(tests, Schema.FLOAT64_SCHEMA, new Double(Double.MIN_VALUE).toString(), new Double(Double.MIN_VALUE));
+
+    of(tests, Schema.INT8_SCHEMA, new Byte(Byte.MAX_VALUE).toString(), new Byte(Byte.MAX_VALUE));
+    of(tests, Schema.INT8_SCHEMA, new Byte(Byte.MIN_VALUE).toString(), new Byte(Byte.MIN_VALUE));
+
+    of(tests, Schema.INT16_SCHEMA, new Short(Short.MAX_VALUE).toString(), new Short(Short.MAX_VALUE));
+    of(tests, Schema.INT16_SCHEMA, new Short(Short.MIN_VALUE).toString(), new Short(Short.MIN_VALUE));
+
+    of(tests, Schema.INT32_SCHEMA, new Integer(Integer.MAX_VALUE).toString(), new Integer(Integer.MAX_VALUE));
+    of(tests, Schema.INT32_SCHEMA, new Integer(Integer.MIN_VALUE).toString(), new Integer(Integer.MIN_VALUE));
+
+    of(tests, Schema.INT64_SCHEMA, new Long(Long.MAX_VALUE).toString(), new Long(Long.MAX_VALUE));
+    of(tests, Schema.INT64_SCHEMA, new Long(Long.MIN_VALUE).toString(), new Long(Long.MIN_VALUE));
+
+    of(tests, Schema.STRING_SCHEMA, "", "");
+    of(tests, Schema.STRING_SCHEMA, "mirror", "mirror");
+
+    for (int SCALE = 3; SCALE < 30; SCALE++) {
+      Schema schema = Decimal.schema(SCALE);
+      of(tests, schema, "12345", new BigDecimal("12345").setScale(SCALE));
+      of(tests, schema, "0", new BigDecimal("0").setScale(SCALE));
+      of(tests, schema, "-12345.001", new BigDecimal("-12345.001").setScale(SCALE));
+    }
+
+    return tests.stream().map(testCase -> dynamicTest(testCase.toString(), () -> {
+      final Object actual = parser.parseString(testCase.schema, testCase.input);
+      assertEquals(testCase.expected, actual);
+    }));
   }
 
   @Test

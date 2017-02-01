@@ -18,13 +18,17 @@ package com.github.jcustenborder.kafka.connect.utils.jackson;
 import com.google.common.io.BaseEncoding;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
+import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 class ValueHelper {
   static final Logger log = LoggerFactory.getLogger(ValueHelper.class);
@@ -102,12 +106,6 @@ class ValueHelper {
         return decimal.setScale(scale);
       }
     }
-    if (value instanceof Number) {
-      Number number = (Number) value;
-      int scale = Integer.parseInt(schema.parameters().get(Decimal.SCALE_FIELD));
-      BigDecimal decimal = BigDecimal.valueOf(number.longValue(), scale);
-      return decimal;
-    }
 
     return value;
   }
@@ -142,7 +140,7 @@ class ValueHelper {
     }
 
     Object result;
-
+    log.trace("schema.type() = {}", schema.type());
     switch (schema.type()) {
       case BYTES:
         if (Decimal.LOGICAL_NAME.equals(schema.name())) {
@@ -180,7 +178,31 @@ class ValueHelper {
         result = float64(value);
         break;
       case STRUCT:
-        log.trace("struct");
+        if (value instanceof Struct) {
+          log.trace("Struct");
+          result = value;
+        } else if (value instanceof Map) {
+          log.trace("Map");
+          Map<String, Object> map = (Map<String, Object>) value;
+          if (map.containsKey("schema") && map.get("fieldValues") instanceof List) {
+            log.trace("struct stored as map.");
+            Struct struct = ObjectMapperFactory.INSTANCE.convertValue(value, Struct.class);
+            result = struct;
+          } else {
+            log.trace("map");
+            Struct struct = new Struct(schema);
+            for (Map.Entry<String, Object> kvp : map.entrySet()) {
+              log.trace("field {}", kvp.getKey());
+              Field field = schema.field(kvp.getKey());
+              struct.put(field, kvp.getValue());
+            }
+            result = struct;
+          }
+        } else {
+          log.trace("not Struct or Map.");
+          result = value;
+        }
+        break;
       default:
         result = value;
         break;
@@ -189,14 +211,14 @@ class ValueHelper {
     return result;
   }
 
-  public Object convert(Object value) {
-    Object result;
-    if (value instanceof java.sql.Date) {
-      java.sql.Date d = (java.sql.Date) value;
-      result = new java.util.Date(d.getTime());
-    } else {
-      result = value;
-    }
-    return result;
-  }
+//  public Object convert(Object value) {
+//    Object result;
+//    if (value instanceof java.sql.Date) {
+//      java.sql.Date d = (java.sql.Date) value;
+//      result = new java.util.Date(d.getTime());
+//    } else {
+//      result = value;
+//    }
+//    return result;
+//  }
 }
