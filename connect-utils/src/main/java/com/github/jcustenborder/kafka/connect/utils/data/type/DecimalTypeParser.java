@@ -16,7 +16,6 @@
 package com.github.jcustenborder.kafka.connect.utils.data.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.apache.kafka.connect.data.Decimal;
@@ -27,6 +26,14 @@ import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
 
 public class DecimalTypeParser implements TypeParser {
+  static final String NOT_FOUND_MESSAGE = String.format(
+      "Invalid Decimal schema: %s parameter not found.",
+      Decimal.SCALE_FIELD
+  );
+  static final String NOT_PARSABLE_MESSAGE = String.format(
+      "Invalid Decimal schema: %s parameter could not be converted to an integer.",
+      Decimal.SCALE_FIELD
+  );
   final Cache<Schema, Integer> schemaCache;
 
   public DecimalTypeParser() {
@@ -34,16 +41,6 @@ public class DecimalTypeParser implements TypeParser {
         .expireAfterWrite(60, TimeUnit.SECONDS)
         .build();
   }
-
-  static final String NOT_FOUND_MESSAGE = String.format(
-      "Invalid Decimal schema: %s parameter not found.",
-      Decimal.SCALE_FIELD
-  );
-
-  static final String NOT_PARSABLE_MESSAGE = String.format(
-      "Invalid Decimal schema: %s parameter could not be converted to an integer.",
-      Decimal.SCALE_FIELD
-  );
 
   private static int scaleInternal(Schema schema) {
     if (null == schema.parameters()) {
@@ -85,8 +82,23 @@ public class DecimalTypeParser implements TypeParser {
 
   @Override
   public Object parseJsonNode(JsonNode input, Schema schema) {
-    Preconditions.checkState(input.isBigDecimal(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
-    int scale = scale(schema);
-    return input.decimalValue().setScale(scale);
+    Object result;
+
+    if (input.isNumber()) {
+      int scale = scale(schema);
+      result = input.decimalValue().setScale(scale);
+    } else if (input.isTextual()) {
+      result = parseString(input.textValue(), schema);
+    } else {
+      throw new UnsupportedOperationException(
+          String.format(
+              "Could not parse '%s' to %s",
+              input,
+              this.expectedClass().getSimpleName()
+          )
+      );
+    }
+
+    return result;
   }
 }

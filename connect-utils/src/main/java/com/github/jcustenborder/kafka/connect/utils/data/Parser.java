@@ -132,7 +132,7 @@ public class Parser {
       Object result = parser.parseJsonNode(input, schema);
       return result;
     } catch (Exception ex) {
-      String message = String.format("Could not parse '%s' to '%s'", input, parser.expectedClass().getSimpleName());
+      String message = String.format("Could not parse '%s' to %s", input, parser.expectedClass().getSimpleName());
       throw new DataException(message, ex);
     }
   }

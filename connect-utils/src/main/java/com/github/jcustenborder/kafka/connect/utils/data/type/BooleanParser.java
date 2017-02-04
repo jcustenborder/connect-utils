@@ -16,7 +16,6 @@
 package com.github.jcustenborder.kafka.connect.utils.data.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Schema;
 
 public class BooleanParser implements TypeParser {
@@ -32,7 +31,20 @@ public class BooleanParser implements TypeParser {
 
   @Override
   public Object parseJsonNode(JsonNode input, Schema schema) {
-    Preconditions.checkState(input.isBoolean(), "'%s' is not a '%s'", input.textValue(), expectedClass().getSimpleName());
-    return input.asBoolean();
+    Object result;
+    if (input.isBoolean()) {
+      result = input.booleanValue();
+    } else if (input.isTextual()) {
+      result = parseString(input.textValue(), schema);
+    } else {
+      throw new UnsupportedOperationException(
+          String.format(
+              "Could not parse '%s' to %s",
+              input,
+              this.expectedClass().getSimpleName()
+          )
+      );
+    }
+    return result;
   }
 }

@@ -157,56 +157,70 @@ public class JsonNodeTest {
     assertEquals(testCase.expected, actual, message);
   }
 
+  <T> void of(List<TestCase> tests, Class<T> cls, Schema schema, List<T> values) {
+    for (T t : values) {
+      of(tests, cls, schema, t);
+      of(tests, cls, schema, t.toString(), t);
+    }
+  }
 
   @TestFactory
   public Stream<DynamicTest> parseJsonNode() {
     List<TestCase> tests = new ArrayList<>();
     of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.TRUE);
     of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.FALSE);
+    of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.TRUE.toString(), Boolean.TRUE);
+    of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.FALSE.toString(), Boolean.FALSE);
 
-    //FLOAT32
-    of(tests, Float.class, Schema.FLOAT32_SCHEMA, Float.MAX_VALUE);
-    of(tests, Float.class, Schema.FLOAT32_SCHEMA, Float.MIN_VALUE);
+    List<Float> floats = new ArrayList<>();
+    floats.add(Float.MAX_VALUE);
+    floats.add(Float.MIN_VALUE);
     for (int i = 0; i < 30; i++) {
-      of(tests, Float.class, Schema.FLOAT32_SCHEMA, this.random.nextFloat());
+      floats.add(this.random.nextFloat());
     }
+    of(tests, Float.class, Schema.FLOAT32_SCHEMA, floats);
 
-    //FLOAT64
-    of(tests, Double.class, Schema.FLOAT64_SCHEMA, Double.MAX_VALUE);
-    of(tests, Double.class, Schema.FLOAT64_SCHEMA, Double.MIN_VALUE);
+    List<Double> doubles = new ArrayList<>();
+    doubles.add(Double.MAX_VALUE);
+    doubles.add(Double.MIN_VALUE);
     for (int i = 0; i < 30; i++) {
-      of(tests, Double.class, Schema.FLOAT64_SCHEMA, this.random.nextDouble());
+      doubles.add(this.random.nextDouble());
     }
+    of(tests, Double.class, Schema.FLOAT64_SCHEMA, doubles);
 
-    //INT8
-    of(tests, Byte.class, Schema.INT8_SCHEMA, Byte.MAX_VALUE);
-    of(tests, Byte.class, Schema.INT8_SCHEMA, Byte.MIN_VALUE);
+    List<Byte> bytes = new ArrayList<>();
+    bytes.add(Byte.MAX_VALUE);
+    bytes.add(Byte.MIN_VALUE);
     byte[] buffer = new byte[30];
     this.random.nextBytes(buffer);
     for (Byte b : buffer) {
-      of(tests, Byte.class, Schema.INT8_SCHEMA, b);
+      bytes.add(b);
     }
+    of(tests, Byte.class, Schema.INT8_SCHEMA, bytes);
 
-    //INT16
-    of(tests, Short.class, Schema.INT16_SCHEMA, Short.MAX_VALUE);
-    of(tests, Short.class, Schema.INT16_SCHEMA, Short.MIN_VALUE);
+    List<Short> shorts = new ArrayList<>();
+    shorts.add(Short.MAX_VALUE);
+    shorts.add(Short.MIN_VALUE);
     for (int i = 0; i < 30; i++) {
-      of(tests, Short.class, Schema.INT16_SCHEMA, (short) this.random.nextInt(Short.MAX_VALUE));
+      shorts.add((short) this.random.nextInt(Short.MAX_VALUE));
     }
+    of(tests, Short.class, Schema.INT16_SCHEMA, shorts);
 
-    //INT32
-    of(tests, Integer.class, Schema.INT32_SCHEMA, Integer.MAX_VALUE);
-    of(tests, Integer.class, Schema.INT32_SCHEMA, Integer.MIN_VALUE);
+    List<Integer> ints = new ArrayList<>();
+    ints.add(Integer.MAX_VALUE);
+    ints.add(Integer.MIN_VALUE);
     for (int i = 0; i < 30; i++) {
-      of(tests, Integer.class, Schema.INT32_SCHEMA, this.random.nextInt());
+      ints.add(this.random.nextInt());
     }
+    of(tests, Integer.class, Schema.INT32_SCHEMA, ints);
 
-    //INT64
-    of(tests, Long.class, Schema.INT64_SCHEMA, Long.MAX_VALUE);
-    of(tests, Long.class, Schema.INT64_SCHEMA, Long.MIN_VALUE);
+    List<Long> longs = new ArrayList<>();
+    longs.add(Long.MAX_VALUE);
+    longs.add(Long.MIN_VALUE);
     for (int i = 0; i < 30; i++) {
-      of(tests, Long.class, Schema.INT64_SCHEMA, this.random.nextLong());
+      longs.add(this.random.nextLong());
     }
+    of(tests, Long.class, Schema.INT64_SCHEMA, longs);
 
     //String
     of(tests, String.class, Schema.STRING_SCHEMA, "");
@@ -217,6 +231,9 @@ public class JsonNodeTest {
       of(tests, BigDecimal.class, Decimal.schema(SCALE), new BigDecimal("12345").setScale(SCALE));
       of(tests, BigDecimal.class, Decimal.schema(SCALE), new BigDecimal("0").setScale(SCALE));
       of(tests, BigDecimal.class, Decimal.schema(SCALE), new BigDecimal("-12345.001").setScale(SCALE));
+      of(tests, BigDecimal.class, Decimal.schema(SCALE), new BigDecimal("12345").setScale(SCALE).toString(), new BigDecimal("12345").setScale(SCALE));
+      of(tests, BigDecimal.class, Decimal.schema(SCALE), new BigDecimal("0").setScale(SCALE).toString(), new BigDecimal("0").setScale(SCALE));
+      of(tests, BigDecimal.class, Decimal.schema(SCALE), new BigDecimal("-12345.001").setScale(SCALE).toString(), new BigDecimal("-12345.001").setScale(SCALE));
     }
 
     //Timestamp
