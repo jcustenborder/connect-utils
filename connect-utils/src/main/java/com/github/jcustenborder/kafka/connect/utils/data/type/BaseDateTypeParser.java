@@ -28,8 +28,8 @@ import java.util.TimeZone;
 
 public abstract class BaseDateTypeParser implements TypeParser {
   final static Logger log = LoggerFactory.getLogger(BaseDateTypeParser.class);
-  final SimpleDateFormat[] dateFormats;
   protected final TimeZone timeZone;
+  final SimpleDateFormat[] dateFormats;
 
   public BaseDateTypeParser(TimeZone timeZone, SimpleDateFormat... dateFormats) {
     this.dateFormats = dateFormats;
