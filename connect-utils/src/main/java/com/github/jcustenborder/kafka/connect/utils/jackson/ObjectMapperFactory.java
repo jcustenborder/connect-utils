@@ -26,7 +26,6 @@ public class ObjectMapperFactory {
     INSTANCE = new ObjectMapper();
     INSTANCE.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     INSTANCE.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
-    INSTANCE.configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true);
     INSTANCE.configure(DeserializationFeature.USE_LONG_FOR_INTS, true);
 
     INSTANCE.registerModule(new SchemaSerializationModule());
