@@ -90,8 +90,10 @@ public abstract class BaseDocumentationTest {
           writer.println();
           writer.println("# Set these required values");
           for (Map.Entry<String, ConfigDef.ConfigKey> kvp : configDef.configKeys().entrySet()) {
-            writer.printf("%s=", kvp.getKey());
-            writer.println();
+            if (!kvp.getValue().hasDefault()) {
+              writer.printf("%s=", kvp.getKey());
+              writer.println();
+            }
           }
           writer.println("```");
           writer.println();
