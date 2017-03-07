@@ -18,12 +18,20 @@ package com.github.jcustenborder.kafka.connect.utils;
 import com.google.common.base.Strings;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Struct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.github.jcustenborder.kafka.connect.utils.AssertSchema.assertSchema;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AssertStruct {
+  private static final Logger log = LoggerFactory.getLogger(AssertStruct.class);
+
   public static void assertStruct(final Struct expected, final Struct actual, String message) {
     String prefix = Strings.isNullOrEmpty(message) ? "" : message + ": ";
 
@@ -34,15 +42,31 @@ public class AssertStruct {
 
     assertSchema(expected.schema(), actual.schema(), "schema does not match.");
     for (Field field : expected.schema().fields()) {
+      log.trace("assertStruct() - testing field '{}'", field.name());
       final Object expectedValue = expected.get(field.name());
-      final Object actualValue = expected.get(field.name());
+      final Object actualValue = actual.get(field.name());
 
       switch (field.schema().type()) {
         case ARRAY:
+          assertTrue(null == expectedValue || expectedValue instanceof List);
+          assertTrue(null == actualValue || actualValue instanceof List);
+          List<Object> expectedArray = (List<Object>) expectedValue;
+          List<Object> actualArray = (List<Object>) actualValue;
+          assertEquals(expectedArray, actualArray);
           break;
         case MAP:
+          assertTrue(null == expectedValue || expectedValue instanceof Map);
+          assertTrue(null == actualValue || actualValue instanceof Map);
+          Map<Object, Object> expectedMap = (Map<Object, Object>) expectedValue;
+          Map<Object, Object> actualMap = (Map<Object, Object>) actualValue;
+          assertEquals(expectedMap, actualMap);
           break;
         case STRUCT:
+          assertTrue(null == expectedValue || expectedValue instanceof Struct);
+          assertTrue(null == actualValue || actualValue instanceof Struct);
+          Struct expectedStruct = (Struct) expectedValue;
+          Struct actualStruct = (Struct) actualValue;
+          assertStruct(expectedStruct, actualStruct, prefix + field.name() + " does not match.");
           break;
         default:
           assertEquals(expectedValue, actualValue, prefix + field.name() + " does not match.");
