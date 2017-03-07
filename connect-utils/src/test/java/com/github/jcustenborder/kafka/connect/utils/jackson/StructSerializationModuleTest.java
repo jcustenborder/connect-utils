@@ -15,6 +15,8 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.jackson;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static com.github.jcustenborder.kafka.connect.utils.AssertStruct.assertStruct;
@@ -43,6 +46,15 @@ public class StructSerializationModuleTest {
         .field("longitude", Schema.FLOAT32_SCHEMA)
         .build();
 
+    Map<String, Struct> cityMap = ImmutableMap.of(
+        "Austin", new Struct(innerSchema).put("latitude", 30.2672F).put("longitude", 97.7431F),
+        "San Francisco", new Struct(innerSchema).put("latitude", 37.7749F).put("longitude", 122.4194F)
+    );
+
+    List<Struct> cityList = ImmutableList.copyOf(
+        cityMap.values()
+    );
+
     List<Struct> testCases = Arrays.asList(
         new Struct(SchemaBuilder.struct().name("Testing").field("firstName", Schema.STRING_SCHEMA).build())
             .put("firstName", "Example"),
@@ -51,7 +63,11 @@ public class StructSerializationModuleTest {
         new Struct(SchemaBuilder.struct().name("NestedOptionalStructWithValue").field("firstName", Schema.OPTIONAL_STRING_SCHEMA).field("inner", innerSchema).build())
             .put("inner", new Struct(innerSchema).put("latitude", 30.2672F).put("longitude", 97.7431F)),
         new Struct(SchemaBuilder.struct().name("NestedOptionalStructWithoutValue").field("firstName", Schema.OPTIONAL_STRING_SCHEMA).field("inner", innerSchema).build())
-            .put("inner", null)
+            .put("inner", null),
+        new Struct(SchemaBuilder.struct().name("NestedMapStruct").field("firstName", Schema.OPTIONAL_STRING_SCHEMA).field("inner", SchemaBuilder.map(Schema.STRING_SCHEMA, innerSchema)).build())
+            .put("inner", cityMap),
+        new Struct(SchemaBuilder.struct().name("NestedArrayStruct").field("firstName", Schema.OPTIONAL_STRING_SCHEMA).field("inner", SchemaBuilder.array(innerSchema)).build())
+            .put("inner", cityList)
     );
 
     return testCases.stream().map(expected -> dynamicTest(expected.schema().name(), () -> {
@@ -60,7 +76,6 @@ public class StructSerializationModuleTest {
       Struct actual = ObjectMapperFactory.INSTANCE.readValue(input, Struct.class);
       assertStruct(expected, actual);
     }));
-
   }
 
 
