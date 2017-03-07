@@ -35,11 +35,23 @@ public class StructSerializationModuleTest {
 
   @TestFactory
   public Stream<DynamicTest> roundtrip() {
+
+    Schema innerSchema = SchemaBuilder.struct()
+        .name("InnerSchema")
+        .optional()
+        .field("latitude", Schema.FLOAT32_SCHEMA)
+        .field("longitude", Schema.FLOAT32_SCHEMA)
+        .build();
+
     List<Struct> testCases = Arrays.asList(
         new Struct(SchemaBuilder.struct().name("Testing").field("firstName", Schema.STRING_SCHEMA).build())
             .put("firstName", "Example"),
         new Struct(SchemaBuilder.struct().name("Nullable").field("firstName", Schema.OPTIONAL_STRING_SCHEMA).build())
-            .put("firstName", null)
+            .put("firstName", null),
+        new Struct(SchemaBuilder.struct().name("NestedOptionalStructWithValue").field("firstName", Schema.OPTIONAL_STRING_SCHEMA).field("inner", innerSchema).build())
+            .put("inner", new Struct(innerSchema).put("latitude", 30.2672F).put("longitude", 97.7431F)),
+        new Struct(SchemaBuilder.struct().name("NestedOptionalStructWithoutValue").field("firstName", Schema.OPTIONAL_STRING_SCHEMA).field("inner", innerSchema).build())
+            .put("inner", null)
     );
 
     return testCases.stream().map(expected -> dynamicTest(expected.schema().name(), () -> {

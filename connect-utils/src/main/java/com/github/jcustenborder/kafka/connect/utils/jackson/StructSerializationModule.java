@@ -28,12 +28,15 @@ import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StructSerializationModule extends SimpleModule {
+  private static final Logger log = LoggerFactory.getLogger(StructSerializationModule.class);
 
   public StructSerializationModule() {
     super();
@@ -63,20 +66,23 @@ public class StructSerializationModule extends SimpleModule {
     private Struct struct;
 
     void value(Object value) {
-      switch (this.schema.type()) {
-        case STRUCT:
-          Preconditions.checkState(value instanceof Struct, "value must be a struct.");
-          this.struct = (Struct) value;
-          break;
-        default:
-          this.storage = value;
-          break;
+      log.trace("value(Object) - name = '{}', schema.type() = {}", this.name, this.schema.type());
+      if (value != null) {
+        switch (this.schema.type()) {
+          case STRUCT:
+            Preconditions.checkState(value instanceof Struct, "value must be a struct.");
+            this.struct = (Struct) value;
+            break;
+          default:
+            this.storage = value;
+            break;
+        }
       }
     }
 
     Object value() {
       Object result;
-
+      log.trace("value() - name = '{}'", this.name);
       switch (this.schema.type()) {
         case STRUCT:
           result = this.struct;
