@@ -29,6 +29,7 @@ import org.opentest4j.AssertionFailedError;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,8 +41,10 @@ public class AssertStructTest {
   Schema arraySchema;
   Schema mapSchema;
   Schema nestedSchema;
+  Schema structBytesSchema;
   Map<String, Struct> mapOfStructs;
   List<Struct> arrayOfStructs;
+  byte[] buffer;
 
   @BeforeEach
   public void createSchemas() {
@@ -72,6 +75,13 @@ public class AssertStructTest {
         .name("com.github.jcustenborder.kafka.connect.utils.MapOfPoint")
         .field("map", SchemaBuilder.map(Schema.STRING_SCHEMA, this.pointSchema).optional().build())
         .build();
+
+    this.structBytesSchema = SchemaBuilder.struct()
+        .name("com.github.jcustenborder.kafka.connect.utils.MapOfPoint")
+        .field("bytes", Schema.OPTIONAL_BYTES_SCHEMA)
+        .build();
+    this.buffer = new byte[10];
+    new Random().nextBytes(this.buffer);
   }
 
   @BeforeEach
@@ -153,6 +163,21 @@ public class AssertStructTest {
         DynamicTest.dynamicTest("arrayDiff", () -> {
           final Struct expected = new Struct(this.arraySchema).put("array", arrayOfStructs);
           final Struct actual = new Struct(this.arraySchema).put("array", Lists.reverse(arrayOfStructs));
+          test(expected, actual, false);
+        }),
+        DynamicTest.dynamicTest("structBytesSchemaSame", () -> {
+          final Struct expected = new Struct(this.structBytesSchema).put("bytes", this.buffer);
+          final Struct actual = new Struct(this.structBytesSchema).put("bytes", this.buffer);
+          test(expected, actual, true);
+        }),
+        DynamicTest.dynamicTest("structBytesSchemaDiff", () -> {
+          final Struct expected = new Struct(this.structBytesSchema).put("bytes", this.buffer);
+          final Struct actual = new Struct(this.structBytesSchema).put("bytes", new byte[10]);
+          test(expected, actual, false);
+        }),
+        DynamicTest.dynamicTest("structBytesSchemaActualNull", () -> {
+          final Struct expected = new Struct(this.structBytesSchema).put("bytes", this.buffer);
+          final Struct actual = new Struct(this.structBytesSchema).put("bytes", null);
           test(expected, actual, false);
         })
     );

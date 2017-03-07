@@ -16,6 +16,7 @@
 package com.github.jcustenborder.kafka.connect.utils;
 
 import com.google.common.base.Strings;
+import com.google.common.io.BaseEncoding;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Struct;
 import org.slf4j.Logger;
@@ -52,14 +53,14 @@ public class AssertStruct {
           assertTrue(null == actualValue || actualValue instanceof List);
           List<Object> expectedArray = (List<Object>) expectedValue;
           List<Object> actualArray = (List<Object>) actualValue;
-          assertEquals(expectedArray, actualArray);
+          assertEquals(expectedArray, actualArray, prefix + field.name() + " does not match.");
           break;
         case MAP:
           assertTrue(null == expectedValue || expectedValue instanceof Map);
           assertTrue(null == actualValue || actualValue instanceof Map);
           Map<Object, Object> expectedMap = (Map<Object, Object>) expectedValue;
           Map<Object, Object> actualMap = (Map<Object, Object>) actualValue;
-          assertEquals(expectedMap, actualMap);
+          assertEquals(expectedMap, actualMap, prefix + field.name() + " does not match.");
           break;
         case STRUCT:
           assertTrue(null == expectedValue || expectedValue instanceof Struct);
@@ -68,6 +69,16 @@ public class AssertStruct {
           Struct actualStruct = (Struct) actualValue;
           assertStruct(expectedStruct, actualStruct, prefix + field.name() + " does not match.");
           break;
+        case BYTES:
+          assertTrue(null == expectedValue || expectedValue instanceof byte[]);
+          assertTrue(null == actualValue || actualValue instanceof byte[]);
+          byte[] expectedByteArray = (byte[]) expectedValue;
+          byte[] actualByteArray = (byte[]) actualValue;
+          assertEquals(
+              null == expectedByteArray ? "" : BaseEncoding.base32Hex().encode(expectedByteArray).toString(),
+              null == actualByteArray ? "" : BaseEncoding.base32Hex().encode(actualByteArray).toString(),
+              prefix + field.name() + " does not match."
+          );
         default:
           assertEquals(expectedValue, actualValue, prefix + field.name() + " does not match.");
           break;
