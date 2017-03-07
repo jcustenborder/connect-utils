@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +15,21 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.connect.data.Date;
+import org.apache.kafka.connect.data.Decimal;
+import org.apache.kafka.connect.data.Field;
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.Time;
+import org.apache.kafka.connect.data.Timestamp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -60,83 +72,18 @@ public class MarkdownFormatter {
   }
 
   public static String toMarkdown(ConfigDef configDef) {
-    StringBuilder b = new StringBuilder();
 
-    List<ConfigDef.ConfigKey> configs = getSortedList(configDef.configKeys());
+    List<ConfigDef.ConfigKey> sortedConfigs = getSortedList(configDef.configKeys());
     String[] headers = new String[]{
         "Name", "Description", "Type", "Default", "Valid Values", "Importance"
     };
-    int[] lengths = new int[headers.length];
-    for (int i = 0; i < headers.length; i++) {
-      lengths[i] = headers[i].length();
-    }
 
-    for (ConfigDef.ConfigKey def : configs) {
+    List<List<String>> rows = new ArrayList<>();
+    rows.add(Arrays.asList(headers));
+
+    for (ConfigDef.ConfigKey def : sortedConfigs) {
+      List<String> row = new ArrayList<>(headers.length);
       for (int i = 0; i < headers.length; i++) {
-        int length = 0;
-        switch (i) {
-          case 0: //Name
-            length = null == def.name ? 0 : def.name.length();
-            break;
-          case 1:
-            length = null == def.documentation ? 0 : def.documentation.length();
-            break;
-          case 2:
-            length = null == def.type ? 0 : def.type.toString().length();
-            break;
-          case 3:
-            String defaultValue = getDefaultValue(def);
-            length = null == defaultValue ? 0 : defaultValue.length();
-            break;
-          case 4:
-            String validValues = def.validator != null ? def.validator.toString() : "";
-            length = null == validValues ? 0 : validValues.length();
-            break;
-          case 5:
-            length = null == def.importance ? 0 : def.importance.toString().length();
-            break;
-          default:
-            throw new IllegalArgumentException("There are more headers than columns.");
-        }
-        if (length > lengths[i]) {
-          lengths[i] = length;
-        }
-      }
-    }
-
-    for (int i = 0; i < headers.length; i++) {
-      String header = headers[i];
-      String format = " %-" + lengths[i] + "s ";
-      String value = String.format(format, header);
-
-      if (i == 0) {
-        b.append("|");
-      }
-      b.append(value);
-      b.append("|");
-      if (i == headers.length - 1) {
-        b.append("\n");
-      }
-    }
-
-    for (int i = 0; i < headers.length; i++) {
-      String format = " %-" + lengths[i] + "s ";
-      String value = String.format(format, "").replace(" ", "-");
-
-      if (i == 0) {
-        b.append("|");
-      }
-      b.append(value);
-      b.append("|");
-      if (i == headers.length - 1) {
-        b.append("\n");
-      }
-    }
-
-    for (ConfigDef.ConfigKey def : configs) {
-      for (int i = 0; i < headers.length; i++) {
-        int length = lengths[i];
-        String format = " %-" + lengths[i] + "s ";
         String value;
         switch (i) {
           case 0: //Name
@@ -162,18 +109,139 @@ public class MarkdownFormatter {
           default:
             throw new IllegalArgumentException("There are more headers than columns.");
         }
+        row.add(value);
+      }
+      rows.add(row);
+    }
 
-        if (i == 0) {
-          b.append("|");
+    return markdownTable(rows);
+  }
+
+  static List<Integer> lengths(List<List<String>> rows) {
+    List<Integer> lengths = new ArrayList<>(rows.size());
+    for (int i = 0; i < rows.get(0).size(); i++) {
+      lengths.add(rows.get(0).get(i).length());
+    }
+    for (List<String> row : rows) {
+      for (int i = 0; i < row.size(); i++) {
+        int previous = lengths.get(i);
+        int current;
+        if (Strings.isNullOrEmpty(row.get(i))) {
+          current = 0;
+        } else {
+          current = row.get(i).length();
         }
-        b.append(String.format(format, value));
-        b.append("|");
-        if (i == headers.length - 1) {
-          b.append("\n");
+        int value = Math.max(current, previous);
+        lengths.set(i, value);
+      }
+    }
+    return lengths;
+  }
+
+  static String markdownTable(List<List<String>> rows) {
+    StringBuilder builder = new StringBuilder();
+    List<Integer> lengths = lengths(rows);
+
+    int index = 0;
+    for (List<String> row : rows) {
+      List<String> copy = new ArrayList<>(row.size());
+      for (int i = 0; i < row.size(); i++) {
+        String f = Strings.padEnd(row.get(i) == null ? "" : row.get(i), lengths.get(i), ' ');
+        copy.add(f);
+      }
+
+      builder.append("| ");
+      Joiner.on(" | ").appendTo(builder, copy);
+      builder.append(" |\n");
+
+      if (index == 0) {
+        List<String> bar = new ArrayList<>(lengths.size());
+
+        for (Integer length : lengths) {
+          bar.add(Strings.repeat("-", length + 2));
         }
+        builder.append("|");
+        Joiner.on("|").appendTo(builder, bar);
+        builder.append("|\n");
+      }
+
+      index++;
+    }
+
+    return builder.toString();
+  }
+
+  static String schema(Schema schema) {
+    String result;
+    if (!Strings.isNullOrEmpty(schema.name())) {
+      if (Time.LOGICAL_NAME.equals(schema.name())) {
+        result = "[Time](https://kafka.apache.org/0102/javadoc/org/apache/kafka/connect/data/Time.html)";
+      } else if (Date.LOGICAL_NAME.equals(schema.name())) {
+        result = "[Date](https://kafka.apache.org/0102/javadoc/org/apache/kafka/connect/data/Date.html)";
+      } else if (Timestamp.LOGICAL_NAME.equals(schema.name())) {
+        result = "[Timestamp](https://kafka.apache.org/0102/javadoc/org/apache/kafka/connect/data/Timestamp.html)";
+      } else if (Decimal.LOGICAL_NAME.equals(schema.name())) {
+        result = "[Decimal](https://kafka.apache.org/0102/javadoc/org/apache/kafka/connect/data/Decimal.html)";
+      } else {
+        result = String.format("[%s](#%s)", schema.name(), schema.name());
+      }
+    } else {
+      if (Schema.Type.ARRAY == schema.type()) {
+        result = String.format("Array of %s", schema(schema.valueSchema()));
+      } else if (Schema.Type.MAP == schema.type()) {
+        result = String.format("Map of <%s, %s>", schema(schema.keySchema()), schema(schema.valueSchema()));
+      } else {
+        result = String.format("[%s](https://kafka.apache.org/0102/javadoc/org/apache/kafka/connect/data/Schema.Type.html#%s)",
+            CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, schema.type().toString()), schema.type()
+        );
       }
     }
 
-    return b.toString();
+    return result;
+  }
+
+  public static String toMarkdown(Schema schema) {
+    Preconditions.checkNotNull(schema, "schema cannot be null.");
+
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("## ");
+    builder.append(schema.name());
+
+    if (!Strings.isNullOrEmpty(schema.doc())) {
+      builder.append("\n\n");
+      builder.append(schema.doc());
+    }
+
+
+    List<List<String>> rows = new ArrayList<>();
+    rows.add(
+        ImmutableList.of(
+            "Name",
+            "Optional",
+            "Schema",
+            "Default Value",
+            "Documentation"
+        )
+    );
+
+    for (Field field : schema.fields()) {
+      Schema fieldSchema = field.schema();
+
+      List<String> row = ImmutableList.of(
+          field.name(),
+          String.valueOf(fieldSchema.isOptional()),
+          schema(fieldSchema),
+          fieldSchema.defaultValue() == null ? "" : fieldSchema.defaultValue().toString(),
+          fieldSchema.doc()
+      );
+      rows.add(row);
+    }
+
+    builder.append("\n\n");
+    builder.append(markdownTable(rows));
+
+
+    return builder.toString();
   }
 }
