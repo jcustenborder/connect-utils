@@ -73,7 +73,7 @@ public class AssertConnectRecord {
     assertSchema(expected.keySchema(), actual.keySchema(), prefix + "keySchema() does not match");
     assertValue(expected.key(), actual.key(), prefix + "key() does not match.");
     assertSchema(expected.valueSchema(), actual.valueSchema(), prefix + "valueSchema() does not match");
-    assertValue(expected.value(), actual.value(), prefix + "key() does not match.");
+    assertValue(expected.value(), actual.value(), prefix + "value() does not match.");
   }
 
   public static void assertSourceRecord(SourceRecord expected, SourceRecord actual) {

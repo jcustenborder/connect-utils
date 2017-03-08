@@ -79,6 +79,7 @@ public class AssertStruct {
               null == actualByteArray ? "" : BaseEncoding.base32Hex().encode(actualByteArray).toString(),
               prefix + field.name() + " does not match."
           );
+          break;
         default:
           assertEquals(expectedValue, actualValue, prefix + field.name() + " does not match.");
           break;
