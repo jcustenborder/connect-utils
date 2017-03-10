@@ -80,6 +80,10 @@ public class StructTemplate {
     }
   }
 
+  public String execute(String templateName, Struct struct) {
+    return executeInternal(templateName, struct);
+  }
+
   public String execute(String templateName, Map<String, ?> values) {
     return executeInternal(templateName, values);
   }

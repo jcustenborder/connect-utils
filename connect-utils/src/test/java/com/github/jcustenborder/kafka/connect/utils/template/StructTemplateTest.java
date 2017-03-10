@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -89,5 +89,12 @@ public class StructTemplateTest {
     SinkRecord record = new SinkRecord("testing", 1, null, null, this.struct.schema(), this.struct, 123456L);
     String actual = this.structTemplate.execute("test", record, this.struct, values);
     assertEquals("", actual);
+  }
+
+  @Test
+  public void struct() {
+    this.structTemplate.addTemplate("test", "${stringField}");
+    String actual = this.structTemplate.execute("test", this.struct);
+    assertEquals("TestValue", actual);
   }
 }

@@ -52,3 +52,34 @@ Object value = parser.parseJson(Schema.BOOLEAN_SCHEMA, null);
 Parser parser = new Parser();
 parser.registerTypeParser(Timestamp.SCHEMA, new DateTypeConverter(TimeZone.getTimeZone("UTC"), new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss")));
 ```
+
+# Templating of Kafka Connect types.
+
+There are several cases where you will want to route data to a different topic based on a field in your data. 
+[StructTemplate](src/main/java/com/github/jcustenborder/kafka/connect/utils/template/StructTemplate.java) is available to 
+assist you with this. It uses [FreeMarker](http://freemarker.org/) under the covers to allow you to apply templates to Connect Stucts. For example:
+
+```java
+// Setup the template once, maybe during start()
+StructTemplate template = new StructTemplate();
+template.addTemplate("test", "${stringField}");
+
+//Apply the template.
+Schema schema = SchemaBuilder.struct()
+    .name("TestStruct")
+    .field("stringField", Schema.STRING_SCHEMA)
+    .field("nullStringField", Schema.OPTIONAL_STRING_SCHEMA)
+    .build();
+
+Struct struct = new Struct(schema);
+struct.put("stringField", "TestValue");
+String actual = this.structTemplate.execute("test", this.struct);
+
+//actual == "TestValue"
+```
+
+You can combine static strings with variables to do something like `database.${stringField}` which would yield `database.TestValue` 
+using the example above. 
+
+
+
