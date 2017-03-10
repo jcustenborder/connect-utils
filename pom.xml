@@ -49,6 +49,7 @@
     <modules>
         <module>connect-utils</module>
         <module>connect-utils-testing</module>
+        <module>connect-utils-testing-data</module>
     </modules>
     <scm>
         <connection>scm:git:https://github.com/jcustenborder/connect-utils.git</connection>
