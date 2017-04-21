@@ -38,6 +38,7 @@ public class TimeSerializationModule extends SimpleModule {
   public static class Storage {
     public long milliseconds;
     public long nanoseconds;
+    public long hiResClockMs;
 
     public Storage() {
 
@@ -46,6 +47,7 @@ public class TimeSerializationModule extends SimpleModule {
     public Storage(Time time) {
       this.milliseconds = time.milliseconds();
       this.nanoseconds = time.nanoseconds();
+      this.hiResClockMs = time.hiResClockMs();
     }
   }
 
@@ -67,6 +69,11 @@ public class TimeSerializationModule extends SimpleModule {
         @Override
         public long milliseconds() {
           return storage.milliseconds;
+        }
+
+        @Override
+        public long hiResClockMs() {
+          return storage.hiResClockMs;
         }
 
         @Override

@@ -15,7 +15,32 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaBuilder;
+
+import java.util.Arrays;
+import java.util.List;
+
 public class DocumentationTest extends BaseDocumentationTest {
+
+  @Override
+  protected List<Schema> schemas() {
+    return Arrays.asList(
+        Schema.STRING_SCHEMA,
+        SchemaBuilder.struct()
+            .name("com.github.jcustenborder.kafka.connect.utils.DocumentationTest")
+            .doc("This is a test schema used for the documentation.")
+            .field("noDoc", Schema.OPTIONAL_STRING_SCHEMA)
+            .field("Doc", SchemaBuilder.string().doc("Testing"))
+            .field("defaultValue", SchemaBuilder.int32().defaultValue(123).build())
+            .build(),
+        SchemaBuilder.map(
+            Schema.STRING_SCHEMA,
+            Schema.STRING_SCHEMA
+        )
+    );
+  }
+
   @Override
   protected String[] packages() {
     return new String[]{this.getClass().getPackage().getName()};
