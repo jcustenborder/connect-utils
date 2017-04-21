@@ -15,8 +15,14 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
+import com.github.jcustenborder.kafka.connect.utils.config.Description;
+import com.github.jcustenborder.kafka.connect.utils.config.MarkdownFormatter;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Connector;
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.transforms.Transformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
@@ -31,6 +37,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +48,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public abstract class BaseDocumentationTest {
   private static final Logger log = LoggerFactory.getLogger(BaseDocumentationTest.class);
 
+  protected List<Schema> schemas() {
+    return Arrays.asList();
+  }
 
   protected abstract String[] packages();
 
@@ -56,20 +66,36 @@ public abstract class BaseDocumentationTest {
     );
   }
 
+  protected List<Map.Entry<String, ConfigDef.ConfigKey>> required(ConfigDef configDef) {
+    List<Map.Entry<String, ConfigDef.ConfigKey>> entries = new ArrayList<>();
+
+    for (Map.Entry<String, ConfigDef.ConfigKey> kvp : configDef.configKeys().entrySet()) {
+      if (!kvp.getValue().hasDefault()) {
+        entries.add(kvp);
+      }
+    }
+
+    return ImmutableList.copyOf(entries);
+  }
+
   @Test
   public void markdown() throws IOException, IllegalAccessException, InstantiationException {
-    Set<Class<? extends Connector>> connectorClasses = reflections.getSubTypesOf(Connector.class);
-    List<Class<? extends Connector>> sorted = new ArrayList<>(connectorClasses);
-    sorted.sort(Comparator.comparing(Class::getName));
+    Set<Class<? extends Transformation>> transformClasses = reflections.getSubTypesOf(Transformation.class);
+    List<Class<? extends Transformation>> transformClassesSorted = new ArrayList<>(transformClasses);
+    transformClassesSorted.sort(Comparator.comparing(Class::getName));
 
-    assertFalse(sorted.isEmpty(), "No connector classes were found.");
+    Set<Class<? extends Connector>> connectorClasses = reflections.getSubTypesOf(Connector.class);
+    List<Class<? extends Connector>> connectorClassesSorted = new ArrayList<>(connectorClasses);
+    connectorClassesSorted.sort(Comparator.comparing(Class::getName));
+
+    assertFalse(connectorClassesSorted.isEmpty(), "No connector classes were found.");
     try (StringWriter stringWriter = new StringWriter()) {
       try (PrintWriter writer = new PrintWriter(stringWriter)) {
         writer.println();
         writer.println("# Configuration");
         writer.println();
 
-        for (Class<? extends Connector> connectorClass : sorted) {
+        for (Class<? extends Connector> connectorClass : connectorClassesSorted) {
           if (Modifier.isAbstract(connectorClass.getModifiers())) {
             log.trace("Skipping {} because it's abstract.", connectorClass.getName());
             continue;
@@ -77,6 +103,17 @@ public abstract class BaseDocumentationTest {
 
           writer.printf("## %s", connectorClass.getSimpleName());
           writer.println();
+
+          Description descriptionAttribute = connectorClass.getAnnotation(Description.class);
+
+          if (null != descriptionAttribute && !Strings.isNullOrEmpty(descriptionAttribute.value())) {
+            writer.println();
+            writer.append(descriptionAttribute.value());
+            writer.println();
+          } else {
+
+          }
+
           writer.println();
 
           Connector connector = connectorClass.newInstance();
@@ -89,16 +126,68 @@ public abstract class BaseDocumentationTest {
           writer.println();
           writer.println();
           writer.println("# Set these required values");
-          for (Map.Entry<String, ConfigDef.ConfigKey> kvp : configDef.configKeys().entrySet()) {
-            if (!kvp.getValue().hasDefault()) {
-              writer.printf("%s=", kvp.getKey());
-              writer.println();
-            }
+          List<Map.Entry<String, ConfigDef.ConfigKey>> requiredValues = required(configDef);
+          for (Map.Entry<String, ConfigDef.ConfigKey> kvp : requiredValues) {
+            writer.printf("%s=", kvp.getKey());
+            writer.println();
           }
           writer.println("```");
           writer.println();
 
           writer.println(MarkdownFormatter.toMarkdown(configDef));
+        }
+
+        for (Class<? extends Transformation> transformationClass : transformClassesSorted) {
+          if (Modifier.isAbstract(transformationClass.getModifiers())) {
+            log.trace("Skipping {} because it's abstract.", transformationClass.getName());
+            continue;
+          }
+
+          writer.printf("## %s", transformationClass.getSimpleName());
+          writer.println();
+
+          Description descriptionAttribute = transformationClass.getAnnotation(Description.class);
+
+          if (null != descriptionAttribute && !Strings.isNullOrEmpty(descriptionAttribute.value())) {
+            writer.println();
+            writer.append(descriptionAttribute.value());
+            writer.println();
+          } else {
+
+          }
+
+          writer.println();
+
+          Transformation transformation = transformationClass.newInstance();
+          ConfigDef configDef = transformation.config();
+
+          writer.println("```properties");
+          final String transformName = transformationClass.getSimpleName().toLowerCase();
+          writer.printf("transforms=%s", transformName);
+          writer.println();
+          writer.printf("transforms.%s.type=%s", transformName, transformationClass.getName());
+          writer.println();
+          writer.println();
+          writer.println("# Set these required values");
+          List<Map.Entry<String, ConfigDef.ConfigKey>> requiredValues = required(configDef);
+          for (Map.Entry<String, ConfigDef.ConfigKey> kvp : requiredValues) {
+            writer.printf("transforms.%s.%s=", transformName, kvp.getKey());
+            writer.println();
+          }
+          writer.println("```");
+          writer.println();
+        }
+
+        List<Schema> schemas = schemas();
+
+        if (!schemas.isEmpty()) {
+          writer.println();
+          writer.println("# Schemas");
+          writer.println();
+
+          for (Schema schema : schemas()) {
+            writer.println(MarkdownFormatter.toMarkdown(schema));
+          }
         }
       }
 

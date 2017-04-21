@@ -206,41 +206,49 @@ public class MarkdownFormatter {
     StringBuilder builder = new StringBuilder();
 
     builder.append("## ");
-    builder.append(schema.name());
+    if (Strings.isNullOrEmpty(schema.name())) {
+      builder.append(schema.type());
+    } else {
+      builder.append(schema.name());
+    }
 
     if (!Strings.isNullOrEmpty(schema.doc())) {
       builder.append("\n\n");
       builder.append(schema.doc());
     }
 
-
-    List<List<String>> rows = new ArrayList<>();
-    rows.add(
-        ImmutableList.of(
-            "Name",
-            "Optional",
-            "Schema",
-            "Default Value",
-            "Documentation"
-        )
-    );
-
-    for (Field field : schema.fields()) {
-      Schema fieldSchema = field.schema();
-
-      List<String> row = ImmutableList.of(
-          field.name(),
-          String.valueOf(fieldSchema.isOptional()),
-          schema(fieldSchema),
-          fieldSchema.defaultValue() == null ? "" : fieldSchema.defaultValue().toString(),
-          fieldSchema.doc()
+    if (Schema.Type.STRUCT == schema.type()) {
+      List<List<String>> rows = new ArrayList<>();
+      rows.add(
+          ImmutableList.of(
+              "Name",
+              "Optional",
+              "Schema",
+              "Default Value",
+              "Documentation"
+          )
       );
-      rows.add(row);
+
+      for (Field field : schema.fields()) {
+        Schema fieldSchema = field.schema();
+
+        List<String> row = ImmutableList.of(
+            field.name(),
+            String.valueOf(fieldSchema.isOptional()),
+            schema(fieldSchema),
+            fieldSchema.defaultValue() == null ? "" : fieldSchema.defaultValue().toString(),
+            Strings.isNullOrEmpty(fieldSchema.doc()) ? "" : fieldSchema.doc()
+        );
+        rows.add(row);
+      }
+
+      builder.append("\n\n");
+      builder.append(markdownTable(rows));
+    } else if (Schema.Type.MAP == schema.type()) {
+
+    } else {
+
     }
-
-    builder.append("\n\n");
-    builder.append(markdownTable(rows));
-
 
     return builder.toString();
   }
