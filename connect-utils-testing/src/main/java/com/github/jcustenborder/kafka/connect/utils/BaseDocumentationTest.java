@@ -176,6 +176,7 @@ public abstract class BaseDocumentationTest {
           }
           writer.println("```");
           writer.println();
+          writer.println(MarkdownFormatter.toMarkdown(configDef));
         }
 
         List<Schema> schemas = schemas();
