@@ -85,43 +85,35 @@ public class AssertStruct {
       final Object actualValue = actual.get(expectedField.name());
 
       if (Decimal.LOGICAL_NAME.equals(expectedField.schema().name())) {
-        BigDecimal expectedDecimal = castAndVerify(BigDecimal.class, expected, expectedField, true);
-        BigDecimal actualDecimal = castAndVerify(BigDecimal.class, actual, expectedField, false);
+        final BigDecimal expectedDecimal = castAndVerify(BigDecimal.class, expected, expectedField, true);
+        final BigDecimal actualDecimal = castAndVerify(BigDecimal.class, actual, expectedField, false);
         assertEquals(expectedDecimal, actualDecimal, prefix + expectedField.name() + " does not match.");
       } else if (Timestamp.LOGICAL_NAME.equals(expectedField.schema().name())
           || Date.LOGICAL_NAME.equals(expectedField.schema().name())
           || Time.LOGICAL_NAME.equals(expectedField.schema().name())) {
-        java.util.Date expectedDate = castAndVerify(java.util.Date.class, expected, expectedField, true);
-        java.util.Date actualDate = castAndVerify(java.util.Date.class, actual, expectedField, false);
+        final java.util.Date expectedDate = castAndVerify(java.util.Date.class, expected, expectedField, true);
+        final java.util.Date actualDate = castAndVerify(java.util.Date.class, actual, expectedField, false);
         assertEquals(expectedDate, actualDate, prefix + expectedField.name() + " does not match.");
       } else {
         switch (expectedField.schema().type()) {
           case ARRAY:
-            assertTrue(null == expectedValue || expectedValue instanceof List);
-            assertTrue(null == actualValue || actualValue instanceof List);
-            List<Object> expectedArray = (List<Object>) expectedValue;
-            List<Object> actualArray = (List<Object>) actualValue;
+            final List<Object> expectedArray = castAndVerify(List.class, expected, expectedField, true);
+            final List<Object> actualArray = castAndVerify(List.class, actual, expectedField, false);
             assertEquals(expectedArray, actualArray, prefix + expectedField.name() + " does not match.");
             break;
           case MAP:
-            assertTrue(null == expectedValue || expectedValue instanceof Map);
-            assertTrue(null == actualValue || actualValue instanceof Map);
-            Map<Object, Object> expectedMap = (Map<Object, Object>) expectedValue;
-            Map<Object, Object> actualMap = (Map<Object, Object>) actualValue;
+            final Map<Object, Object> expectedMap = castAndVerify(Map.class, expected, expectedField, true);
+            final Map<Object, Object> actualMap = castAndVerify(Map.class, actual, expectedField, false);
             assertEquals(expectedMap, actualMap, prefix + expectedField.name() + " does not match.");
             break;
           case STRUCT:
-            assertTrue(null == expectedValue || expectedValue instanceof Struct);
-            assertTrue(null == actualValue || actualValue instanceof Struct);
-            Struct expectedStruct = (Struct) expectedValue;
-            Struct actualStruct = (Struct) actualValue;
+            final Struct expectedStruct = castAndVerify(Struct.class, expected, expectedField, true);
+            final Struct actualStruct = castAndVerify(Struct.class, actual, expectedField, false);
             assertStruct(expectedStruct, actualStruct, prefix + expectedField.name() + " does not match.");
             break;
           case BYTES:
-            assertTrue(null == expectedValue || expectedValue instanceof byte[]);
-            assertTrue(null == actualValue || actualValue instanceof byte[]);
-            byte[] expectedByteArray = (byte[]) expectedValue;
-            byte[] actualByteArray = (byte[]) actualValue;
+            final byte[] expectedByteArray = castAndVerify(byte[].class, expected, expectedField, true);
+            final byte[] actualByteArray = castAndVerify(byte[].class, actual, expectedField, false);
             assertEquals(
                 null == expectedByteArray ? "" : BaseEncoding.base32Hex().encode(expectedByteArray).toString(),
                 null == actualByteArray ? "" : BaseEncoding.base32Hex().encode(actualByteArray).toString(),
