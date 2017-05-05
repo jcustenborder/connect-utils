@@ -18,14 +18,19 @@ package com.github.jcustenborder.kafka.connect.utils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import org.apache.kafka.connect.data.Date;
+import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
+import org.apache.kafka.connect.data.Time;
+import org.apache.kafka.connect.data.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.opentest4j.AssertionFailedError;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +47,35 @@ public class AssertStructTest {
   Schema mapSchema;
   Schema nestedSchema;
   Schema structBytesSchema;
+  Schema decimalSchema;
+  Schema timestampSchema;
+  Schema dateSchema;
+  Schema timeSchema;
+
   Map<String, Struct> mapOfStructs;
   List<Struct> arrayOfStructs;
   byte[] buffer;
+  java.util.Date date = new java.util.Date(1494023828123L);
 
   @BeforeEach
   public void createSchemas() {
+    this.decimalSchema = SchemaBuilder.struct()
+        .name("com.github.jcustenborder.kafka.connect.utils.Decimal")
+        .field("decimal", Decimal.builder(1).optional().build())
+        .build();
+    this.timestampSchema = SchemaBuilder.struct()
+        .name("com.github.jcustenborder.kafka.connect.utils.Timestamp")
+        .field("timestamp", Timestamp.builder().optional().build())
+        .build();
+    this.dateSchema = SchemaBuilder.struct()
+        .name("com.github.jcustenborder.kafka.connect.utils.Date")
+        .field("date", Date.builder().optional().build())
+        .build();
+    this.timeSchema = SchemaBuilder.struct()
+        .name("com.github.jcustenborder.kafka.connect.utils.Time")
+        .field("time", Time.builder().optional().build())
+        .build();
+
     this.simple = SchemaBuilder.struct()
         .name("com.github.jcustenborder.kafka.connect.utils.Simple")
         .optional()
@@ -77,7 +105,7 @@ public class AssertStructTest {
         .build();
 
     this.structBytesSchema = SchemaBuilder.struct()
-        .name("com.github.jcustenborder.kafka.connect.utils.MapOfPoint")
+        .name("com.github.jcustenborder.kafka.connect.utils.Bytes")
         .field("bytes", Schema.OPTIONAL_BYTES_SCHEMA)
         .build();
     this.buffer = new byte[10];
@@ -178,6 +206,36 @@ public class AssertStructTest {
         DynamicTest.dynamicTest("structBytesSchemaActualNull", () -> {
           final Struct expected = new Struct(this.structBytesSchema).put("bytes", this.buffer);
           final Struct actual = new Struct(this.structBytesSchema).put("bytes", null);
+          test(expected, actual, false);
+        }),
+        DynamicTest.dynamicTest("structDecimal", () -> {
+          final Struct expected = new Struct(this.decimalSchema).put("decimal", BigDecimal.valueOf(1234, 1));
+          final Struct actual = new Struct(this.decimalSchema).put("decimal", BigDecimal.valueOf(1234, 1));
+          test(expected, actual, true);
+        }),
+        DynamicTest.dynamicTest("structDecimalActualNull", () -> {
+          final Struct expected = new Struct(this.decimalSchema).put("decimal", BigDecimal.valueOf(1234, 1));
+          final Struct actual = new Struct(this.decimalSchema).put("decimal", null);
+          test(expected, actual, false);
+        }),
+        DynamicTest.dynamicTest("structDecimalActualDiff", () -> {
+          final Struct expected = new Struct(this.decimalSchema).put("decimal", BigDecimal.valueOf(1234, 1));
+          final Struct actual = new Struct(this.decimalSchema).put("decimal", BigDecimal.valueOf(12345, 1));
+          test(expected, actual, false);
+        }),
+        DynamicTest.dynamicTest("structTimestamp", () -> {
+          final Struct expected = new Struct(this.timestampSchema).put("timestamp", date);
+          final Struct actual = new Struct(this.timestampSchema).put("timestamp", date);
+          test(expected, actual, true);
+        }),
+        DynamicTest.dynamicTest("structTimestampActualNull", () -> {
+          final Struct expected = new Struct(this.timestampSchema).put("timestamp", date);
+          final Struct actual = new Struct(this.timestampSchema).put("timestamp", null);
+          test(expected, actual, false);
+        }),
+        DynamicTest.dynamicTest("structTimestampActualDiff", () -> {
+          final Struct expected = new Struct(this.timestampSchema).put("timestamp", date);
+          final Struct actual = new Struct(this.timestampSchema).put("timestamp", new java.util.Date(date.getTime() + (1000L * 60L * 5L)));
           test(expected, actual, false);
         })
     );
