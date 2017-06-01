@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,11 +18,16 @@ package com.github.jcustenborder.kafka.connect.utils.data.type;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.jcustenborder.kafka.connect.utils.AssertStruct;
 import com.github.jcustenborder.kafka.connect.utils.data.Parser;
+import com.github.jcustenborder.kafka.connect.utils.jackson.ObjectMapperFactory;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableMap;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
 import org.apache.kafka.connect.errors.DataException;
@@ -39,15 +44,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
+import static com.github.jcustenborder.kafka.connect.utils.AssertStruct.assertStruct;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class JsonNodeTest {
@@ -164,13 +173,58 @@ public class JsonNodeTest {
     }
   }
 
+  @Test
+  public void struct() {
+
+    Map<String, Object> map = new LinkedHashMap<>();
+    map.put("first", (Object) 1234);
+    map.put("second", true);
+    map.put("third", "testing");
+    map.put("fourth", Arrays.asList("one", "two", "three"));
+    map.put("fifth", ImmutableMap.of("a", "a", "b", "b", "c", "c"));
+    map.put("sixth", ImmutableMap.of("a", "a", "b", "b", "c", "c"));
+
+    Schema childSchema = SchemaBuilder.struct()
+        .field("a", Schema.OPTIONAL_STRING_SCHEMA)
+        .field("b", Schema.OPTIONAL_STRING_SCHEMA)
+        .field("c", Schema.OPTIONAL_STRING_SCHEMA)
+        .build();
+
+    Schema schema = SchemaBuilder.struct()
+        .field("first", Schema.OPTIONAL_INT64_SCHEMA)
+        .field("second", Schema.OPTIONAL_BOOLEAN_SCHEMA)
+        .field("third", Schema.OPTIONAL_STRING_SCHEMA)
+        .field("fourth", SchemaBuilder.array(Schema.STRING_SCHEMA))
+        .field("fifth", SchemaBuilder.map(Schema.STRING_SCHEMA, Schema.STRING_SCHEMA))
+        .field("sixth", childSchema)
+        .build();
+
+    final Struct expected = new Struct(schema)
+        .put("first", 1234L)
+        .put("second", true)
+        .put("third", "testing")
+        .put("fourth", Arrays.asList("one", "two", "three"))
+        .put("fifth", ImmutableMap.of("a", "a", "b", "b", "c", "c"))
+        .put("sixth", new Struct(childSchema)
+            .put("a", "a")
+            .put("b", "b")
+            .put("c", "c")
+        );
+
+
+    JsonNode input = ObjectMapperFactory.INSTANCE.convertValue(map, ObjectNode.class);
+
+    Object result = parser.parseJsonNode(schema, input);
+    assertNotNull(result);
+    assertTrue(result instanceof Struct, "result should be a struct");
+    assertStruct(expected, (Struct) result);
+  }
+
   @TestFactory
   public Stream<DynamicTest> parseJsonNode() {
     List<TestCase> tests = new ArrayList<>();
     of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.TRUE);
     of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.FALSE);
-    of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.TRUE.toString(), Boolean.TRUE);
-    of(tests, Boolean.class, Schema.BOOLEAN_SCHEMA, Boolean.FALSE.toString(), Boolean.FALSE);
 
     List<Float> floats = new ArrayList<>();
     floats.add(Float.MAX_VALUE);
@@ -237,7 +291,7 @@ public class JsonNodeTest {
     }
 
     //Timestamp
-    java.util.Date expectedDate = new java.util.Date(994204800000L);
+    java.util.Date expectedDate = new java.util.Date(1494855736000L);
     SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
     of(tests, java.util.Date.class, Timestamp.SCHEMA, expectedDate);
     of(tests, java.util.Date.class, Timestamp.SCHEMA, inputFormat.format(expectedDate), expectedDate);
