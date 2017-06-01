@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,13 +16,12 @@
 package com.github.jcustenborder.kafka.connect.utils.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.jcustenborder.kafka.connect.utils.data.type.Int16TypeParser;
-import com.google.common.base.Preconditions;
 import com.github.jcustenborder.kafka.connect.utils.data.type.BooleanParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.DateTypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.DecimalTypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.Float32TypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.Float64TypeParser;
+import com.github.jcustenborder.kafka.connect.utils.data.type.Int16TypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.Int32TypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.Int64TypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.Int8TypeParser;
@@ -30,17 +29,27 @@ import com.github.jcustenborder.kafka.connect.utils.data.type.StringTypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.TimeTypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.TimestampTypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.TypeParser;
+import com.google.common.base.Preconditions;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
+import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
 import org.apache.kafka.connect.errors.DataException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Parser {
+  private static final Logger log = LoggerFactory.getLogger(Parser.class);
   final Map<ParserKey, TypeParser> typeParsers;
 
   public Parser() {
@@ -126,15 +135,55 @@ public class Parser {
       return null;
     }
 
-    TypeParser parser = findParser(schema);
+    Object result;
 
-    try {
-      Object result = parser.parseJsonNode(input, schema);
-      return result;
-    } catch (Exception ex) {
-      String message = String.format("Could not parse '%s' to %s", input, parser.expectedClass().getSimpleName());
-      throw new DataException(message, ex);
+    if (Schema.Type.STRUCT == schema.type()) {
+      Struct struct = new Struct(schema);
+      Preconditions.checkState(input.isObject(), "struct schemas require a ObjectNode to be supplied for input.");
+      for (Field field : schema.fields()) {
+        JsonNode fieldInput = input.findValue(field.name());
+        Object convertedValue = parseJsonNode(field.schema(), fieldInput);
+        struct.put(field, convertedValue);
+      }
+      result = struct;
+    } else if (Schema.Type.ARRAY == schema.type()) {
+      Preconditions.checkState(input.isArray(), "array schemas require a ArrayNode to be supplied for input.");
+
+      List<Object> array = new ArrayList<>();
+      Iterator<JsonNode> arrayIterator = input.iterator();
+      while (arrayIterator.hasNext()) {
+        JsonNode arrayInput = arrayIterator.next();
+        Object arrayResult = parseJsonNode(schema.valueSchema(), arrayInput);
+        array.add(arrayResult);
+      }
+      result = array;
+    } else if (Schema.Type.MAP == schema.type()) {
+      Preconditions.checkState(input.isObject(), "map schemas require a ObjectNode to be supplied for input.");
+
+      Map<Object, Object> map = new LinkedHashMap<>();
+      Iterator<String> fieldNameIterator = input.fieldNames();
+
+      while (fieldNameIterator.hasNext()) {
+        String fieldName = fieldNameIterator.next();
+        Object mapKey = parseString(schema.keySchema(), fieldName);
+        JsonNode fieldInput = input.findValue(fieldName);
+        Object mapValue = parseJsonNode(schema.keySchema(), fieldInput);
+        map.put(mapKey, mapValue);
+      }
+
+      result = map;
+    } else {
+      TypeParser parser = findParser(schema);
+
+      try {
+        result = parser.parseJsonNode(input, schema);
+      } catch (Exception ex) {
+        String message = String.format("Could not parse '%s' to %s", input, parser.expectedClass().getSimpleName());
+        throw new DataException(message, ex);
+      }
     }
+
+    return result;
   }
 
 }
