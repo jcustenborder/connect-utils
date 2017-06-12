@@ -29,7 +29,10 @@ import com.github.jcustenborder.kafka.connect.utils.data.type.StringTypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.TimeTypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.TimestampTypeParser;
 import com.github.jcustenborder.kafka.connect.utils.data.type.TypeParser;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Field;
@@ -47,6 +50,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Parser {
   private static final Logger log = LoggerFactory.getLogger(Parser.class);
@@ -135,39 +139,87 @@ public class Parser {
       return null;
     }
 
+    log.trace("parseJsonNode() - schema.type() = {}", schema.type());
+
     Object result;
 
     if (Schema.Type.STRUCT == schema.type()) {
       Struct struct = new Struct(schema);
       Preconditions.checkState(input.isObject(), "struct schemas require a ObjectNode to be supplied for input.");
+      log.trace("parseJsonNode() - Processing as struct.");
+      final Set<String> processedFields = Sets.newHashSetWithExpectedSize(schema.fields().size());
       for (Field field : schema.fields()) {
+        log.trace("parseJsonNode() - Processing field '{}:{}'", schema.name(), field.name());
         JsonNode fieldInput = input.findValue(field.name());
-        Object convertedValue = parseJsonNode(field.schema(), fieldInput);
-        struct.put(field, convertedValue);
+        try {
+          Object convertedValue = parseJsonNode(field.schema(), fieldInput);
+          struct.put(field, convertedValue);
+        } catch (Exception ex) {
+          throw new DataException(
+              String.format("Exception thrown while processing %s:%s", schema.name(), field.name()),
+              ex
+          );
+        }
+        processedFields.add(field.name());
       }
+
+      if (log.isTraceEnabled()) {
+        final Set<String> jsonFieldNames = Sets.newLinkedHashSet(ImmutableList.copyOf(input.fieldNames()));
+        Sets.SetView<String> difference = Sets.difference(jsonFieldNames, processedFields);
+        log.trace("parseJsonNode() - Unprocessed fields:\n{}", Joiner.on('\n').join(difference));
+      }
+
       result = struct;
     } else if (Schema.Type.ARRAY == schema.type()) {
       Preconditions.checkState(input.isArray(), "array schemas require a ArrayNode to be supplied for input.");
-
+      log.trace("parseJsonNode() - Processing as array.");
       List<Object> array = new ArrayList<>();
       Iterator<JsonNode> arrayIterator = input.iterator();
+      int index = 0;
       while (arrayIterator.hasNext()) {
+        log.trace("parseJsonNode() - Processing index {}", index);
         JsonNode arrayInput = arrayIterator.next();
-        Object arrayResult = parseJsonNode(schema.valueSchema(), arrayInput);
-        array.add(arrayResult);
+        try {
+          Object arrayResult = parseJsonNode(schema.valueSchema(), arrayInput);
+          array.add(arrayResult);
+        } catch (Exception ex) {
+          throw new DataException(
+              String.format("Exception thrown while processing index %s", index),
+              ex
+          );
+        }
+        index++;
       }
       result = array;
     } else if (Schema.Type.MAP == schema.type()) {
       Preconditions.checkState(input.isObject(), "map schemas require a ObjectNode to be supplied for input.");
-
+      log.trace("parseJsonNode() - Processing as map.");
       Map<Object, Object> map = new LinkedHashMap<>();
       Iterator<String> fieldNameIterator = input.fieldNames();
 
       while (fieldNameIterator.hasNext()) {
-        String fieldName = fieldNameIterator.next();
-        Object mapKey = parseString(schema.keySchema(), fieldName);
-        JsonNode fieldInput = input.findValue(fieldName);
-        Object mapValue = parseJsonNode(schema.keySchema(), fieldInput);
+        final String fieldName = fieldNameIterator.next();
+        final JsonNode fieldInput = input.findValue(fieldName);
+        log.trace("parseJsonNode() - Processing key. Key='{}'", fieldName);
+        final Object mapKey;
+        try {
+          mapKey = parseString(schema.keySchema(), fieldName);
+        } catch (Exception ex) {
+          throw new DataException(
+              String.format("Exception thrown while parsing key. Key='%s'", fieldName),
+              ex
+          );
+        }
+        log.trace("parseJsonNode() - Processing value. Key='{}'", fieldName);
+        final Object mapValue;
+        try {
+          mapValue = parseJsonNode(schema.keySchema(), fieldInput);
+        } catch (Exception ex) {
+          throw new DataException(
+              String.format("Exception thrown while parsing value. Key='%s'", fieldName),
+              ex
+          );
+        }
         map.put(mapKey, mapValue);
       }
 
