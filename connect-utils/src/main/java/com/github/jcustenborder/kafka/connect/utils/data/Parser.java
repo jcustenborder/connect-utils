@@ -166,7 +166,9 @@ public class Parser {
       if (log.isTraceEnabled()) {
         final Set<String> jsonFieldNames = Sets.newLinkedHashSet(ImmutableList.copyOf(input.fieldNames()));
         Sets.SetView<String> difference = Sets.difference(jsonFieldNames, processedFields);
-        log.trace("parseJsonNode() - Unprocessed fields:\n{}", Joiner.on('\n').join(difference));
+        if (!difference.isEmpty()) {
+          log.trace("parseJsonNode() - Unprocessed fields for {}:\n{}", schema.name(), Joiner.on('\n').join(difference));
+        }
       }
 
       result = struct;
