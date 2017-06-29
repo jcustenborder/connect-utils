@@ -31,7 +31,7 @@ public class DocumentationTest extends BaseDocumentationTest {
             .name("com.github.jcustenborder.kafka.connect.utils.DocumentationTest")
             .doc("This is a test schema used for the documentation.")
             .field("noDoc", Schema.OPTIONAL_STRING_SCHEMA)
-            .field("Doc", SchemaBuilder.string().doc("Testing"))
+            .field("Doc", SchemaBuilder.string().doc("Testing").build())
             .field("defaultValue", SchemaBuilder.int32().defaultValue(123).build())
             .build(),
         SchemaBuilder.map(
