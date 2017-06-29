@@ -68,7 +68,7 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>${parent.groupId}</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>connect-utils</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

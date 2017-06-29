@@ -1,12 +1,12 @@
 /**
  * Copyright © 2016 Jeremy Custenborder (jcustenborder@gmail.com)
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ public class DocumentationTest extends BaseDocumentationTest {
             .name("com.github.jcustenborder.kafka.connect.utils.DocumentationTest")
             .doc("This is a test schema used for the documentation.")
             .field("noDoc", Schema.OPTIONAL_STRING_SCHEMA)
-            .field("Doc", SchemaBuilder.string().doc("Testing"))
+            .field("Doc", SchemaBuilder.string().doc("Testing").build())
             .field("defaultValue", SchemaBuilder.int32().defaultValue(123).build())
             .build(),
         SchemaBuilder.map(
