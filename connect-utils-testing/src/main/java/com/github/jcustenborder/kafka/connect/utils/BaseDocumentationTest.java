@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,7 +58,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -98,10 +98,12 @@ public abstract class BaseDocumentationTest {
 
 
   <T> List<Class<? extends T>> list(Class<T> cls) {
-    Set<Class<? extends T>> classes = reflections.getSubTypesOf(cls);
-    List<Class<? extends T>> sorted = new ArrayList<>(classes);
-    sorted.sort(Comparator.comparing(Class::getName));
-    return sorted;
+    List<Class<? extends T>> classes = reflections.getSubTypesOf(cls)
+        .stream()
+        .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()) && Modifier.isPublic(aClass.getModifiers()))
+        .collect(Collectors.toList());
+    classes.sort(Comparator.comparing(Class::getName));
+    return classes;
   }
 
   @BeforeEach
