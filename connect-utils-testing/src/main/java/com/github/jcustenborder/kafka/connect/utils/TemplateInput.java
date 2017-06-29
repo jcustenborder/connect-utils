@@ -196,7 +196,7 @@ public class TemplateInput {
       entry.importance = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, key.importance.toString());
       entry.doc = key.documentation;
       entry.type = key.type.toString().toLowerCase();
-      if (null != entry.defaultValue) {
+      if (null != key.defaultValue) {
         entry.defaultValue = key.defaultValue.toString();
       }
       if (null != key.validator) {
