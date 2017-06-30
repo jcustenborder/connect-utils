@@ -1,4 +1,4 @@
-<#include "common.rst.ftl">
+<#-- @formatter:off --><#include "common.rst.ftl">
 <@section text=input.title/>
 
 <#if input.description??>
@@ -8,21 +8,21 @@ ${input.description}
 
 <#if input.danger??>
 .. DANGER::
-${input.danger}
+    ${input.danger}
 
 </#if><#if input.warning??>
 .. WARNING::
-${input.warning}
+    ${input.warning}
 
 
 </#if><#if input.important??>
 .. IMPORTANT::
-${input.important}
+    ${input.important}
 
 
 </#if><#if input.tip??>
 .. TIP::
-${input.tip}
+    ${input.tip}
 
 
 </#if>

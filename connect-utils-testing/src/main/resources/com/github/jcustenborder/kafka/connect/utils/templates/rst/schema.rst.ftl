@@ -1,6 +1,6 @@
-<#include "common.rst.ftl">
+<#-- @formatter:off --><#include "common.rst.ftl">
 <#if input.name()?has_content >
-    <@section text=input.name() />
+<@section text=input.name() />
 </#if>
 
 <#if input.doc()?has_content >
@@ -28,11 +28,11 @@ ${input.doc()}
 |<@tablePadText columnLengths=lengths column="name" text="Name" />|<@tablePadText columnLengths=lengths column="optional" text="Optional" />|<@tablePadText columnLengths=lengths column="schema" text="Schema" />|<@tablePadText columnLengths=lengths column="defaultValue" text="Default Value" />|<@tablePadText columnLengths=lengths column="doc" text="Documentation" />|
 +<@headerBar columnLengths=lengths column="name" />+<@headerBar columnLengths=lengths column="optional" />+<@headerBar columnLengths=lengths column="schema" />+<@headerBar columnLengths=lengths column="defaultValue" />+<@headerBar columnLengths=lengths column="doc" />+
 <#list input.fields() as field>
-    <#assign doc><#if field.schema().doc()?has_content>${field.schema().doc()}<#else > </#if></#assign>
-    <#assign defaultValue><#if field.schema().defaultValue()?has_content>${field.schema().defaultValue()}<#else > </#if></#assign>
-    <#assign optional>${field.schema().isOptional()?c}</#assign>
-    <#assign name>${field.name()}</#assign>
-    <#assign schemaLink><@schema input=field.schema()/></#assign>
+<#assign doc><#if field.schema().doc()?has_content>${field.schema().doc()}<#else > </#if></#assign>
+<#assign defaultValue><#if field.schema().defaultValue()?has_content>${field.schema().defaultValue()}<#else > </#if></#assign>
+<#assign optional>${field.schema().isOptional()?c}</#assign>
+<#assign name>${field.name()}</#assign>
+<#assign schemaLink><@schema input=field.schema()/></#assign>
 |<@tablePadText columnLengths=lengths column="name" text=name />|<@tablePadText columnLengths=lengths column="optional" text=optional />|<@tablePadText columnLengths=lengths column="schema" text=schemaLink />|<@tablePadText columnLengths=lengths column="defaultValue" text=defaultValue />|<@tablePadText columnLengths=lengths column="doc" text=doc />|
 +<@tableBar columnLengths=lengths column="name" />+<@tableBar columnLengths=lengths column="optional" />+<@tableBar columnLengths=lengths column="schema" />+<@tableBar columnLengths=lengths column="defaultValue" />+<@tableBar columnLengths=lengths column="doc" />+
 </#list>
