@@ -233,9 +233,9 @@ public abstract class BaseDocumentationTest {
       for (Field field : schema.fields()) {
         TemplateInput.checkLength(lengths, "name", field.name());
         TemplateInput.checkLength(lengths, "optional", field.schema().isOptional());
-        TemplateInput.checkLength(lengths, "schema", Strings.padEnd(schema.type().toString(), 50, ' '));
-        TemplateInput.checkLength(lengths, "defaultValue", schema.defaultValue());
-        TemplateInput.checkLength(lengths, "doc", schema.doc());
+        TemplateInput.checkLength(lengths, "schema", Strings.padEnd(field.schema().type().toString(), 50, ' '));
+        TemplateInput.checkLength(lengths, "defaultValue", field.schema().defaultValue());
+        TemplateInput.checkLength(lengths, "doc", field.schema().doc());
       }
 
 
