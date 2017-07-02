@@ -206,11 +206,30 @@ public abstract class BaseDocumentationTest {
   }
 
   @TestFactory
-  public Stream<DynamicTest> schema() {
+  public Stream<DynamicTest> schema() throws IOException {
     final File parentDirectory = new File(outputDirectory, "schemas");
     if (!parentDirectory.exists()) {
       parentDirectory.mkdirs();
     }
+
+    List<Schema> schemas = schemas();
+
+    if (null != schemas && !schemas.isEmpty()) {
+      final File schemaRstPath = new File(outputDirectory, "schemas.rst");
+      final String schemaRst = "=======\n" +
+          "Schemas\n" +
+          "=======\n" +
+          "\n" +
+          ".. toctree::\n" +
+          "    :maxdepth: 0\n" +
+          "    :caption: Schemas:\n" +
+          "    :glob:\n" +
+          "\n" +
+          "    schemas/*";
+      Files.write(schemaRst, schemaRstPath, Charsets.UTF_8);
+    }
+
+
     final String templateName = "rst/schema.rst.ftl";
     return this.schemas().stream().filter(schema -> !Strings.isNullOrEmpty(schema.name())).map(schema -> dynamicTest(String.format("%s.%s", schema.type(), schema.name()), () -> {
       StringBuilder filenameBuilder = new StringBuilder()
