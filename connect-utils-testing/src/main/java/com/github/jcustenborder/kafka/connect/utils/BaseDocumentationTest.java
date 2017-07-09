@@ -270,7 +270,6 @@ public abstract class BaseDocumentationTest {
 
   @Test
   public void markdown() throws IOException, IllegalAccessException, InstantiationException {
-    assertFalse(connectorClasses.isEmpty(), "No connector classes were found.");
     try (StringWriter stringWriter = new StringWriter()) {
       try (PrintWriter writer = new PrintWriter(stringWriter)) {
         writer.println();
