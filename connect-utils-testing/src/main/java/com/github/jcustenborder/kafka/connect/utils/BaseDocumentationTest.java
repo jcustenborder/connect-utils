@@ -61,7 +61,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public abstract class BaseDocumentationTest {
