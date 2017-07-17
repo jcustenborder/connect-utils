@@ -45,9 +45,6 @@
             <timezone>America/Chicago</timezone>
         </developer>
     </developers>
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
     <scm>
         <connection>scm:git:https://github.com/jcustenborder/connect-utils.git</connection>
         <developerConnection>scm:git:git@github.com:jcustenborder/connect-utils.git</developerConnection>
@@ -92,6 +89,12 @@
             <artifactId>reflections</artifactId>
             <version>${reflections.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>

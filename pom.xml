@@ -43,9 +43,6 @@
             <timezone>America/Chicago</timezone>
         </developer>
     </developers>
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
     <modules>
         <module>connect-utils</module>
         <module>connect-utils-testing</module>
@@ -61,8 +58,8 @@
         <url>https://github.com/jcustenborder/connect-utils/issues</url>
     </issueManagement>
     <properties>
-        <guava.version>18.0</guava.version>
-        <jackson.version>2.6.3</jackson.version>
+        <guava.version>20.0</guava.version>
+        <jackson.version>2.8.5</jackson.version>
         <kafka.version>0.10.2.1-cp1</kafka.version>
         <reflections.version>0.9.11</reflections.version>
         <mockito.version>2.6.3</mockito.version>
@@ -133,6 +130,26 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.3</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
