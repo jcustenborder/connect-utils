@@ -45,9 +45,6 @@
             <timezone>America/Chicago</timezone>
         </developer>
     </developers>
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
     <scm>
         <connection>scm:git:https://github.com/jcustenborder/connect-utils.git</connection>
         <developerConnection>scm:git:git@github.com:jcustenborder/connect-utils.git</developerConnection>
@@ -70,7 +67,7 @@
         <dependency>
             <groupId>com.github.jcustenborder.kafka.connect</groupId>
             <artifactId>connect-utils</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -94,7 +91,8 @@
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
-            <version>0.9.10</version>
+            <version>${reflections.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
