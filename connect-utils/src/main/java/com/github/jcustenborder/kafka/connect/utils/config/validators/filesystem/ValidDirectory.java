@@ -21,6 +21,15 @@ import java.io.File;
 
 public class ValidDirectory extends ValidFileSystem {
 
+  private ValidDirectory() {
+    this(false);
+  }
+
+  protected ValidDirectory(boolean ensureWritable) {
+    super(ensureWritable);
+  }
+
+
   @Override
   protected void ensureValid(String setting, Object input, File file) {
     Preconditions.checkState(file.isDirectory(), "'%s'(%s) must be a file.", setting, file);

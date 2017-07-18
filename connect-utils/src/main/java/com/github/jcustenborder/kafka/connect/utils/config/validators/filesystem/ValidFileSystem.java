@@ -18,6 +18,8 @@ package com.github.jcustenborder.kafka.connect.utils.config.validators.filesyste
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.apache.kafka.common.config.ConfigDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -25,20 +27,29 @@ import java.io.File;
  * Validator is used as a base for validators that check file system properties.
  */
 public abstract class ValidFileSystem implements ConfigDef.Validator {
+  private static final Logger log = LoggerFactory.getLogger(ValidFileSystem.class);
 
-  protected ValidFileSystem() {
+  public final boolean ensureWritable;
 
+  protected ValidFileSystem(boolean ensureWritable) {
+    this.ensureWritable = ensureWritable;
   }
 
   protected abstract void ensureValid(String setting, Object input, File file);
 
   @Override
   public void ensureValid(String setting, Object input) {
+    log.trace("ensureValid('{}', '{}')", setting, input);
     Preconditions.checkState(input instanceof String, "'%s' must be a string", setting);
     final String value = input.toString();
     Preconditions.checkState(!Strings.isNullOrEmpty(value), "'%s' cannot be null or empty.", setting);
     final File file = new File(value);
     Preconditions.checkState(file.isAbsolute(), "'%s'(%s) is not an absolute path.", setting, file);
     ensureValid(setting, input, file);
+
+    if (this.ensureWritable) {
+      Preconditions.checkState(file.canWrite(), "'%s'(%s) should be writable.", setting, file);
+    }
+    Preconditions.checkState(file.canRead(), "'%s'(%s) should be readable.", setting, file);
   }
 }

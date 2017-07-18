@@ -15,26 +15,24 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config.validators.filesystem;
 
-import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class ValidFile extends ValidFileSystem {
+public class ValidFileWritable extends ValidFile {
+  private static final Logger log = LoggerFactory.getLogger(ValidFileWritable.class);
 
-  private ValidFile() {
-    this(false);
-  }
-
-  protected ValidFile(boolean ensureWritable) {
-    super(ensureWritable);
+  private ValidFileWritable() {
+    super(true);
   }
 
   @Override
-  protected void ensureValid(String setting, Object input, File file) {
-    Preconditions.checkState(file.isFile(), "'%s'(%s) must be a file.", setting, file);
+  protected void ensureValid(String setting, Object input, File directoryPath) {
+    super.ensureValid(setting, input, directoryPath);
   }
 
-  public static ValidFile of() {
-    return new ValidFile();
+  public static ValidFileWritable of() {
+    return new ValidFileWritable();
   }
 }
