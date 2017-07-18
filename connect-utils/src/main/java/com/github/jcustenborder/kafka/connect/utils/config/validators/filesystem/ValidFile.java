@@ -19,6 +19,9 @@ import com.google.common.base.Preconditions;
 
 import java.io.File;
 
+/**
+ * Validator is used to ensure that the setting is a file on the file system and that it is readable.
+ */
 public class ValidFile extends ValidFileSystem {
 
   private ValidFile() {

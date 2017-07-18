@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+/**
+ * Validator is used to ensure that the setting is a directory on the file system, is readable, and writable.
+ */
 public class ValidDirectoryWritable extends ValidDirectory {
   private static final Logger log = LoggerFactory.getLogger(ValidDirectoryWritable.class);
 
