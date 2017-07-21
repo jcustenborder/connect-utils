@@ -27,4 +27,4 @@ ${input.description}
 
 </#if>
 
-<@configExamples configs=input.configs columnLengths=input.columnLengths className=input.className requiredConfigs=input.requiredConfigs />
+<@configExamples input=input />

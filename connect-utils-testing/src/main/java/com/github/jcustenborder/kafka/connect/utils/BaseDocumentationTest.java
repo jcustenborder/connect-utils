@@ -17,6 +17,9 @@ package com.github.jcustenborder.kafka.connect.utils;
 
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
 import com.github.jcustenborder.kafka.connect.utils.config.MarkdownFormatter;
+import com.github.jcustenborder.kafka.connect.utils.templates.TemplateInput;
+import com.github.jcustenborder.kafka.connect.utils.templates.TemplateSchema;
+import com.github.jcustenborder.kafka.connect.utils.templates.rst.RstTemplateHelper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -27,9 +30,14 @@ import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import guru.nidi.graphviz.attribute.RankDir;
+import guru.nidi.graphviz.attribute.Shape;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.model.Graph;
+import guru.nidi.graphviz.model.Label;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Connector;
-import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.apache.kafka.connect.source.SourceConnector;
@@ -55,12 +63,14 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static guru.nidi.graphviz.model.Factory.graph;
+import static guru.nidi.graphviz.model.Factory.node;
+import static guru.nidi.graphviz.model.Factory.to;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public abstract class BaseDocumentationTest {
@@ -149,8 +159,42 @@ public abstract class BaseDocumentationTest {
       parentDirectory.mkdirs();
     }
 
+
     return dynamicTest(connectorClass.getSimpleName(), () -> {
-      final File outputFile = new File(parentDirectory, connectorClass.getSimpleName().toLowerCase() + ".rst");
+      final File graphOutputFile = new File(parentDirectory, connectorClass.getSimpleName() + ".svg");
+
+      final Graph g;
+      if (SourceConnector.class.isAssignableFrom(connectorClass)) {
+        g = graph()
+            .graphAttr().with(RankDir.LEFT_TO_RIGHT)
+            .directed()
+            .with(
+                node(connectorClass.getSimpleName()).with(Shape.RECTANGLE)
+                    .link(
+                        to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node("Kafka").with(Shape.RECTANGLE)).with(Label.of("Writes messages to")))).with(Label.of("Hosted by"))
+
+                    )
+            );
+      } else {
+        g = graph()
+            .graphAttr().with(RankDir.LEFT_TO_RIGHT)
+            .directed()
+            .with(
+                node("Kafka").with(Shape.RECTANGLE)
+                    .link(
+                        to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node(connectorClass.getSimpleName()).with(Shape.RECTANGLE)).with(Label.of("Writes data to")))).with(Label.of("Pulls Data from"))
+
+                    )
+            );
+      }
+
+
+      Graphviz.fromGraph(g)
+          .width(350)
+          .render(Format.SVG_STANDALONE)
+          .toFile(graphOutputFile);
+
+      final File outputFile = new File(parentDirectory, connectorClass.getSimpleName() + ".rst");
       TemplateInput input = TemplateInput.fromConnector(connectorClass);
       Template template = configuration.getTemplate(templateName);
       log.info("Writing {}", outputFile);
@@ -193,7 +237,7 @@ public abstract class BaseDocumentationTest {
   }
 
   void process(Writer writer, Template template, Object input) throws IOException, TemplateException {
-    Map<String, Object> variables = ImmutableMap.of("input", input);
+    Map<String, Object> variables = ImmutableMap.of("input", input, "helper", new RstTemplateHelper());
     template.process(variables, writer);
   }
 
@@ -230,41 +274,29 @@ public abstract class BaseDocumentationTest {
 
 
     final String templateName = "rst/schema.rst.ftl";
-    return this.schemas().stream().filter(schema -> !Strings.isNullOrEmpty(schema.name())).map(schema -> dynamicTest(String.format("%s.%s", schema.type(), schema.name()), () -> {
-      StringBuilder filenameBuilder = new StringBuilder()
-          .append(schema.type().toString().toLowerCase());
-      if (!Strings.isNullOrEmpty(schema.name())) {
-        filenameBuilder.append('.').append(schema.name());
-      }
-      filenameBuilder.append(".rst");
-      File outputFile = new File(parentDirectory, filenameBuilder.toString());
-      Template template = configuration.getTemplate(templateName);
-      log.info("Writing {}", outputFile);
+    return this.schemas().stream()
+        .filter(schema -> !Strings.isNullOrEmpty(schema.name()))
 
-      Map<String, Integer> lengths = new LinkedHashMap<>();
-      TemplateInput.checkLength(lengths, "name", "name");
-      TemplateInput.checkLength(lengths, "optional", "Optional");
-      TemplateInput.checkLength(lengths, "schema", "Schema");
-      TemplateInput.checkLength(lengths, "defaultValue", "Default Value");
-      TemplateInput.checkLength(lengths, "doc", "Documentation");
-
-      for (Field field : schema.fields()) {
-        TemplateInput.checkLength(lengths, "name", field.name());
-        TemplateInput.checkLength(lengths, "optional", field.schema().isOptional());
-        TemplateInput.checkLength(lengths, "schema", Strings.padEnd(field.schema().type().toString(), 50, ' '));
-        TemplateInput.checkLength(lengths, "defaultValue", field.schema().defaultValue());
-        TemplateInput.checkLength(lengths, "doc", field.schema().doc());
-      }
+        .map(schema -> dynamicTest(String.format("%s.%s", schema.type(), schema.name()), () -> {
+          StringBuilder filenameBuilder = new StringBuilder()
+              .append(schema.type().toString().toLowerCase());
+          if (!Strings.isNullOrEmpty(schema.name())) {
+            filenameBuilder.append('.').append(schema.name());
+          }
+          filenameBuilder.append(".rst");
+          File outputFile = new File(parentDirectory, filenameBuilder.toString());
+          Template template = configuration.getTemplate(templateName);
+          log.info("Writing {}", outputFile);
 
 
-      try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
-        Map<String, Object> variables = ImmutableMap.of(
-            "input", schema,
-            "lengths", lengths
-        );
-        template.process(variables, writer);
-      }
-    }));
+          try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+            Map<String, Object> variables = ImmutableMap.of(
+                "input", TemplateSchema.of(schema),
+                "helper", new RstTemplateHelper()
+            );
+            template.process(variables, writer);
+          }
+        }));
   }
 
   @Test

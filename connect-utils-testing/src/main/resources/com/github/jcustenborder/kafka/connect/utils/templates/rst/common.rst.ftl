@@ -39,7 +39,8 @@ This configuration is used typically along with `standalone mode
 
 This configuration is used typically along with `distributed mode
 <http://docs.confluent.io/current/connect/concepts.html#distributed-workers>`_.
-Write the following json to `connector.json` and use the command below to post the configuration to the distributed connect workers.
+Write the following json to `connector.json`, configure all of the required values, and use the command below to
+post the configuration to one the distributed connect worker(s).
 
 .. code-block:: json
 
@@ -54,7 +55,7 @@ Write the following json to `connector.json` and use the command below to post t
     }
 
 Use curl to post the configuration to one of the Kafka Connect Workers. Change `http://localhost:8083/` the the endpoint of
-one of your Kafka Connect workers.
+one of your Kafka Connect worker(s).
 
 .. code-block:: bash
 
@@ -77,17 +78,17 @@ one of your Kafka Connect workers.
 </#list>
 </#macro>
 
-<#macro configExamples className configs requiredConfigs columnLengths>
+<#macro configExamples input>
 <@subsection text="Configuration"/>
 
-<@configTable configs=configs lengths=columnLengths />
+${helper.table(input.config)}
 
 <@subsubsection text="Property based example" />
 
-<@configProperties className=className requiredConfigs=requiredConfigs />
+<@configProperties className=input.className requiredConfigs=input.config.requiredConfigs />
 
 <@subsubsection text="Rest based example" />
 
-<@configJson className=className requiredConfigs=requiredConfigs />
+<@configJson className=input.className requiredConfigs=input.config.requiredConfigs />
 </#macro>
 
