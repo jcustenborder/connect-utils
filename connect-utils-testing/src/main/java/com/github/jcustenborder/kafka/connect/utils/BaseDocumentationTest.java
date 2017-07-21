@@ -220,8 +220,7 @@ public abstract class BaseDocumentationTest {
     });
   }
 
-  //  final File outputDirectory = new File("target/docs");
-  final File outputDirectory = new File("/Users/jeremy/source/opensource/kafka-connect/kafka-connect-documentation/connectors/kafka-connect-test");
+  final File outputDirectory = new File("target/docs");
 
   @TestFactory
   public Stream<DynamicTest> sources() {
