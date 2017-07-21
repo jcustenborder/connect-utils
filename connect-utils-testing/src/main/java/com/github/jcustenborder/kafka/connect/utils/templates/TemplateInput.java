@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jcustenborder.kafka.connect.utils;
+package com.github.jcustenborder.kafka.connect.utils.templates;
 
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationDanger;
@@ -21,17 +21,12 @@ import com.github.jcustenborder.kafka.connect.utils.config.DocumentationImportan
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationTip;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationWarning;
 import com.github.jcustenborder.kafka.connect.utils.config.Title;
-import com.google.common.base.CaseFormat;
-import com.google.common.collect.ImmutableMap;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Connector;
 import org.apache.kafka.connect.transforms.Transformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,9 +40,7 @@ public class TemplateInput {
   private String tip;
   private String important;
   private String danger;
-  private List<ConfigEntry> requiredConfigs;
-  private List<ConfigEntry> configs;
-  private Map<String, Integer> columnLengths;
+  private TemplateConfigDef config;
 
   public String getTitle() {
     return title;
@@ -77,16 +70,8 @@ public class TemplateInput {
     return danger;
   }
 
-  public List<ConfigEntry> getRequiredConfigs() {
-    return requiredConfigs;
-  }
-
-  public List<ConfigEntry> getConfigs() {
-    return configs;
-  }
-
-  public Map<String, Integer> getColumnLengths() {
-    return columnLengths;
+  public TemplateConfigDef getConfig() {
+    return this.config;
   }
 
   private static String title(Class<?> aClass) {
@@ -169,68 +154,10 @@ public class TemplateInput {
     result.warning = warning(aClass);
     result.important = important(aClass);
     result.danger = danger(aClass);
-
-    List<ConfigDef.ConfigKey> keys = new ArrayList<>(config.configKeys().values());
-    keys.sort((k1, k2) -> {
-      // first take anything with no default value (therefore required)
-      if (!k1.hasDefault() && k2.hasDefault())
-        return -1;
-      else if (!k2.hasDefault() && k1.hasDefault())
-        return 1;
-
-      // then sort by importance
-      int cmp = k1.importance.compareTo(k2.importance);
-      if (cmp == 0)
-        // then sort in alphabetical order
-        return k1.name.compareTo(k2.name);
-      else
-        return cmp;
-    });
-
-    result.requiredConfigs = new ArrayList<>();
-
-    List<ConfigEntry> configs = new ArrayList<>();
-    for (ConfigDef.ConfigKey key : keys) {
-      ConfigEntry entry = new ConfigEntry();
-      entry.name = key.name;
-      entry.importance = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, key.importance.toString());
-      entry.doc = key.documentation;
-      entry.type = key.type.toString().toLowerCase();
-      if (null != key.defaultValue) {
-        entry.defaultValue = key.defaultValue.toString();
-      }
-      if (null != key.validator) {
-        entry.validator = key.validator.toString();
-      }
-      configs.add(entry);
-
-      if (!key.hasDefault()) {
-        result.requiredConfigs.add(entry);
-      }
-    }
-    result.configs = configs;
-    Map<String, Integer> lengths = new LinkedHashMap<>();
-    checkLength(lengths, "name", "Name");
-    checkLength(lengths, "type", "Type");
-    checkLength(lengths, "importance", "Importance");
-    checkLength(lengths, "doc", "Documentation");
-    checkLength(lengths, "defaultValue", "Default Value");
-    checkLength(lengths, "validator", "validator");
-
-
-    for (ConfigEntry entry : configs) {
-      checkLength(lengths, "name", entry.name);
-      checkLength(lengths, "type", String.format(":ref:`configuration-%s`", entry.type));
-      checkLength(lengths, "importance", entry.importance);
-      checkLength(lengths, "doc", entry.doc);
-      checkLength(lengths, "defaultValue", entry.defaultValue);
-      checkLength(lengths, "validator", entry.validator);
-    }
-
-    result.columnLengths = ImmutableMap.copyOf(lengths);
+    result.config = TemplateConfigDef.from(config);
   }
 
-  static TemplateInput fromTransformation(Class<? extends Transformation> transform) throws IllegalAccessException, InstantiationException {
+  public static TemplateInput fromTransformation(Class<? extends Transformation> transform) throws IllegalAccessException, InstantiationException {
     final TemplateInput result = new TemplateInput();
 
     Transformation sourceConnector = transform.newInstance();
@@ -243,7 +170,7 @@ public class TemplateInput {
   }
 
 
-  static TemplateInput fromConnector(Class<? extends Connector> connectorClass) throws IllegalAccessException, InstantiationException {
+  public static TemplateInput fromConnector(Class<? extends Connector> connectorClass) throws IllegalAccessException, InstantiationException {
     final TemplateInput result = new TemplateInput();
     Connector connector = connectorClass.newInstance();
     ConfigDef config = connector.config();
@@ -252,7 +179,7 @@ public class TemplateInput {
     return result;
   }
 
-  static void checkLength(Map<String, Integer> columnLengths, String name, Object value) {
+  public static void checkLength(Map<String, Integer> columnLengths, String name, Object value) {
     final int length = (value != null ? value.toString().length() : 0) + 2;
 
     final int current = columnLengths.getOrDefault(name, 0);
@@ -262,37 +189,4 @@ public class TemplateInput {
     }
   }
 
-  public static class ConfigEntry {
-    private String name;
-    private String importance;
-    private String doc;
-    private String defaultValue = "";
-    private String validator = "";
-    private String type;
-
-    public String name() {
-      return name;
-    }
-
-    public String importance() {
-      return importance;
-    }
-
-    public String doc() {
-      return doc;
-    }
-
-    public String defaultValue() {
-      return defaultValue;
-    }
-
-    public String validator() {
-      return validator;
-    }
-
-    public String type() {
-      return this.type;
-    }
-
-  }
 }
