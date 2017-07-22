@@ -28,14 +28,14 @@ public class TemplateConfigEntry {
   private final String type;
   private final boolean isRequired;
 
-  private TemplateConfigEntry(String name, ConfigDef.Importance importance, String doc, Object defaultValue, ConfigDef.Validator validator, ConfigDef.Type type) {
+  private TemplateConfigEntry(String name, ConfigDef.Importance importance, String doc, Object defaultValue, ConfigDef.Validator validator, ConfigDef.Type type, boolean isRequired) {
     this.name = name;
     this.importance = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, importance.toString());
     this.doc = !Strings.isNullOrEmpty(doc) ? doc : "";
     this.defaultValue = null != defaultValue ? defaultValue.toString() : "";
     this.validator = null != validator ? validator.toString() : "";
     this.type = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, type.toString());
-    this.isRequired = null == defaultValue;
+    this.isRequired = isRequired;
   }
 
   public String name() {
@@ -63,8 +63,10 @@ public class TemplateConfigEntry {
   }
 
   public static TemplateConfigEntry of(ConfigDef.ConfigKey configKey) {
+
     return new TemplateConfigEntry(configKey.name, configKey.importance,
-        configKey.documentation, configKey.defaultValue, configKey.validator, configKey.type
+        configKey.documentation, configKey.defaultValue, configKey.validator, configKey.type,
+        !configKey.hasDefault()
     );
   }
 
