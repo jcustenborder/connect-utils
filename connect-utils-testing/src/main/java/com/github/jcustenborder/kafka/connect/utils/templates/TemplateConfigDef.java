@@ -69,7 +69,7 @@ public class TemplateConfigDef implements Table {
   }
 
   public List<TemplateConfigEntry> getRequiredConfigs() {
-    return this.configs.stream().filter(entry -> !entry.isRequired()).collect(Collectors.toList());
+    return this.configs.stream().filter(entry -> entry.isRequired()).collect(Collectors.toList());
   }
 
   public static TemplateConfigDef from(ConfigDef config) {
