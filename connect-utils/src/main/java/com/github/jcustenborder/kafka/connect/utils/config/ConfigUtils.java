@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,9 +17,15 @@ package com.github.jcustenborder.kafka.connect.utils.config;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Ints;
 import org.apache.kafka.common.config.AbstractConfig;
 
 import java.io.File;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
 
 public class ConfigUtils {
   /**
@@ -31,7 +37,7 @@ public class ConfigUtils {
    * @param expected expected parent class or interface
    * @param <T>      Class type to return.
    * @return Returns a class if it's assignable from the specified class.
-   * @exception IllegalStateException Thrown if it fails expected.isAssignableFrom(cls).
+   * @throws IllegalStateException Thrown if it fails expected.isAssignableFrom(cls).
    */
   public static <T> Class<T> getClass(AbstractConfig config, String key, Class<T> expected) {
     Preconditions.checkNotNull(config, "config cannot be null");
@@ -85,5 +91,45 @@ public class ConfigUtils {
     Preconditions.checkState(file.isAbsolute(), "'%s' must be an absolute path.", key);
     return new File(path);
   }
+
+  static InetSocketAddress parseInetSocketAddress(String s) {
+    Preconditions.checkNotNull(s, "s cannot be null.");
+    Matcher matcher = ValidHostnameAndPort.HOSTNAME_PATTERN.matcher(s);
+    Preconditions.checkState(matcher.matches(), "'%s' does not match '%s'", s, ValidHostnameAndPort.HOSTNAME_PATTERN.pattern());
+    final Integer port = Ints.tryParse(matcher.group(2));
+    Preconditions.checkState(port >= 1 && port <= 65535, "Invalid port value %s. Must be between 1 and 65535", port);
+    return new InetSocketAddress(matcher.group(1), port);
+  }
+
+  /**
+   * Method is used to return an InetSocketAddress from a hostname:port string.
+   *
+   * @param config config to read the value from
+   * @param key    key for the value
+   * @return InetSocketAddress for the supplied string.
+   */
+  public static InetSocketAddress inetSocketAddress(AbstractConfig config, String key) {
+    Preconditions.checkNotNull(config, "config cannot be null");
+    String value = config.getString(key);
+    return parseInetSocketAddress(value);
+  }
+
+  /**
+   * Method is used to return a list of InetSocketAddress from a config list of hostname:port strings.
+   *
+   * @param config config to read the value from
+   * @param key    key for the value
+   * @return List of InetSocketAddress for the supplied strings.
+   */
+  public static List<InetSocketAddress> inetSocketAddresses(AbstractConfig config, String key) {
+    Preconditions.checkNotNull(config, "config cannot be null");
+    List<String> value = config.getList(key);
+    List<InetSocketAddress> addresses = new ArrayList<>(value.size());
+    for (String s : value) {
+      addresses.add(parseInetSocketAddress(s));
+    }
+    return ImmutableList.copyOf(addresses);
+  }
+
 
 }
