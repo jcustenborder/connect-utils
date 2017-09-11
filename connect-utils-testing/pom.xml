@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.github.jcustenborder.kafka.connect</groupId>
         <artifactId>connect-utils-parent</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
     <artifactId>connect-utils-testing</artifactId>
     <name>connect-utils-testing</name>
@@ -92,7 +92,6 @@
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>${reflections.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>

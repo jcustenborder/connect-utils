@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.github.jcustenborder.kafka.connect</groupId>
         <artifactId>connect-utils-parent</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
     <artifactId>connect-utils</artifactId>
     <name>connect-utils</name>
@@ -63,13 +63,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-    </dependencies>
     <build>
         <resources>
             <resource>
@@ -95,33 +88,6 @@
                             <failsOnError>true</failsOnError>
                             <includeResources>false</includeResources>
                             <includeTestResources>false</includeTestResources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <!--<finalName>twill-${project.version}-shaded</finalName>-->
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.google.common</pattern>
-                                    <shadedPattern>com.github.jcustenborder.repackaged.com.google.common</shadedPattern>
-                                </relocation>
-                            </relocations>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.google.guava:guava</include>
-                                </includes>
-                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
