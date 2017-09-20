@@ -209,8 +209,20 @@ public abstract class BaseDocumentationTest {
       parentDirectory.mkdirs();
     }
 
-    return dynamicTest(transformationClass.getSimpleName(), () -> {
-      final File outputFile = new File(parentDirectory, transformationClass.getSimpleName().toLowerCase() + ".rst");
+    final String testName;
+
+    if (null != transformationClass.getDeclaringClass()) {
+      testName = String.format(
+          "%s.%s",
+          transformationClass.getDeclaringClass().getSimpleName(),
+          transformationClass.getSimpleName()
+      );
+    } else {
+      testName = transformationClass.getSimpleName();
+    }
+
+    return dynamicTest(testName, () -> {
+      final File outputFile = new File(parentDirectory, testName.toLowerCase() + ".rst");
       TemplateInput input = TemplateInput.fromTransformation(transformationClass);
       Template template = configuration.getTemplate(templateName);
       log.info("Writing {}", outputFile);
