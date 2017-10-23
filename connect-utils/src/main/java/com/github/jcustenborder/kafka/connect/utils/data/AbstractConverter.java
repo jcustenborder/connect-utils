@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -92,8 +93,65 @@ public abstract class AbstractConverter<T> {
   void convertMap(final T result, Map value) {
     for (final Object key : value.keySet()) {
       Preconditions.checkState(key instanceof String, "Map key must be a String.");
+      final String fieldName = (String) key;
+      final Object fieldValue = value.get(key);
 
+      if (null == fieldValue) {
+        log.trace("convertStruct() - Setting '{}' to null.", fieldName);
+        setNullField(result, fieldName);
+        continue;
+      }
 
+      if (fieldValue instanceof String) {
+        log.trace("convertStruct() - Processing '{}' as string.", fieldName);
+        setStringField(result, fieldName, (String) fieldValue);
+      } else if (fieldValue instanceof Byte) {
+        log.trace("convertStruct() - Processing '{}' as int8.", fieldName);
+        setInt8Field(result, fieldName, (Byte) fieldValue);
+      } else if (fieldValue instanceof Short) {
+        log.trace("convertStruct() - Processing '{}' as int16.", fieldName);
+        setInt16Field(result, fieldName, (Short) fieldValue);
+      } else if (fieldValue instanceof Integer) {
+        log.trace("convertStruct() - Processing '{}' as int32.", fieldName);
+        setInt32Field(result, fieldName, (Integer) fieldValue);
+      } else if (fieldValue instanceof Long) {
+        log.trace("convertStruct() - Processing '{}' as long.", fieldName);
+        setInt64Field(result, fieldName, (Long) fieldValue);
+      } else if (fieldValue instanceof BigInteger) {
+        log.trace("convertStruct() - Processing '{}' as long.", fieldName);
+        setInt64Field(result, fieldName, ((BigInteger) fieldValue).longValue());
+      } else if (fieldValue instanceof Double) {
+        log.trace("convertStruct() - Processing '{}' as float64.", fieldName);
+        setFloat64Field(result, fieldName, (Double) fieldValue);
+      } else if (fieldValue instanceof Float) {
+        log.trace("convertStruct() - Processing '{}' as float32.", fieldName);
+        setFloat32Field(result, fieldName, (Float) fieldValue);
+      } else if (fieldValue instanceof BigDecimal) {
+        log.trace("convertStruct() - Processing '{}' as decimal.", fieldName);
+        setDecimalField(result, fieldName, (BigDecimal) fieldValue);
+      } else if (fieldValue instanceof Boolean) {
+        log.trace("convertStruct() - Processing '{}' as boolean.", fieldName);
+        setBooleanField(result, fieldName, (Boolean) fieldValue);
+      } else if (fieldValue instanceof Date) {
+        log.trace("convertStruct() - Processing '{}' as timestamp.", fieldName);
+        setTimestampField(result, fieldName, (Date) fieldValue);
+      } else if (fieldValue instanceof byte[]) {
+        log.trace("convertStruct() - Processing '{}' as bytes.", fieldName);
+        setBytesField(result, fieldName, (byte[]) fieldValue);
+      } else if (fieldValue instanceof List) {
+        log.trace("convertStruct() - Processing '{}' as array.", fieldName);
+        setArray(result, fieldName, null, (List) fieldValue);
+      } else if (fieldValue instanceof Map) {
+        log.trace("convertStruct() - Processing '{}' as map.", fieldName);
+        setMap(result, fieldName, null, (Map) fieldValue);
+      } else {
+        throw new DataException(
+            String.format(
+                "%s is not a supported data type.",
+                fieldValue.getClass().getName()
+            )
+        );
+      }
     }
   }
 
