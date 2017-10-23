@@ -97,7 +97,7 @@ public class GenericAssertions {
     }
   }
 
-  static void assertMap(Map<String, ?> expected, Map<String, ?> actual, String message) {
+  public static void assertMap(Map<String, ?> expected, Map<String, ?> actual, String message) {
     if (null == expected && null == actual) {
       return;
     }
