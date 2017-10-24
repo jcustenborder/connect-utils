@@ -15,19 +15,73 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.data;
 
+import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
+import org.apache.kafka.connect.data.Timestamp;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.github.jcustenborder.kafka.connect.utils.AssertStruct.assertStruct;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class SchemaAbstractConverterTest {
+
+  static class TestCase {
+    public final Schema schema;
+    public final Object value;
+
+    TestCase(Schema schema, Object value) {
+      this.schema = schema;
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return SchemaUtils.toString(this.schema);
+    }
+  }
+
+  public static TestCase test(Schema schema, Object value) {
+    return new TestCase(schema, value);
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> convert() {
+    List<TestCase> tests = Arrays.asList(
+        test(Schema.STRING_SCHEMA, "foo"),
+        test(Schema.BOOLEAN_SCHEMA, true),
+        test(Schema.BYTES_SCHEMA, new byte[]{0x00, 0x01, 0x02}),
+        test(Schema.INT8_SCHEMA, Byte.MAX_VALUE),
+        test(Schema.INT16_SCHEMA, Short.MAX_VALUE),
+        test(Schema.INT32_SCHEMA, Integer.MAX_VALUE),
+        test(Schema.INT64_SCHEMA, Long.MAX_VALUE),
+        test(Schema.FLOAT32_SCHEMA, Float.MAX_VALUE),
+        test(Schema.FLOAT64_SCHEMA, Double.MAX_VALUE),
+        test(Decimal.schema(0), BigDecimal.ZERO),
+        test(Timestamp.SCHEMA, new Date())
+    );
+
+    return tests.stream().map(test -> dynamicTest(test.toString(), () -> {
+      final Schema schema = SchemaBuilder.struct()
+          .field("test", test.schema)
+          .build();
+      final Struct expected = new Struct(schema)
+          .put("test", test.value);
+      MockStructConverter converter = new MockStructConverter(schema);
+      final Struct actual = converter.convert(expected);
+      assertStruct(expected, actual);
+    }));
+  }
 
   @Test
   public void innerStruct() {

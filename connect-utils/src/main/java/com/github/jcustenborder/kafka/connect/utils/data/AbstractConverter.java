@@ -184,35 +184,36 @@ public abstract class AbstractConverter<T> {
           setInt16Field(result, fieldName, (Short) fieldValue);
           break;
         case INT32:
-          Integer int32Value = (Integer) fieldValue;
-
           if (org.apache.kafka.connect.data.Date.LOGICAL_NAME.equals(field.schema().name())) {
             log.trace("convertStruct() - Processing '{}' as date.", fieldName);
-            setDateField(result, fieldName, org.apache.kafka.connect.data.Date.toLogical(field.schema(), int32Value));
+            setDateField(result, fieldName, (Date) fieldValue);
           } else if (org.apache.kafka.connect.data.Time.LOGICAL_NAME.equals(field.schema().name())) {
             log.trace("convertStruct() - Processing '{}' as time.", fieldName);
-            setTimeField(result, fieldName, org.apache.kafka.connect.data.Time.toLogical(field.schema(), int32Value));
+            setTimeField(result, fieldName, (Date) fieldValue);
           } else {
+            Integer int32Value = (Integer) fieldValue;
             log.trace("convertStruct() - Processing '{}' as int32.", fieldName);
             setInt32Field(result, fieldName, int32Value);
           }
           break;
         case INT64:
-          Long int64Value = (Long) fieldValue;
+
           if (Timestamp.LOGICAL_NAME.equals(field.schema().name())) {
             log.trace("convertStruct() - Processing '{}' as timestamp.", fieldName);
-            setTimestampField(result, fieldName, Timestamp.toLogical(field.schema(), int64Value));
+            setTimestampField(result, fieldName, (Date) fieldValue);
           } else {
+            Long int64Value = (Long) fieldValue;
             log.trace("convertStruct() - Processing '{}' as int64.", fieldName);
             setInt64Field(result, fieldName, int64Value);
           }
           break;
         case BYTES:
-          byte[] bytes = (byte[]) fieldValue;
+
           if (Decimal.LOGICAL_NAME.equals(field.schema().name())) {
             log.trace("convertStruct() - Processing '{}' as decimal.", fieldName);
-            setDecimalField(result, fieldName, Decimal.toLogical(field.schema(), bytes));
+            setDecimalField(result, fieldName, (BigDecimal) fieldValue);
           } else {
+            byte[] bytes = (byte[]) fieldValue;
             log.trace("convertStruct() - Processing '{}' as bytes.", fieldName);
             setBytesField(result, fieldName, bytes);
           }
