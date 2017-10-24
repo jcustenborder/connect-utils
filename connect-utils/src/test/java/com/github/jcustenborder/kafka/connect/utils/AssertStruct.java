@@ -16,14 +16,20 @@
 package com.github.jcustenborder.kafka.connect.utils;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.BaseEncoding;
+import org.apache.kafka.connect.data.Date;
+import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Struct;
+import org.apache.kafka.connect.data.Time;
+import org.apache.kafka.connect.data.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.github.jcustenborder.kafka.connect.utils.AssertSchema.assertSchema;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,47 +48,59 @@ public class AssertStruct {
     }
 
     assertSchema(expected.schema(), actual.schema(), "schema does not match.");
+
+    final Set<String> logicalTypes = ImmutableSet.of(
+        Timestamp.LOGICAL_NAME,
+        Date.LOGICAL_NAME,
+        Time.LOGICAL_NAME,
+        Decimal.LOGICAL_NAME
+    );
+
     for (Field field : expected.schema().fields()) {
       log.trace("assertStruct() - testing field '{}'", field.name());
       final Object expectedValue = expected.get(field.name());
       final Object actualValue = actual.get(field.name());
 
-      switch (field.schema().type()) {
-        case ARRAY:
-          assertTrue(null == expectedValue || expectedValue instanceof List);
-          assertTrue(null == actualValue || actualValue instanceof List);
-          List<Object> expectedArray = (List<Object>) expectedValue;
-          List<Object> actualArray = (List<Object>) actualValue;
-          assertEquals(expectedArray, actualArray, prefix + field.name() + " does not match.");
-          break;
-        case MAP:
-          assertTrue(null == expectedValue || expectedValue instanceof Map);
-          assertTrue(null == actualValue || actualValue instanceof Map);
-          Map<Object, Object> expectedMap = (Map<Object, Object>) expectedValue;
-          Map<Object, Object> actualMap = (Map<Object, Object>) actualValue;
-          assertEquals(expectedMap, actualMap, prefix + field.name() + " does not match.");
-          break;
-        case STRUCT:
-          assertTrue(null == expectedValue || expectedValue instanceof Struct);
-          assertTrue(null == actualValue || actualValue instanceof Struct);
-          Struct expectedStruct = (Struct) expectedValue;
-          Struct actualStruct = (Struct) actualValue;
-          assertStruct(expectedStruct, actualStruct, prefix + field.name() + " does not match.");
-          break;
-        case BYTES:
-          assertTrue(null == expectedValue || expectedValue instanceof byte[]);
-          assertTrue(null == actualValue || actualValue instanceof byte[]);
-          byte[] expectedByteArray = (byte[]) expectedValue;
-          byte[] actualByteArray = (byte[]) actualValue;
-          assertEquals(
-              null == expectedByteArray ? "" : BaseEncoding.base32Hex().encode(expectedByteArray).toString(),
-              null == actualByteArray ? "" : BaseEncoding.base32Hex().encode(actualByteArray).toString(),
-              prefix + field.name() + " does not match."
-          );
-          break;
-        default:
-          assertEquals(expectedValue, actualValue, prefix + field.name() + " does not match.");
-          break;
+      if (!Strings.isNullOrEmpty(field.schema().name()) && logicalTypes.contains(field.schema().name())) {
+        assertEquals(expectedValue, actualValue, prefix + field.name() + " does not match.");
+      } else {
+        switch (field.schema().type()) {
+          case ARRAY:
+            assertTrue(null == expectedValue || expectedValue instanceof List);
+            assertTrue(null == actualValue || actualValue instanceof List);
+            List<Object> expectedArray = (List<Object>) expectedValue;
+            List<Object> actualArray = (List<Object>) actualValue;
+            assertEquals(expectedArray, actualArray, prefix + field.name() + " does not match.");
+            break;
+          case MAP:
+            assertTrue(null == expectedValue || expectedValue instanceof Map);
+            assertTrue(null == actualValue || actualValue instanceof Map);
+            Map<Object, Object> expectedMap = (Map<Object, Object>) expectedValue;
+            Map<Object, Object> actualMap = (Map<Object, Object>) actualValue;
+            assertEquals(expectedMap, actualMap, prefix + field.name() + " does not match.");
+            break;
+          case STRUCT:
+            assertTrue(null == expectedValue || expectedValue instanceof Struct);
+            assertTrue(null == actualValue || actualValue instanceof Struct);
+            Struct expectedStruct = (Struct) expectedValue;
+            Struct actualStruct = (Struct) actualValue;
+            assertStruct(expectedStruct, actualStruct, prefix + field.name() + " does not match.");
+            break;
+          case BYTES:
+            assertTrue(null == expectedValue || expectedValue instanceof byte[]);
+            assertTrue(null == actualValue || actualValue instanceof byte[]);
+            byte[] expectedByteArray = (byte[]) expectedValue;
+            byte[] actualByteArray = (byte[]) actualValue;
+            assertEquals(
+                null == expectedByteArray ? "" : BaseEncoding.base32Hex().encode(expectedByteArray).toString(),
+                null == actualByteArray ? "" : BaseEncoding.base32Hex().encode(actualByteArray).toString(),
+                prefix + field.name() + " does not match."
+            );
+            break;
+          default:
+            assertEquals(expectedValue, actualValue, prefix + field.name() + " does not match.");
+            break;
+        }
       }
     }
   }
