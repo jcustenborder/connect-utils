@@ -15,6 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config.validators.filesystem;
 
+import org.apache.kafka.common.config.ConfigException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,21 +26,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ValidDirectoryTests extends FileSystemTests<ValidDirectory> {
 
-  @BeforeEach
+  @Override
   public ValidDirectory createValidator() {
     return ValidDirectory.of();
   }
 
   @Test
   public void ensureValid_nullSetting() {
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       this.validator.ensureValid("test", null);
     });
   }
 
   @Test
   public void ensureValid_blankSetting() {
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       this.validator.ensureValid("test", "");
     });
   }
@@ -54,7 +55,7 @@ public class ValidDirectoryTests extends FileSystemTests<ValidDirectory> {
   @Test
   public void fileIsFile() throws IOException {
     final Path input = createTempFile();
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       this.validator.ensureValid("test", input.toString());
     });
   }

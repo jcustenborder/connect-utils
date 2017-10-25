@@ -15,6 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
+import org.apache.kafka.common.config.ConfigException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ public class ValidPortTest {
 
   @Test
   public void ensureValid_low() {
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       ValidPort range = ValidPort.of();
       range.ensureValid("port", 1);
     });
@@ -38,7 +39,7 @@ public class ValidPortTest {
 
   @Test
   public void ensureValid_high() {
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       ValidPort range = ValidPort.of();
       range.ensureValid("port", 65536);
     });

@@ -15,6 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config.validators.filesystem;
 
+import org.apache.kafka.common.config.ConfigException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class ValidDirectoryWritableTests extends FileSystemTests<ValidDirectoryW
     ));
     final Path path = createTempDirectory(attr);
 
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       this.validator.ensureValid("testing", path.toString());
     });
   }

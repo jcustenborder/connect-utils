@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +15,9 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config.validators.filesystem;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.common.config.ConfigException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +40,36 @@ public abstract class ValidFileSystem implements ConfigDef.Validator {
   @Override
   public void ensureValid(String setting, Object input) {
     log.trace("ensureValid('{}', '{}')", setting, input);
-    Preconditions.checkState(input instanceof String, "'%s' must be a string", setting);
+    if (!(input instanceof String)) {
+      throw new ConfigException(setting, "Input must be a string.");
+    }
     final String value = input.toString();
-    Preconditions.checkState(!Strings.isNullOrEmpty(value), "'%s' cannot be null or empty.", setting);
+    if (Strings.isNullOrEmpty(value)) {
+      throw new ConfigException(setting, "Cannot be null or empty.");
+    }
     final File file = new File(value);
-    Preconditions.checkState(file.isAbsolute(), "'%s'(%s) is not an absolute path.", setting, file);
+    if (!file.isAbsolute()) {
+      throw new ConfigException(
+          setting,
+          String.format("File '%s' is not an absolute path.", file)
+      );
+    }
     ensureValid(setting, input, file);
 
     if (this.ensureWritable) {
-      Preconditions.checkState(file.canWrite(), "'%s'(%s) should be writable.", setting, file);
+      if (!file.canWrite()) {
+        throw new ConfigException(
+            setting,
+            String.format("File '%s' should be writable.", file)
+        );
+      }
     }
-    Preconditions.checkState(file.canRead(), "'%s'(%s) should be readable.", setting, file);
+
+    if (!file.canRead()) {
+      throw new ConfigException(
+          setting,
+          String.format("File '%s' should be readable.", file)
+      );
+    }
   }
 }
