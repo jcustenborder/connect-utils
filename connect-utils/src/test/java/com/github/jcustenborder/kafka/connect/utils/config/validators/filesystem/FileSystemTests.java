@@ -15,6 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config.validators.filesystem;
 
+import org.apache.kafka.common.config.ConfigException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,21 +58,21 @@ public abstract class FileSystemTests<T extends ValidFileSystem> {
 
   @Test
   public void ensureValid_nullSetting() {
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       this.validator.ensureValid("test", null);
     });
   }
 
   @Test
   public void ensureValid_blankSetting() {
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       this.validator.ensureValid("test", "");
     });
   }
 
   @Test
   public void ensureValid_notString() {
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       this.validator.ensureValid("test", 1);
     });
   }

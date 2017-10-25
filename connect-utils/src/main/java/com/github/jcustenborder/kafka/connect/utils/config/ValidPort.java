@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package com.github.jcustenborder.kafka.connect.utils.config;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.common.config.ConfigException;
 
 
 /**
@@ -69,9 +70,17 @@ public class ValidPort implements ConfigDef.Validator {
    */
   @Override
   public void ensureValid(String setting, Object value) {
-    Preconditions.checkState(value instanceof Integer, "%s must be an integer.", setting);
-    Integer port = (Integer) value;
-    Preconditions.checkState(port >= this.start && port <= this.end, "'%s'(%s) must be between %s and %s.", setting, port, this.start, this.end);
+    if (null == value || !(value instanceof Integer)) {
+      throw new ConfigException(setting, "Must be an integer.");
+    }
+    final Integer port = (Integer) value;
+
+    if (!(port >= this.start && port <= this.end)) {
+      throw new ConfigException(
+          setting,
+          String.format("(%s) must be between %s and %s.", port, this.start, this.end)
+      );
+    }
   }
 
   @Override

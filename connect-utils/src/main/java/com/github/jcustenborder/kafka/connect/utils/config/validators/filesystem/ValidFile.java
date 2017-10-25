@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config.validators.filesystem;
 
-import com.google.common.base.Preconditions;
+import org.apache.kafka.common.config.ConfigException;
 
 import java.io.File;
 
@@ -34,7 +34,12 @@ public class ValidFile extends ValidFileSystem {
 
   @Override
   protected void ensureValid(String setting, Object input, File file) {
-    Preconditions.checkState(file.isFile(), "'%s'(%s) must be a file.", setting, file);
+    if (!file.isFile()) {
+      throw new ConfigException(
+          setting,
+          String.format("'%s' must be a file.", file)
+      );
+    }
   }
 
   public static ValidFile of() {

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package com.github.jcustenborder.kafka.connect.utils.config;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.common.config.ConfigException;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -56,12 +57,17 @@ public class ValidEnum implements ConfigDef.Validator {
 
   @Override
   public void ensureValid(String s, Object o) {
-    Preconditions.checkState(validEnums.contains(o),
-        "'%s' is not a valid value for %s. Valid values are %s.",
-        o,
-        enumClass.getSimpleName(),
-        ConfigUtils.enumValues(enumClass)
-    );
+    if (!validEnums.contains(o)) {
+      throw new ConfigException(
+          s,
+          String.format(
+              "'%s' is not a valid value for %s. Valid values are %s.",
+              o,
+              enumClass.getSimpleName(),
+              ConfigUtils.enumValues(enumClass)
+          )
+      );
+    }
   }
 
   @Override

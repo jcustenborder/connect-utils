@@ -15,6 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
+import org.apache.kafka.common.config.ConfigException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ public class ValidPatternTests {
 
   @Test
   public void ensureValidInvalid() {
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       ValidPattern validPattern = ValidPattern.of(".*\\.csv$");
       validPattern.ensureValid("file.name", "testing.txt");
     });
@@ -38,7 +39,7 @@ public class ValidPatternTests {
 
   @Test
   public void ensureValidNullString() {
-    assertThrows(NullPointerException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       ValidPattern validPattern = ValidPattern.of(".*\\.csv$");
       validPattern.ensureValid("file.name", null);
     });
@@ -47,7 +48,7 @@ public class ValidPatternTests {
 
   @Test
   public void ensureValidNonString() {
-    assertThrows(IllegalStateException.class, () -> {
+    assertThrows(ConfigException.class, () -> {
       ValidPattern validPattern = ValidPattern.of(".*\\.csv$");
       validPattern.ensureValid("file.name", new Integer(1));
     });
