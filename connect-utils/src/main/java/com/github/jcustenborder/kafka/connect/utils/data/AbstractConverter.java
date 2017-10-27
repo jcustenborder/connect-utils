@@ -96,60 +96,68 @@ public abstract class AbstractConverter<T> {
       final String fieldName = (String) key;
       final Object fieldValue = value.get(key);
 
-      if (null == fieldValue) {
-        log.trace("convertStruct() - Setting '{}' to null.", fieldName);
-        setNullField(result, fieldName);
-        continue;
-      }
+      try {
 
-      if (fieldValue instanceof String) {
-        log.trace("convertStruct() - Processing '{}' as string.", fieldName);
-        setStringField(result, fieldName, (String) fieldValue);
-      } else if (fieldValue instanceof Byte) {
-        log.trace("convertStruct() - Processing '{}' as int8.", fieldName);
-        setInt8Field(result, fieldName, (Byte) fieldValue);
-      } else if (fieldValue instanceof Short) {
-        log.trace("convertStruct() - Processing '{}' as int16.", fieldName);
-        setInt16Field(result, fieldName, (Short) fieldValue);
-      } else if (fieldValue instanceof Integer) {
-        log.trace("convertStruct() - Processing '{}' as int32.", fieldName);
-        setInt32Field(result, fieldName, (Integer) fieldValue);
-      } else if (fieldValue instanceof Long) {
-        log.trace("convertStruct() - Processing '{}' as long.", fieldName);
-        setInt64Field(result, fieldName, (Long) fieldValue);
-      } else if (fieldValue instanceof BigInteger) {
-        log.trace("convertStruct() - Processing '{}' as long.", fieldName);
-        setInt64Field(result, fieldName, ((BigInteger) fieldValue).longValue());
-      } else if (fieldValue instanceof Double) {
-        log.trace("convertStruct() - Processing '{}' as float64.", fieldName);
-        setFloat64Field(result, fieldName, (Double) fieldValue);
-      } else if (fieldValue instanceof Float) {
-        log.trace("convertStruct() - Processing '{}' as float32.", fieldName);
-        setFloat32Field(result, fieldName, (Float) fieldValue);
-      } else if (fieldValue instanceof BigDecimal) {
-        log.trace("convertStruct() - Processing '{}' as decimal.", fieldName);
-        setDecimalField(result, fieldName, (BigDecimal) fieldValue);
-      } else if (fieldValue instanceof Boolean) {
-        log.trace("convertStruct() - Processing '{}' as boolean.", fieldName);
-        setBooleanField(result, fieldName, (Boolean) fieldValue);
-      } else if (fieldValue instanceof Date) {
-        log.trace("convertStruct() - Processing '{}' as timestamp.", fieldName);
-        setTimestampField(result, fieldName, (Date) fieldValue);
-      } else if (fieldValue instanceof byte[]) {
-        log.trace("convertStruct() - Processing '{}' as bytes.", fieldName);
-        setBytesField(result, fieldName, (byte[]) fieldValue);
-      } else if (fieldValue instanceof List) {
-        log.trace("convertStruct() - Processing '{}' as array.", fieldName);
-        setArray(result, fieldName, null, (List) fieldValue);
-      } else if (fieldValue instanceof Map) {
-        log.trace("convertStruct() - Processing '{}' as map.", fieldName);
-        setMap(result, fieldName, null, (Map) fieldValue);
-      } else {
+        if (null == fieldValue) {
+          log.trace("convertStruct() - Setting '{}' to null.", fieldName);
+          setNullField(result, fieldName);
+          continue;
+        }
+
+        if (fieldValue instanceof String) {
+          log.trace("convertStruct() - Processing '{}' as string.", fieldName);
+          setStringField(result, fieldName, (String) fieldValue);
+        } else if (fieldValue instanceof Byte) {
+          log.trace("convertStruct() - Processing '{}' as int8.", fieldName);
+          setInt8Field(result, fieldName, (Byte) fieldValue);
+        } else if (fieldValue instanceof Short) {
+          log.trace("convertStruct() - Processing '{}' as int16.", fieldName);
+          setInt16Field(result, fieldName, (Short) fieldValue);
+        } else if (fieldValue instanceof Integer) {
+          log.trace("convertStruct() - Processing '{}' as int32.", fieldName);
+          setInt32Field(result, fieldName, (Integer) fieldValue);
+        } else if (fieldValue instanceof Long) {
+          log.trace("convertStruct() - Processing '{}' as long.", fieldName);
+          setInt64Field(result, fieldName, (Long) fieldValue);
+        } else if (fieldValue instanceof BigInteger) {
+          log.trace("convertStruct() - Processing '{}' as long.", fieldName);
+          setInt64Field(result, fieldName, ((BigInteger) fieldValue).longValue());
+        } else if (fieldValue instanceof Double) {
+          log.trace("convertStruct() - Processing '{}' as float64.", fieldName);
+          setFloat64Field(result, fieldName, (Double) fieldValue);
+        } else if (fieldValue instanceof Float) {
+          log.trace("convertStruct() - Processing '{}' as float32.", fieldName);
+          setFloat32Field(result, fieldName, (Float) fieldValue);
+        } else if (fieldValue instanceof BigDecimal) {
+          log.trace("convertStruct() - Processing '{}' as decimal.", fieldName);
+          setDecimalField(result, fieldName, (BigDecimal) fieldValue);
+        } else if (fieldValue instanceof Boolean) {
+          log.trace("convertStruct() - Processing '{}' as boolean.", fieldName);
+          setBooleanField(result, fieldName, (Boolean) fieldValue);
+        } else if (fieldValue instanceof Date) {
+          log.trace("convertStruct() - Processing '{}' as timestamp.", fieldName);
+          setTimestampField(result, fieldName, (Date) fieldValue);
+        } else if (fieldValue instanceof byte[]) {
+          log.trace("convertStruct() - Processing '{}' as bytes.", fieldName);
+          setBytesField(result, fieldName, (byte[]) fieldValue);
+        } else if (fieldValue instanceof List) {
+          log.trace("convertStruct() - Processing '{}' as array.", fieldName);
+          setArray(result, fieldName, null, (List) fieldValue);
+        } else if (fieldValue instanceof Map) {
+          log.trace("convertStruct() - Processing '{}' as map.", fieldName);
+          setMap(result, fieldName, null, (Map) fieldValue);
+        } else {
+          throw new DataException(
+              String.format(
+                  "%s is not a supported data type.",
+                  fieldValue.getClass().getName()
+              )
+          );
+        }
+      } catch (Exception ex) {
         throw new DataException(
-            String.format(
-                "%s is not a supported data type.",
-                fieldValue.getClass().getName()
-            )
+            String.format("Exception thrown while processing field '%s'", fieldName),
+            ex
         );
       }
     }
@@ -163,87 +171,94 @@ public abstract class AbstractConverter<T> {
       log.trace("convertStruct() - Processing '{}'", field.name());
       final Object fieldValue = struct.get(field);
 
-      if (null == fieldValue) {
-        log.trace("convertStruct() - Setting '{}' to null.", fieldName);
-        setNullField(result, fieldName);
-        continue;
-      }
+      try {
+        if (null == fieldValue) {
+          log.trace("convertStruct() - Setting '{}' to null.", fieldName);
+          setNullField(result, fieldName);
+          continue;
+        }
 
-      log.trace("convertStruct() - Field '{}'.field().schema().type() = '{}'", fieldName, field.schema().type());
-      switch (field.schema().type()) {
-        case STRING:
-          log.trace("convertStruct() - Processing '{}' as string.", fieldName);
-          setStringField(result, fieldName, (String) fieldValue);
-          break;
-        case INT8:
-          log.trace("convertStruct() - Processing '{}' as int8.", fieldName);
-          setInt8Field(result, fieldName, (Byte) fieldValue);
-          break;
-        case INT16:
-          log.trace("convertStruct() - Processing '{}' as int16.", fieldName);
-          setInt16Field(result, fieldName, (Short) fieldValue);
-          break;
-        case INT32:
-          if (org.apache.kafka.connect.data.Date.LOGICAL_NAME.equals(field.schema().name())) {
-            log.trace("convertStruct() - Processing '{}' as date.", fieldName);
-            setDateField(result, fieldName, (Date) fieldValue);
-          } else if (org.apache.kafka.connect.data.Time.LOGICAL_NAME.equals(field.schema().name())) {
-            log.trace("convertStruct() - Processing '{}' as time.", fieldName);
-            setTimeField(result, fieldName, (Date) fieldValue);
-          } else {
-            Integer int32Value = (Integer) fieldValue;
-            log.trace("convertStruct() - Processing '{}' as int32.", fieldName);
-            setInt32Field(result, fieldName, int32Value);
-          }
-          break;
-        case INT64:
+        log.trace("convertStruct() - Field '{}'.field().schema().type() = '{}'", fieldName, field.schema().type());
+        switch (field.schema().type()) {
+          case STRING:
+            log.trace("convertStruct() - Processing '{}' as string.", fieldName);
+            setStringField(result, fieldName, (String) fieldValue);
+            break;
+          case INT8:
+            log.trace("convertStruct() - Processing '{}' as int8.", fieldName);
+            setInt8Field(result, fieldName, (Byte) fieldValue);
+            break;
+          case INT16:
+            log.trace("convertStruct() - Processing '{}' as int16.", fieldName);
+            setInt16Field(result, fieldName, (Short) fieldValue);
+            break;
+          case INT32:
+            if (org.apache.kafka.connect.data.Date.LOGICAL_NAME.equals(field.schema().name())) {
+              log.trace("convertStruct() - Processing '{}' as date.", fieldName);
+              setDateField(result, fieldName, (Date) fieldValue);
+            } else if (org.apache.kafka.connect.data.Time.LOGICAL_NAME.equals(field.schema().name())) {
+              log.trace("convertStruct() - Processing '{}' as time.", fieldName);
+              setTimeField(result, fieldName, (Date) fieldValue);
+            } else {
+              Integer int32Value = (Integer) fieldValue;
+              log.trace("convertStruct() - Processing '{}' as int32.", fieldName);
+              setInt32Field(result, fieldName, int32Value);
+            }
+            break;
+          case INT64:
 
-          if (Timestamp.LOGICAL_NAME.equals(field.schema().name())) {
-            log.trace("convertStruct() - Processing '{}' as timestamp.", fieldName);
-            setTimestampField(result, fieldName, (Date) fieldValue);
-          } else {
-            Long int64Value = (Long) fieldValue;
-            log.trace("convertStruct() - Processing '{}' as int64.", fieldName);
-            setInt64Field(result, fieldName, int64Value);
-          }
-          break;
-        case BYTES:
+            if (Timestamp.LOGICAL_NAME.equals(field.schema().name())) {
+              log.trace("convertStruct() - Processing '{}' as timestamp.", fieldName);
+              setTimestampField(result, fieldName, (Date) fieldValue);
+            } else {
+              Long int64Value = (Long) fieldValue;
+              log.trace("convertStruct() - Processing '{}' as int64.", fieldName);
+              setInt64Field(result, fieldName, int64Value);
+            }
+            break;
+          case BYTES:
 
-          if (Decimal.LOGICAL_NAME.equals(field.schema().name())) {
-            log.trace("convertStruct() - Processing '{}' as decimal.", fieldName);
-            setDecimalField(result, fieldName, (BigDecimal) fieldValue);
-          } else {
-            byte[] bytes = (byte[]) fieldValue;
-            log.trace("convertStruct() - Processing '{}' as bytes.", fieldName);
-            setBytesField(result, fieldName, bytes);
-          }
-          break;
-        case FLOAT32:
-          log.trace("convertStruct() - Processing '{}' as float32.", fieldName);
-          setFloat32Field(result, fieldName, (Float) fieldValue);
-          break;
-        case FLOAT64:
-          log.trace("convertStruct() - Processing '{}' as float64.", fieldName);
-          setFloat64Field(result, fieldName, (Double) fieldValue);
-          break;
-        case BOOLEAN:
-          log.trace("convertStruct() - Processing '{}' as boolean.", fieldName);
-          setBooleanField(result, fieldName, (Boolean) fieldValue);
-          break;
-        case STRUCT:
-          log.trace("convertStruct() - Processing '{}' as struct.", fieldName);
-          setStructField(result, fieldName, (Struct) fieldValue);
-          break;
-        case ARRAY:
-          log.trace("convertStruct() - Processing '{}' as array.", fieldName);
-          setArray(result, fieldName, schema, (List) fieldValue);
-          break;
-        case MAP:
-          log.trace("convertStruct() - Processing '{}' as map.", fieldName);
-          setMap(result, fieldName, schema, (Map) fieldValue);
-          break;
-        default:
-          throw new DataException("Unsupported schema.type(): " + schema.type());
+            if (Decimal.LOGICAL_NAME.equals(field.schema().name())) {
+              log.trace("convertStruct() - Processing '{}' as decimal.", fieldName);
+              setDecimalField(result, fieldName, (BigDecimal) fieldValue);
+            } else {
+              byte[] bytes = (byte[]) fieldValue;
+              log.trace("convertStruct() - Processing '{}' as bytes.", fieldName);
+              setBytesField(result, fieldName, bytes);
+            }
+            break;
+          case FLOAT32:
+            log.trace("convertStruct() - Processing '{}' as float32.", fieldName);
+            setFloat32Field(result, fieldName, (Float) fieldValue);
+            break;
+          case FLOAT64:
+            log.trace("convertStruct() - Processing '{}' as float64.", fieldName);
+            setFloat64Field(result, fieldName, (Double) fieldValue);
+            break;
+          case BOOLEAN:
+            log.trace("convertStruct() - Processing '{}' as boolean.", fieldName);
+            setBooleanField(result, fieldName, (Boolean) fieldValue);
+            break;
+          case STRUCT:
+            log.trace("convertStruct() - Processing '{}' as struct.", fieldName);
+            setStructField(result, fieldName, (Struct) fieldValue);
+            break;
+          case ARRAY:
+            log.trace("convertStruct() - Processing '{}' as array.", fieldName);
+            setArray(result, fieldName, schema, (List) fieldValue);
+            break;
+          case MAP:
+            log.trace("convertStruct() - Processing '{}' as map.", fieldName);
+            setMap(result, fieldName, schema, (Map) fieldValue);
+            break;
+          default:
+            throw new DataException("Unsupported schema.type(): " + schema.type());
+        }
+      } catch (Exception ex) {
+        throw new DataException(
+            String.format("Exception thrown while processing field '%s'", fieldName),
+            ex
+        );
       }
     }
   }
