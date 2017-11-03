@@ -1,34 +1,13 @@
 <#-- @formatter:off --><#include "common.rst.ftl">
 <@section text=input.title/>
 
-.. image:: ${input.title}.svg
-
+.. image:: ${input.diagramFileName}
 
 
 <#if input.description??>
 ${input.description}
 </#if>
 
-
-<#if input.danger??>
-.. DANGER::
-    ${input.danger}
-
-</#if><#if input.warning??>
-.. WARNING::
-    ${input.warning}
-
-
-</#if><#if input.important??>
-.. IMPORTANT::
-    ${input.important}
-
-
-</#if><#if input.tip??>
-.. TIP::
-    ${input.tip}
-
-
-</#if>
+<@notes input=input/>
 
 <@configExamples input=input />

@@ -16,17 +16,19 @@
 package com.github.jcustenborder.kafka.connect.utils;
 
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationDanger;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationImportant;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationNote;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationTip;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationWarning;
 import com.github.jcustenborder.kafka.connect.utils.config.Title;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.ConnectRecord;
-import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.transforms.Transformation;
 
 import java.util.Map;
 
-@Description("This is a testing transformation.")
-public abstract class TestTransform<R extends ConnectRecord<R>> implements Transformation<R> {
+public abstract class TestTransformation<R extends ConnectRecord<R>> implements Transformation<R> {
   @Override
   public R apply(R sourceRecord) {
     return null;
@@ -48,17 +50,25 @@ public abstract class TestTransform<R extends ConnectRecord<R>> implements Trans
 
   }
 
-  @Title("TestTransform(Key)")
+  @Title("TestTransformation(Key)")
   @Description("This transformation is used to rename fields in the key.")
-  @DocumentationTip("This transformation is used to manipulate fields in the Key of the record.")
-  public static class Key<R extends ConnectRecord<R>> extends TestTransform<R> {
+  @DocumentationNote("This is a note")
+  @DocumentationTip("This is a tip")
+  @DocumentationImportant("This is important")
+  @DocumentationDanger("This is a danger")
+  @DocumentationWarning("This is a warning")
+  public static class Key<R extends ConnectRecord<R>> extends TestTransformation<R> {
 
   }
 
-  @Title("TestTransform(Value)")
+  @Title("TestTransformation(Value)")
   @Description("This transformation is used to rename fields in the value.")
-  @DocumentationTip("This transformation is used to manipulate fields in the Key of the record.")
-  public static class Value<R extends ConnectRecord<R>> extends TestTransform<R> {
+  @DocumentationNote("This is a note")
+  @DocumentationTip("This is a tip")
+  @DocumentationImportant("This is important")
+  @DocumentationDanger("This is a danger")
+  @DocumentationWarning("This is a warning")
+  public static class Value<R extends ConnectRecord<R>> extends TestTransformation<R> {
 
   }
 }

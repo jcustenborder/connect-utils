@@ -81,7 +81,7 @@ one of your Kafka Connect worker(s).
 <#macro configExamples input>
 <@subsection text="Configuration"/>
 
-${helper.table(input.config)}
+${rstHelper.table(input.config)}
 
 <@subsubsection text="Property based example" />
 
@@ -92,3 +92,32 @@ ${helper.table(input.config)}
 <@configJson className=input.className requiredConfigs=input.config.requiredConfigs />
 </#macro>
 
+<#macro notes input>
+
+<#if input.danger??>
+.. DANGER::
+    ${input.danger}
+
+
+</#if><#if input.warning??>
+.. WARNING::
+    ${input.warning}
+
+
+</#if><#if input.important??>
+.. IMPORTANT::
+    ${input.important}
+
+
+</#if><#if input.tip??>
+.. TIP::
+    ${input.tip}
+
+
+</#if><#if input.note??>
+.. NOTE::
+    ${input.note}
+
+
+</#if>
+</#macro>

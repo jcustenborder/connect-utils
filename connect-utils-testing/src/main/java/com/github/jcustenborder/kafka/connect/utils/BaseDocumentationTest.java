@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,10 +15,12 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import com.github.jcustenborder.kafka.connect.utils.config.Description;
-import com.github.jcustenborder.kafka.connect.utils.config.MarkdownFormatter;
-import com.github.jcustenborder.kafka.connect.utils.templates.TemplateInput;
+import com.github.jcustenborder.kafka.connect.utils.templates.ConnectorTemplate;
+import com.github.jcustenborder.kafka.connect.utils.templates.PluginTemplate;
+import com.github.jcustenborder.kafka.connect.utils.templates.SourceConnectorTemplate;
 import com.github.jcustenborder.kafka.connect.utils.templates.TemplateSchema;
+import com.github.jcustenborder.kafka.connect.utils.templates.TransformationTemplate;
+import com.github.jcustenborder.kafka.connect.utils.templates.markdown.MarkdownTemplateHelper;
 import com.github.jcustenborder.kafka.connect.utils.templates.rst.RstTemplateHelper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -37,7 +39,6 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.Graph;
 import guru.nidi.graphviz.model.Label;
 import org.apache.kafka.common.config.ConfigDef;
-import org.apache.kafka.connect.connector.Connector;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.apache.kafka.connect.source.SourceConnector;
@@ -55,7 +56,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Modifier;
@@ -100,11 +100,6 @@ public abstract class BaseDocumentationTest {
 
 
   Reflections reflections;
-  List<Class<? extends Transformation>> transformClasses;
-  List<Class<? extends Connector>> connectorClasses;
-  List<Class<? extends SourceConnector>> sourceConnectorClasses;
-  List<Class<? extends SinkConnector>> sinkConnectorClasses;
-
 
   <T> List<Class<? extends T>> list(Class<T> cls) {
     List<Class<? extends T>> classes = reflections.getSubTypesOf(cls)
@@ -114,6 +109,8 @@ public abstract class BaseDocumentationTest {
     classes.sort(Comparator.comparing(Class::getName));
     return classes;
   }
+
+  PluginTemplate pluginTemplate;
 
   @BeforeEach
   public void before() throws MalformedURLException {
@@ -126,20 +123,11 @@ public abstract class BaseDocumentationTest {
       );
     }
 
-    if (null == this.transformClasses) {
-      this.transformClasses = list(Transformation.class);
-    }
-    if (null == this.sourceConnectorClasses) {
-      this.sourceConnectorClasses = list(SourceConnector.class);
-    }
-    if (null == this.sinkConnectorClasses) {
-      this.sinkConnectorClasses = list(SinkConnector.class);
-    }
-    if (null == connectorClasses) {
-      this.connectorClasses = new ArrayList<>(this.sourceConnectorClasses.size() + this.sinkConnectorClasses.size());
-      this.connectorClasses.addAll(this.sourceConnectorClasses);
-      this.connectorClasses.addAll(this.sinkConnectorClasses);
-    }
+    List<Class<? extends Transformation>> transformClasses = list(Transformation.class);
+    List<Class<? extends SourceConnector>> sourceConnectorClasses = list(SourceConnector.class);
+    List<Class<? extends SinkConnector>> sinkConnectorClasses = list(SinkConnector.class);
+
+    this.pluginTemplate = PluginTemplate.from(sourceConnectorClasses, sinkConnectorClasses, transformClasses);
   }
 
   protected List<Map.Entry<String, ConfigDef.ConfigKey>> required(ConfigDef configDef) {
@@ -154,22 +142,22 @@ public abstract class BaseDocumentationTest {
     return ImmutableList.copyOf(entries);
   }
 
-  DynamicTest connectorRstTest(Class<? extends Connector> connectorClass, final String templateName, final File parentDirectory) {
+  DynamicTest connectorRstTest(ConnectorTemplate connectorTemplate, final String templateName, final File parentDirectory) {
     if (!parentDirectory.isDirectory()) {
       parentDirectory.mkdirs();
     }
 
 
-    return dynamicTest(connectorClass.getSimpleName(), () -> {
-      final File graphOutputFile = new File(parentDirectory, connectorClass.getSimpleName() + ".svg");
+    return dynamicTest(connectorTemplate.getSimpleName(), () -> {
+      final File graphOutputFile = new File(parentDirectory, connectorTemplate.getDiagramFileName());
 
       final Graph g;
-      if (SourceConnector.class.isAssignableFrom(connectorClass)) {
+      if (connectorTemplate instanceof SourceConnectorTemplate) {
         g = graph()
             .graphAttr().with(RankDir.LEFT_TO_RIGHT)
             .directed()
             .with(
-                node(connectorClass.getSimpleName()).with(Shape.RECTANGLE)
+                node(connectorTemplate.getSimpleName()).with(Shape.RECTANGLE)
                     .link(
                         to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node("Kafka").with(Shape.RECTANGLE)).with(Label.of("Writes messages to")))).with(Label.of("Hosted by"))
 
@@ -182,7 +170,7 @@ public abstract class BaseDocumentationTest {
             .with(
                 node("Kafka").with(Shape.RECTANGLE)
                     .link(
-                        to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node(connectorClass.getSimpleName()).with(Shape.RECTANGLE)).with(Label.of("Writes data to")))).with(Label.of("Pulls Data from"))
+                        to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node(connectorTemplate.getSimpleName()).with(Shape.RECTANGLE)).with(Label.of("Writes data to")))).with(Label.of("Pulls Data from"))
 
                     )
             );
@@ -194,40 +182,30 @@ public abstract class BaseDocumentationTest {
           .render(Format.SVG_STANDALONE)
           .toFile(graphOutputFile);
 
-      final File outputFile = new File(parentDirectory, connectorClass.getSimpleName() + ".rst");
-      TemplateInput input = TemplateInput.fromConnector(connectorClass);
+      final File outputFile = new File(parentDirectory, connectorTemplate.getSimpleName() + ".rst");
+
       Template template = configuration.getTemplate(templateName);
       log.info("Writing {}", outputFile);
       try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
-        process(writer, template, input);
+        process(writer, template, connectorTemplate);
       }
     });
   }
 
-  DynamicTest transformRstTest(Class<? extends Transformation> transformationClass, final String templateName, final File parentDirectory) {
+  DynamicTest transformRstTest(TransformationTemplate transformationTemplate, final String templateName, final File parentDirectory) {
     if (!parentDirectory.isDirectory()) {
       parentDirectory.mkdirs();
     }
 
-    final String testName;
-
-    if (null != transformationClass.getDeclaringClass()) {
-      testName = String.format(
-          "%s.%s",
-          transformationClass.getDeclaringClass().getSimpleName(),
-          transformationClass.getSimpleName()
-      );
-    } else {
-      testName = transformationClass.getSimpleName();
-    }
+    final String testName = transformationTemplate.getTestName();
 
     return dynamicTest(testName, () -> {
       final File outputFile = new File(parentDirectory, testName.toLowerCase() + ".rst");
-      TemplateInput input = TemplateInput.fromTransformation(transformationClass);
+
       Template template = configuration.getTemplate(templateName);
       log.info("Writing {}", outputFile);
       try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
-        process(writer, template, input);
+        process(writer, template, transformationTemplate);
       }
     });
   }
@@ -238,18 +216,22 @@ public abstract class BaseDocumentationTest {
   public Stream<DynamicTest> sources() {
     final File parentDirectory = new File(outputDirectory, "sources");
     final String templateName = "rst/source.rst.ftl";
-    return this.sourceConnectorClasses.stream().map(aClass -> connectorRstTest(aClass, templateName, parentDirectory));
+    return this.pluginTemplate.getSourceConnectors().stream().map(connectorTemplate -> connectorRstTest(connectorTemplate, templateName, parentDirectory));
   }
 
   @TestFactory
   public Stream<DynamicTest> sinks() {
     final File parentDirectory = new File(outputDirectory, "sinks");
     final String templateName = "rst/sink.rst.ftl";
-    return this.sinkConnectorClasses.stream().map(aClass -> connectorRstTest(aClass, templateName, parentDirectory));
+    return this.pluginTemplate.getSinkConnectors().stream().map(connectorTemplate -> connectorRstTest(connectorTemplate, templateName, parentDirectory));
   }
 
   void process(Writer writer, Template template, Object input) throws IOException, TemplateException {
-    Map<String, Object> variables = ImmutableMap.of("input", input, "helper", new RstTemplateHelper());
+    Map<String, Object> variables = ImmutableMap.of(
+        "input", input,
+        "rstHelper", new RstTemplateHelper(),
+        "markdownHelper", new MarkdownTemplateHelper()
+    );
     template.process(variables, writer);
   }
 
@@ -257,7 +239,7 @@ public abstract class BaseDocumentationTest {
   public Stream<DynamicTest> transformations() {
     final File parentDirectory = new File(outputDirectory, "transformations");
     final String templateName = "rst/transformation.rst.ftl";
-    return this.transformClasses.stream().map(aClass -> transformRstTest(aClass, templateName, parentDirectory));
+    return this.pluginTemplate.getTransformations().stream().map(connectorTemplate -> transformRstTest(connectorTemplate, templateName, parentDirectory));
   }
 
   @TestFactory
@@ -312,113 +294,140 @@ public abstract class BaseDocumentationTest {
   }
 
   @Test
-  public void markdown() throws IOException, IllegalAccessException, InstantiationException {
-    try (StringWriter stringWriter = new StringWriter()) {
-      try (PrintWriter writer = new PrintWriter(stringWriter)) {
-        writer.println();
-        writer.println("# Configuration");
-        writer.println();
-
-        for (Class<? extends Connector> connectorClass : connectorClasses) {
-          if (Modifier.isAbstract(connectorClass.getModifiers())) {
-            log.trace("Skipping {} because it's abstract.", connectorClass.getName());
-            continue;
-          }
-
-          writer.printf("## %s", connectorClass.getSimpleName());
-          writer.println();
-
-          Description descriptionAttribute = connectorClass.getAnnotation(Description.class);
-
-          if (null != descriptionAttribute && !Strings.isNullOrEmpty(descriptionAttribute.value())) {
-            writer.println();
-            writer.append(descriptionAttribute.value());
-            writer.println();
-          } else {
-
-          }
-
-          writer.println();
-
-          Connector connector = connectorClass.newInstance();
-          ConfigDef configDef = connector.config();
-
-          writer.println("```properties");
-          writer.println("name=connector1");
-          writer.println("tasks.max=1");
-          writer.printf("connector.class=%s", connectorClass.getName());
-          writer.println();
-          writer.println();
-          writer.println("# Set these required values");
-          List<Map.Entry<String, ConfigDef.ConfigKey>> requiredValues = required(configDef);
-          for (Map.Entry<String, ConfigDef.ConfigKey> kvp : requiredValues) {
-            writer.printf("%s=", kvp.getKey());
-            writer.println();
-          }
-          writer.println("```");
-          writer.println();
-
-          writer.println(MarkdownFormatter.toMarkdown(configDef));
-        }
-
-        for (Class<? extends Transformation> transformationClass : transformClasses) {
-          if (Modifier.isAbstract(transformationClass.getModifiers())) {
-            log.trace("Skipping {} because it's abstract.", transformationClass.getName());
-            continue;
-          }
-
-          writer.printf("## %s", transformationClass.getSimpleName());
-          writer.println();
-
-          Description descriptionAttribute = transformationClass.getAnnotation(Description.class);
-
-          if (null != descriptionAttribute && !Strings.isNullOrEmpty(descriptionAttribute.value())) {
-            writer.println();
-            writer.append(descriptionAttribute.value());
-            writer.println();
-          } else {
-
-          }
-
-          writer.println();
-
-          Transformation transformation = transformationClass.newInstance();
-          ConfigDef configDef = transformation.config();
-
-          writer.println("```properties");
-          final String transformName = transformationClass.getSimpleName().toLowerCase();
-          writer.printf("transforms=%s", transformName);
-          writer.println();
-          writer.printf("transforms.%s.type=%s", transformName, transformationClass.getName());
-          writer.println();
-          writer.println();
-          writer.println("# Set these required values");
-          List<Map.Entry<String, ConfigDef.ConfigKey>> requiredValues = required(configDef);
-          for (Map.Entry<String, ConfigDef.ConfigKey> kvp : requiredValues) {
-            writer.printf("transforms.%s.%s=", transformName, kvp.getKey());
-            writer.println();
-          }
-          writer.println("```");
-          writer.println();
-          writer.println(MarkdownFormatter.toMarkdown(configDef));
-        }
-
-        List<Schema> schemas = schemas();
-
-        if (!schemas.isEmpty()) {
-          writer.println();
-          writer.println("# Schemas");
-          writer.println();
-
-          for (Schema schema : schemas()) {
-            writer.println(MarkdownFormatter.toMarkdown(schema));
-          }
-        }
-      }
-
-      log.info("{}", stringWriter);
+  public void rst() throws IOException, TemplateException {
+    final File outputFile = new File("target", "README.rst");
+    Template template = configuration.getTemplate("rst/README.rst.ftl");
+    log.info("Writing {}", outputFile);
+    try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+      process(writer, template, this.pluginTemplate);
     }
+
   }
+
+  @Test
+  public void markdown() throws IOException, TemplateException {
+    final File outputFile = new File("target", "README.md");
+    Template template = configuration.getTemplate("md/README.md.ftl");
+    final String output;
+    try (StringWriter writer = new StringWriter()) {
+      writer.write('\n');
+      process(writer, template, this.pluginTemplate);
+      output = writer.toString();
+    }
+    log.info("\n{}", output);
+    Files.write(output, outputFile, Charsets.UTF_8);
+
+  }
+
+
+//  @Test
+//  public void markdown() throws IOException, IllegalAccessException, InstantiationException {
+//    try (StringWriter stringWriter = new StringWriter()) {
+//      try (PrintWriter writer = new PrintWriter(stringWriter)) {
+//        writer.println();
+//        writer.println("# Configuration");
+//        writer.println();
+//
+//        for (Class<? extends Connector> connectorClass : connectorClasses) {
+//          if (Modifier.isAbstract(connectorClass.getModifiers())) {
+//            log.trace("Skipping {} because it's abstract.", connectorClass.getName());
+//            continue;
+//          }
+//
+//          writer.printf("## %s", connectorClass.getSimpleName());
+//          writer.println();
+//
+//          Description descriptionAttribute = connectorClass.getAnnotation(Description.class);
+//
+//          if (null != descriptionAttribute && !Strings.isNullOrEmpty(descriptionAttribute.value())) {
+//            writer.println();
+//            writer.append(descriptionAttribute.value());
+//            writer.println();
+//          } else {
+//
+//          }
+//
+//          writer.println();
+//
+//          Connector connector = connectorClass.newInstance();
+//          ConfigDef configDef = connector.config();
+//
+//          writer.println("```properties");
+//          writer.println("name=connector1");
+//          writer.println("tasks.max=1");
+//          writer.printf("connector.class=%s", connectorClass.getName());
+//          writer.println();
+//          writer.println();
+//          writer.println("# Set these required values");
+//          List<Map.Entry<String, ConfigDef.ConfigKey>> requiredValues = required(configDef);
+//          for (Map.Entry<String, ConfigDef.ConfigKey> kvp : requiredValues) {
+//            writer.printf("%s=", kvp.getKey());
+//            writer.println();
+//          }
+//          writer.println("```");
+//          writer.println();
+//
+//          writer.println(MarkdownFormatter.toMarkdown(configDef));
+//        }
+//
+//        for (Class<? extends Transformation> transformationClass : transformClasses) {
+//          if (Modifier.isAbstract(transformationClass.getModifiers())) {
+//            log.trace("Skipping {} because it's abstract.", transformationClass.getName());
+//            continue;
+//          }
+//
+//          writer.printf("## %s", transformationClass.getSimpleName());
+//          writer.println();
+//
+//          Description descriptionAttribute = transformationClass.getAnnotation(Description.class);
+//
+//          if (null != descriptionAttribute && !Strings.isNullOrEmpty(descriptionAttribute.value())) {
+//            writer.println();
+//            writer.append(descriptionAttribute.value());
+//            writer.println();
+//          } else {
+//
+//          }
+//
+//          writer.println();
+//
+//          Transformation transformation = transformationClass.newInstance();
+//          ConfigDef configDef = transformation.config();
+//
+//          writer.println("```properties");
+//          final String transformName = transformationClass.getSimpleName().toLowerCase();
+//          writer.printf("transforms=%s", transformName);
+//          writer.println();
+//          writer.printf("transforms.%s.type=%s", transformName, transformationClass.getName());
+//          writer.println();
+//          writer.println();
+//          writer.println("# Set these required values");
+//          List<Map.Entry<String, ConfigDef.ConfigKey>> requiredValues = required(configDef);
+//          for (Map.Entry<String, ConfigDef.ConfigKey> kvp : requiredValues) {
+//            writer.printf("transforms.%s.%s=", transformName, kvp.getKey());
+//            writer.println();
+//          }
+//          writer.println("```");
+//          writer.println();
+//          writer.println(MarkdownFormatter.toMarkdown(configDef));
+//        }
+//
+//        List<Schema> schemas = schemas();
+//
+//        if (!schemas.isEmpty()) {
+//          writer.println();
+//          writer.println("# Schemas");
+//          writer.println();
+//
+//          for (Schema schema : schemas()) {
+//            writer.println(MarkdownFormatter.toMarkdown(schema));
+//          }
+//        }
+//      }
+//
+//      log.info("{}", stringWriter);
+//    }
+//  }
 
 
 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@ package com.github.jcustenborder.kafka.connect.utils.templates;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
@@ -75,8 +76,8 @@ public class TemplateSchema implements Table {
   }
 
   @Override
-  public List<String[]> getRowData() {
-    List<String[]> rows = new ArrayList<>();
+  public List<List<String>> getRowData() {
+    List<List<String>> rows = new ArrayList<>();
 
     if (Schema.Type.STRUCT != this.schema.type()) {
       return rows;
@@ -84,13 +85,13 @@ public class TemplateSchema implements Table {
 
     for (Field field : this.schema.fields()) {
       rows.add(
-          new String[]{
+          ImmutableList.of(
               field.name(),
               type(field.schema()),
               String.format("%s", field.schema().isOptional()),
               null != field.schema().defaultValue() ? field.schema().defaultValue().toString() : "",
-              field.schema().doc()
-          }
+              !Strings.isNullOrEmpty(field.schema().doc()) ? field.schema().doc() : ""
+          )
       );
     }
 

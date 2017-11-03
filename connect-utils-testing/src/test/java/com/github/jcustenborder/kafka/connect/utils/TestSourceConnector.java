@@ -16,7 +16,12 @@
 package com.github.jcustenborder.kafka.connect.utils;
 
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationDanger;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationImportant;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationNote;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationTip;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationWarning;
+import com.github.jcustenborder.kafka.connect.utils.config.Title;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
@@ -26,7 +31,12 @@ import java.util.Map;
 
 @Description("The test source connector is used to simulate the usage fromConnector an actual connector that we would generate " +
     "documentation from.")
-@DocumentationImportant("This connector uses a foo which does a bar.")
+@Title("Test Source Connector")
+@DocumentationNote("This is a note")
+@DocumentationTip("This is a tip")
+@DocumentationImportant("This is important")
+@DocumentationDanger("This is a danger")
+@DocumentationWarning("This is a warning")
 public class TestSourceConnector extends SourceConnector {
   @Override
   public String version() {
