@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,24 +25,52 @@ import com.github.jcustenborder.kafka.connect.utils.config.Title;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Connector;
 import org.apache.kafka.connect.transforms.Transformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+public class ConnectorTemplate {
+  private final String title;
+  private final String description;
+  private final String className;
+  private final String warning;
+  private final String tip;
+  private final String important;
+  private final String danger;
+  private final String note;
+  private final String simpleName;
+  private final String diagramFileName;
+  private final TemplateConfigDef config;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+  public ConnectorTemplate(Class<?> cls) {
+    this.title = title(cls);
+    this.description = description(cls);
+    this.className = cls.getName();
+    this.simpleName = cls.getSimpleName();
+    this.diagramFileName = this.simpleName + ".svg";
+    this.warning = warning(cls);
+    this.tip = tip(cls);
+    this.important = important(cls);
+    this.danger = danger(cls);
+    this.note = note(cls);
 
-public class TemplateInput {
-  private static final Logger log = LoggerFactory.getLogger(TemplateInput.class);
-  private String title;
-  private String description;
-  private String className;
-  private String warning;
-  private String tip;
-  private String important;
-  private String danger;
-  private String note;
-  private TemplateConfigDef config;
+    final ConfigDef configDef;
+
+    try {
+      if (Connector.class.isAssignableFrom(cls)) {
+        Connector connector = (Connector) cls.newInstance();
+        configDef = connector.config();
+      } else if (Transformation.class.isAssignableFrom(cls)) {
+        Transformation transformation = (Transformation) cls.newInstance();
+        configDef = transformation.config();
+      } else {
+        throw new UnsupportedOperationException(
+            String.format("Class %s is not supported", cls.getName())
+        );
+      }
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new IllegalStateException(e);
+    }
+
+    this.config = TemplateConfigDef.from(configDef);
+  }
 
   public String getTitle() {
     return title;
@@ -80,7 +108,7 @@ public class TemplateInput {
     return this.config;
   }
 
-  private static String title(Class<?> aClass) {
+  protected static String title(Class<?> aClass) {
     final String result;
     Title annotation = aClass.getAnnotation(Title.class);
 
@@ -92,7 +120,7 @@ public class TemplateInput {
     return result;
   }
 
-  private static String description(Class<?> aClass) {
+  protected static String description(Class<?> aClass) {
     final String result;
     Description annotation = aClass.getAnnotation(Description.class);
 
@@ -104,7 +132,7 @@ public class TemplateInput {
     return result;
   }
 
-  private static String danger(Class<?> aClass) {
+  protected static String danger(Class<?> aClass) {
     final String result;
     DocumentationDanger annotation = aClass.getAnnotation(DocumentationDanger.class);
 
@@ -116,7 +144,7 @@ public class TemplateInput {
     return result;
   }
 
-  private static String important(Class<?> aClass) {
+  protected static String important(Class<?> aClass) {
     final String result;
     DocumentationImportant annotation = aClass.getAnnotation(DocumentationImportant.class);
 
@@ -128,7 +156,7 @@ public class TemplateInput {
     return result;
   }
 
-  private static String tip(Class<?> aClass) {
+  protected static String tip(Class<?> aClass) {
     final String result;
     DocumentationTip annotation = aClass.getAnnotation(DocumentationTip.class);
 
@@ -140,7 +168,7 @@ public class TemplateInput {
     return result;
   }
 
-  private static String note(Class<?> aClass) {
+  protected static String note(Class<?> aClass) {
     final String result;
     DocumentationNote annotation = aClass.getAnnotation(DocumentationNote.class);
 
@@ -152,7 +180,7 @@ public class TemplateInput {
     return result;
   }
 
-  private static String warning(Class<?> aClass) {
+  protected static String warning(Class<?> aClass) {
     final String result;
     DocumentationWarning annotation = aClass.getAnnotation(DocumentationWarning.class);
 
@@ -164,47 +192,11 @@ public class TemplateInput {
     return result;
   }
 
-  private static void populateTemplate(Class<?> aClass, TemplateInput result, ConfigDef config) {
-    result.className = aClass.getName();
-    result.title = title(aClass);
-    result.description = description(aClass);
-    result.tip = tip(aClass);
-    result.warning = warning(aClass);
-    result.important = important(aClass);
-    result.danger = danger(aClass);
-    result.config = TemplateConfigDef.from(config);
+  public String getSimpleName() {
+    return simpleName;
   }
 
-  public static TemplateInput fromTransformation(Class<? extends Transformation> transform) throws IllegalAccessException, InstantiationException {
-    final TemplateInput result = new TemplateInput();
-
-    Transformation sourceConnector = transform.newInstance();
-    ConfigDef config = sourceConnector.config();
-    assertNotNull(config, "config() cannot return a null.");
-
-    populateTemplate(transform, result, config);
-
-    return result;
+  public String getDiagramFileName() {
+    return diagramFileName;
   }
-
-
-  public static TemplateInput fromConnector(Class<? extends Connector> connectorClass) throws IllegalAccessException, InstantiationException {
-    final TemplateInput result = new TemplateInput();
-    Connector connector = connectorClass.newInstance();
-    ConfigDef config = connector.config();
-    assertNotNull(config, "config() cannot return a null.");
-    populateTemplate(connectorClass, result, config);
-    return result;
-  }
-
-  public static void checkLength(Map<String, Integer> columnLengths, String name, Object value) {
-    final int length = (value != null ? value.toString().length() : 0) + 2;
-
-    final int current = columnLengths.getOrDefault(name, 0);
-
-    if (length > current) {
-      columnLengths.put(name, length);
-    }
-  }
-
 }

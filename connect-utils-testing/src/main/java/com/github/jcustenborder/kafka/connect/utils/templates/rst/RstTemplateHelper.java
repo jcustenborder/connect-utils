@@ -22,6 +22,8 @@ import com.opencsv.CSVWriter;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RstTemplateHelper {
   public String table(Table table) {
@@ -34,7 +36,10 @@ public class RstTemplateHelper {
         printWriter.println();
 
         try (CSVWriter csvWriter = new CSVWriter(printWriter)) {
-          csvWriter.writeAll(table.getRowData());
+          final List<String[]> rows = table.getRowData().stream()
+              .map(strings -> strings.toArray(new String[strings.size()]))
+              .collect(Collectors.toList());
+          csvWriter.writeAll(rows);
         }
       }
       return writer.toString();

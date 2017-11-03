@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +15,24 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.templates;
 
-import java.util.List;
+public class TransformationTemplate extends ConnectorTemplate {
+  private final String testName;
 
-public interface Table {
-  String getTitle();
+  public TransformationTemplate(Class<?> cls) {
+    super(cls);
 
-  List<String> getHeaders();
+    if (null != cls.getDeclaringClass()) {
+      testName = String.format(
+          "%s.%s",
+          cls.getDeclaringClass().getSimpleName(),
+          cls.getSimpleName()
+      );
+    } else {
+      testName = cls.getSimpleName();
+    }
+  }
 
-  List<List<String>> getRowData();
+  public String getTestName() {
+    return testName;
+  }
 }
