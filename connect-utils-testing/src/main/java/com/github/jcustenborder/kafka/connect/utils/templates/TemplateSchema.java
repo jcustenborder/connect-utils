@@ -90,7 +90,7 @@ public class TemplateSchema implements Table {
               type(field.schema()),
               String.format("%s", field.schema().isOptional()),
               null != field.schema().defaultValue() ? field.schema().defaultValue().toString() : "",
-              field.schema().doc()
+              !Strings.isNullOrEmpty(field.schema().doc()) ? field.schema().doc() : ""
           )
       );
     }
