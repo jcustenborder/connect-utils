@@ -17,7 +17,7 @@ ${source.description}
 </#if>
 
 <#if input.sinkConnectors?has_content>
-# Source Connectors
+# Sink Connectors
 
 <#list input.sinkConnectors as sink>
 ## ${sink.title}
