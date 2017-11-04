@@ -10,22 +10,22 @@ name=connector1
 tasks.max=1
 connector.class=${connector.className}
 # The following values must be configured.
-    <#list connector.config.requiredConfigs as item>
-    ${item.name()}=
-    </#list>
+<#list connector.config.requiredConfigs as item>
+${item.name()}=
+</#list>
 ```
 
 #### Distributed Example
 
 ```json
 {
-"name": "connector1",
-"config": {
-"connector.class": "${connector.className}",
-    <#list connector.config.requiredConfigs as item>
-    "${item.name()}":"",
-    </#list>
-}
+    "name": "connector1",
+    "config": {
+        "connector.class": "${connector.className}",
+        <#list connector.config.requiredConfigs as item>
+        "${item.name()}":"",
+        </#list>
+    }
 }
 ```
 </#macro>
@@ -41,9 +41,9 @@ ${markdownHelper.table(transformation.config)}
 transforms=${transformation.simpleName}
 transforms.${transformation.simpleName}.type=${transformation.className}
 # The following values must be configured.
-    <#list transformation.config.requiredConfigs as item>
-    transforms.${transformation.simpleName}.${item.name()}=
-    </#list>
+<#list transformation.config.requiredConfigs as item>
+transforms.${transformation.simpleName}.${item.name()}=
+</#list>
 ```
 
 #### Distributed Example
@@ -51,14 +51,14 @@ transforms.${transformation.simpleName}.type=${transformation.className}
 ```json
 {
 "name": "connector1",
-"config": {
-"connector.class": "${transformation.className}",
-"transforms": "${transformation.simpleName}",
-"transforms.${transformation.simpleName}.type": "${transformation.className}",
-    <#list transformation.config.requiredConfigs as item>
-    "transforms.${transformation.simpleName}.${item.name()}":"",
-    </#list>
-}
+    "config": {
+        "connector.class": "${transformation.className}",
+        "transforms": "${transformation.simpleName}",
+        "transforms.${transformation.simpleName}.type": "${transformation.className}",
+        <#list transformation.config.requiredConfigs as item>
+        "transforms.${transformation.simpleName}.${item.name()}":"",
+        </#list>
+    }
 }
 ```
 </#macro>
