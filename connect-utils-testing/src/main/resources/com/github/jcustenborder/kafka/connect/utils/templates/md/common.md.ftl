@@ -1,4 +1,4 @@
-<#macro connectorConfig connector>
+<#-- @formatter:off --><#macro connectorConfig connector>
 ### Configuration
 
 ${markdownHelper.table(connector.config)}
