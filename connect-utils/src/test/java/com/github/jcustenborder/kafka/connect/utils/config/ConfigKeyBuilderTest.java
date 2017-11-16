@@ -34,12 +34,13 @@ public class ConfigKeyBuilderTest {
   }
 
   @Test
-  public void nullDocumentation() {
-    IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-      ConfigKeyBuilder builder = ConfigKeyBuilder.of("testing", ConfigDef.Type.STRING);
-      builder.build();
-    });
-    assertTrue(exception.getMessage().contains("documentation"));
+  public void minimal() {
+    final ConfigDef.ConfigKey actual = ConfigKeyBuilder.of("testing", ConfigDef.Type.STRING)
+        .build();
+    assertEquals("testing", actual.name, "name should match.");
+    assertEquals(ConfigDef.Type.STRING, actual.type, "type should match.");
+
+    new ConfigDef().define(actual).toEnrichedRst();
   }
 
   @Test
@@ -52,5 +53,8 @@ public class ConfigKeyBuilderTest {
     assertEquals(ConfigDef.Type.STRING, actual.type, "type should match.");
     assertEquals("Testing", actual.documentation, "documentation should match.");
     assertEquals(ConfigDef.Importance.HIGH, actual.importance, "importance should match.");
+
+    new ConfigDef().define(actual).toEnrichedRst();
+
   }
 }

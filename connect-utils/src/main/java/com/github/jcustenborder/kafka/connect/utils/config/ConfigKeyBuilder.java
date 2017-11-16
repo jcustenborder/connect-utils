@@ -17,24 +17,26 @@ package com.github.jcustenborder.kafka.connect.utils.config;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import org.apache.kafka.common.config.ConfigDef;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ConfigKeyBuilder {
-  final String name;
-  final ConfigDef.Type type;
-  String documentation;
-  Object defaultValue;
-  ConfigDef.Validator validator;
-  ConfigDef.Importance importance;
-  String group;
-  int orderInGroup;
-  ConfigDef.Width width;
-  String displayName;
-  List<String> dependents;
-  ConfigDef.Recommender recommender;
-  boolean internalConfig;
+  private final String name;
+  private final ConfigDef.Type type;
+  private String documentation = "";
+  private Object defaultValue = ConfigDef.NO_DEFAULT_VALUE;
+  private ConfigDef.Validator validator;
+  private ConfigDef.Importance importance;
+  private String group = "";
+  private int orderInGroup = -1;
+  private ConfigDef.Width width = ConfigDef.Width.NONE;
+  private String displayName;
+  private List<String> dependents = Collections.emptyList();
+  private ConfigDef.Recommender recommender;
+  private boolean internalConfig = true;
 
   private ConfigKeyBuilder(String group, String name, ConfigDef.Type type) {
     this(name, type);
@@ -43,6 +45,7 @@ public class ConfigKeyBuilder {
 
   private ConfigKeyBuilder(String name, ConfigDef.Type type) {
     this.name = name;
+    this.displayName = name;
     this.type = type;
   }
 
@@ -55,8 +58,7 @@ public class ConfigKeyBuilder {
   }
 
   public ConfigDef.ConfigKey build() {
-    Preconditions.checkState(!Strings.isNullOrEmpty(this.name), "name cannot be null or blank.");
-    Preconditions.checkState(!Strings.isNullOrEmpty(this.documentation), "documentation cannot be null or blank.");
+    Preconditions.checkState(!Strings.isNullOrEmpty(this.name), "name must be specified.");
     return new ConfigDef.ConfigKey(this.name, this.type, this.defaultValue, this.validator, this.importance, this.documentation, this.group, this.orderInGroup, this.width, this.displayName, this.dependents, this.recommender, this.internalConfig);
   }
 
@@ -147,6 +149,10 @@ public class ConfigKeyBuilder {
   public ConfigKeyBuilder dependents(List<String> dependents) {
     this.dependents = dependents;
     return this;
+  }
+
+  public ConfigKeyBuilder dependents(String... dependents) {
+    return dependents(ImmutableList.copyOf(dependents));
   }
 
   public ConfigDef.Recommender recommender() {
