@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package com.github.jcustenborder.kafka.connect.utils.config;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.HostAndPort;
 import com.google.common.primitives.Ints;
 import org.apache.kafka.common.config.AbstractConfig;
 
@@ -131,5 +132,58 @@ public class ConfigUtils {
     return ImmutableList.copyOf(addresses);
   }
 
+  static HostAndPort hostAndPort(String input, Integer defaultPort) {
+    final HostAndPort result = HostAndPort.fromString(input);
 
+    if (null != defaultPort) {
+      result.withDefaultPort(defaultPort);
+    }
+
+    return result;
+  }
+
+  /**
+   * Method is used to parse a string ConfigDef item to a HostAndPort
+   * @param config Config to read from
+   * @param key ConfigItem to get the host string from.
+   * @param defaultPort The default port to use if a port was not specified. Can be null.
+   * @return HostAndPort based on the ConfigItem.
+   */
+  public static HostAndPort hostAndPort(AbstractConfig config, String key, Integer defaultPort) {
+    final String input = config.getString(key);
+    return hostAndPort(input, defaultPort);
+  }
+
+  /**
+   * Method is used to parse a string ConfigDef item to a HostAndPort
+   * @param config Config to read from
+   * @param key ConfigItem to get the host string from.
+   * @return HostAndPort based on the ConfigItem.
+   */
+  public static HostAndPort hostAndPort(AbstractConfig config, String key) {
+    return hostAndPort(config, key, null);
+  }
+
+  /**
+   * Method is used to parse a list ConfigDef item to a list of HostAndPort
+   * @param config Config to read from
+   * @param key ConfigItem to get the host string from.
+   * @param defaultPort The default port to use if a port was not specified. Can be null.
+   * @return HostAndPort based on the ConfigItem.
+   * @return
+   */
+  public static List<HostAndPort> hostAndPorts(AbstractConfig config, String key, Integer defaultPort) {
+    final List<String> inputs = config.getList(key);
+    List<HostAndPort> result = new ArrayList<>();
+    for (final String input : inputs) {
+      final HostAndPort hostAndPort = hostAndPort(input, defaultPort);
+      result.add(hostAndPort);
+    }
+
+    return ImmutableList.copyOf(result);
+  }
+
+  public static List<HostAndPort> hostAndPorts(AbstractConfig config, String key) {
+    return hostAndPorts(config, key, null);
+  }
 }
