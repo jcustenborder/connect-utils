@@ -21,9 +21,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.net.HostAndPort;
 import com.google.common.primitives.Ints;
 import org.apache.kafka.common.config.AbstractConfig;
+import org.apache.kafka.common.config.ConfigException;
 
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -183,7 +186,56 @@ public class ConfigUtils {
     return ImmutableList.copyOf(result);
   }
 
+  /**
+   * Method is used to parse hosts and ports
+   *
+   * @param config
+   * @param key
+   * @return
+   */
   public static List<HostAndPort> hostAndPorts(AbstractConfig config, String key) {
     return hostAndPorts(config, key, null);
   }
+
+  static URL url(String key, String value) {
+    try {
+      return new URL(value);
+    } catch (MalformedURLException e) {
+      ConfigException configException = new ConfigException(
+          key, value, "Could not parse to URL."
+      );
+      configException.initCause(e);
+
+      throw configException;
+    }
+  }
+
+  /**
+   * Method is used to retrieve a URL from a configuration key.
+   *
+   * @param config Config to read
+   * @param key    Key to read
+   * @return URL for the value.
+   */
+  public static URL url(AbstractConfig config, String key) {
+    final String value = config.getString(key);
+    return url(key, value);
+  }
+
+  /**
+   * Method is used to retrieve a list of URL(s) from a configuration key.
+   *
+   * @param config Config to read
+   * @param key    Key to read
+   * @return URL for the value.
+   */
+  public static List<URL> urls(AbstractConfig config, String key) {
+    List<URL> result = new ArrayList<>();
+    List<String> input = config.getList(key);
+    for (String s : input) {
+      result.add(url(key, s));
+    }
+    return ImmutableList.copyOf(result);
+  }
+
 }
