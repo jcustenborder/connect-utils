@@ -17,52 +17,61 @@ ${text}
 <#list 0..<text?length as i>^</#list>
 </#macro>
 
-<#macro configProperties className requiredConfigs>
+<#macro configProperties connector>
 
 This configuration is used typically along with `standalone mode
 <http://docs.confluent.io/current/connect/concepts.html#standalone-workers>`_.
 
-.. code-block:: properties
-
-    name=connector1
-    tasks.max=1
-    connector.class=${className}
-    # The following values must be configured.
-<#list requiredConfigs as item>
-    ${item.name()}=
-</#list>
+${rstHelper.propertiesExample(connector)}
 
 
 </#macro>
 
-<#macro configJson className requiredConfigs>
+<#macro configJson connector>
 
 This configuration is used typically along with `distributed mode
 <http://docs.confluent.io/current/connect/concepts.html#distributed-workers>`_.
 Write the following json to `connector.json`, configure all of the required values, and use the command below to
-post the configuration to one the distributed connect worker(s).
+post the configuration to one the distributed connect worker(s). Check here for more information about the
+`Kafka Connect REST Interface. <https://docs.confluent.io/current/connect/restapi.html>`_
 
-.. code-block:: json
-
-    {
-        "name": "connector1",
-        "config": {
-            "connector.class": "${className}",
-            <#list requiredConfigs as item>
-            "${item.name()}":"",
-            </#list>
-        }
-    }
+${rstHelper.jsonExample(connector)}
 
 Use curl to post the configuration to one of the Kafka Connect Workers. Change `http://localhost:8083/` the the endpoint of
 one of your Kafka Connect worker(s).
 
 .. code-block:: bash
+    :caption: Create a new connector
 
     curl -s -X POST -H 'Content-Type: application/json' --data @connector.json http://localhost:8083/connectors
 
 
+.. code-block:: bash
+    :caption: Update an existing connector
 
+    curl -s -X PUT -H 'Content-Type: application/json' --data @connector.json http://localhost:8083/connectors/${connector.simpleName}1/config
+
+
+</#macro>
+
+<#macro configuration connector>
+<#list connector.config.configs as item>
+
+<@subsubsection text=item.name/>
+
+**Importance:** ${item.importance}
+
+**Type:** ${item.type}
+
+<#if item.defaultValue?has_content>**Default Value:** ${item.defaultValue}
+
+</#if>
+<#if item.validator?has_content>**Validator:** ${item.validator}
+
+</#if>
+
+${item.doc}
+</#list>
 </#macro>
 
 <#macro tableBar columnLengths column character="-"><#list 0..<columnLengths[column] as i>${character}</#list></#macro>
@@ -81,15 +90,17 @@ one of your Kafka Connect worker(s).
 <#macro configExamples input>
 <@subsection text="Configuration"/>
 
-${rstHelper.table(input.config)}
+<@configuration connector=input />
+
+<@subsection text="Examples"/>
 
 <@subsubsection text="Property based example" />
 
-<@configProperties className=input.className requiredConfigs=input.config.requiredConfigs />
+<@configProperties connector=input />
 
 <@subsubsection text="Rest based example" />
 
-<@configJson className=input.className requiredConfigs=input.config.requiredConfigs />
+<@configJson connector=input />
 </#macro>
 
 <#macro notes input>

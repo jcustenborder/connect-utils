@@ -4,14 +4,11 @@
 <#if input.sourceConnectors?has_content>
 # Source Connectors
 
-<#list input.sourceConnectors as source>
-## ${source.title}
+<#list input.sourceConnectors as connector>
 
-<#if source.description??>
-${source.description}
-</#if>
+<@details connector=connector/>
 
-<@connectorConfig connector=source/>
+<@config connector=connector/>
 
 </#list>
 </#if>
@@ -19,14 +16,11 @@ ${source.description}
 <#if input.sinkConnectors?has_content>
 # Sink Connectors
 
-<#list input.sinkConnectors as sink>
-## ${sink.title}
+<#list input.sinkConnectors as connector>
 
-<#if sink.description??>
-${sink.description}
-</#if>
+<@details connector=connector/>
 
-<@connectorConfig connector=sink/>
+<@config connector=connector/>
 
 </#list>
 </#if>
@@ -35,13 +29,10 @@ ${sink.description}
 # Transformations
 
 <#list input.transformations as transformation>
-## ${transformation.title}
 
-<#if transformation.description??>
-${transformation.description}
-</#if>
+<@details connector=transformation/>
 
-<@transformationConfig transformation=transformation/>
+<@config connector=transformation/>
 
 </#list>
 </#if>

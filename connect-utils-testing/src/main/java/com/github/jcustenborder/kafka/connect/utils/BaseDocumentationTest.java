@@ -26,6 +26,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
@@ -65,6 +66,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -104,13 +106,16 @@ public abstract class BaseDocumentationTest {
   <T> List<Class<? extends T>> list(Class<T> cls) {
     List<Class<? extends T>> classes = reflections.getSubTypesOf(cls)
         .stream()
-        .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()) && Modifier.isPublic(aClass.getModifiers()))
+        .filter(aClass -> packages.contains(aClass.getPackage().getName()))
+        .filter(aClass -> Modifier.isPublic(aClass.getModifiers()))
+        .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
         .collect(Collectors.toList());
     classes.sort(Comparator.comparing(Class::getName));
     return classes;
   }
 
   PluginTemplate pluginTemplate;
+  Set<String> packages;
 
   @BeforeEach
   public void before() throws MalformedURLException {
@@ -122,6 +127,8 @@ public abstract class BaseDocumentationTest {
           .forPackages(packages())
       );
     }
+
+    this.packages = ImmutableSet.copyOf(packages());
 
     List<Class<? extends Transformation>> transformClasses = list(Transformation.class);
     List<Class<? extends SourceConnector>> sourceConnectorClasses = list(SourceConnector.class);
@@ -318,116 +325,4 @@ public abstract class BaseDocumentationTest {
     Files.write(output, outputFile, Charsets.UTF_8);
 
   }
-
-
-//  @Test
-//  public void markdown() throws IOException, IllegalAccessException, InstantiationException {
-//    try (StringWriter stringWriter = new StringWriter()) {
-//      try (PrintWriter writer = new PrintWriter(stringWriter)) {
-//        writer.println();
-//        writer.println("# Configuration");
-//        writer.println();
-//
-//        for (Class<? extends Connector> connectorClass : connectorClasses) {
-//          if (Modifier.isAbstract(connectorClass.getModifiers())) {
-//            log.trace("Skipping {} because it's abstract.", connectorClass.getName());
-//            continue;
-//          }
-//
-//          writer.printf("## %s", connectorClass.getSimpleName());
-//          writer.println();
-//
-//          Description descriptionAttribute = connectorClass.getAnnotation(Description.class);
-//
-//          if (null != descriptionAttribute && !Strings.isNullOrEmpty(descriptionAttribute.value())) {
-//            writer.println();
-//            writer.append(descriptionAttribute.value());
-//            writer.println();
-//          } else {
-//
-//          }
-//
-//          writer.println();
-//
-//          Connector connector = connectorClass.newInstance();
-//          ConfigDef configDef = connector.config();
-//
-//          writer.println("```properties");
-//          writer.println("name=connector1");
-//          writer.println("tasks.max=1");
-//          writer.printf("connector.class=%s", connectorClass.getName());
-//          writer.println();
-//          writer.println();
-//          writer.println("# Set these required values");
-//          List<Map.Entry<String, ConfigDef.ConfigKey>> requiredValues = required(configDef);
-//          for (Map.Entry<String, ConfigDef.ConfigKey> kvp : requiredValues) {
-//            writer.printf("%s=", kvp.getKey());
-//            writer.println();
-//          }
-//          writer.println("```");
-//          writer.println();
-//
-//          writer.println(MarkdownFormatter.toMarkdown(configDef));
-//        }
-//
-//        for (Class<? extends Transformation> transformationClass : transformClasses) {
-//          if (Modifier.isAbstract(transformationClass.getModifiers())) {
-//            log.trace("Skipping {} because it's abstract.", transformationClass.getName());
-//            continue;
-//          }
-//
-//          writer.printf("## %s", transformationClass.getSimpleName());
-//          writer.println();
-//
-//          Description descriptionAttribute = transformationClass.getAnnotation(Description.class);
-//
-//          if (null != descriptionAttribute && !Strings.isNullOrEmpty(descriptionAttribute.value())) {
-//            writer.println();
-//            writer.append(descriptionAttribute.value());
-//            writer.println();
-//          } else {
-//
-//          }
-//
-//          writer.println();
-//
-//          Transformation transformation = transformationClass.newInstance();
-//          ConfigDef configDef = transformation.config();
-//
-//          writer.println("```properties");
-//          final String transformName = transformationClass.getSimpleName().toLowerCase();
-//          writer.printf("transforms=%s", transformName);
-//          writer.println();
-//          writer.printf("transforms.%s.type=%s", transformName, transformationClass.getName());
-//          writer.println();
-//          writer.println();
-//          writer.println("# Set these required values");
-//          List<Map.Entry<String, ConfigDef.ConfigKey>> requiredValues = required(configDef);
-//          for (Map.Entry<String, ConfigDef.ConfigKey> kvp : requiredValues) {
-//            writer.printf("transforms.%s.%s=", transformName, kvp.getKey());
-//            writer.println();
-//          }
-//          writer.println("```");
-//          writer.println();
-//          writer.println(MarkdownFormatter.toMarkdown(configDef));
-//        }
-//
-//        List<Schema> schemas = schemas();
-//
-//        if (!schemas.isEmpty()) {
-//          writer.println();
-//          writer.println("# Schemas");
-//          writer.println();
-//
-//          for (Schema schema : schemas()) {
-//            writer.println(MarkdownFormatter.toMarkdown(schema));
-//          }
-//        }
-//      }
-//
-//      log.info("{}", stringWriter);
-//    }
-//  }
-
-
 }
