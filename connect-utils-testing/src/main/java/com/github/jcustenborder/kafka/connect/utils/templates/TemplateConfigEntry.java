@@ -27,8 +27,9 @@ public class TemplateConfigEntry {
   private final String validator;
   private final String type;
   private final boolean isRequired;
+  private final String group;
 
-  private TemplateConfigEntry(String name, ConfigDef.Importance importance, String doc, Object defaultValue, ConfigDef.Validator validator, ConfigDef.Type type, boolean isRequired) {
+  private TemplateConfigEntry(String name, ConfigDef.Importance importance, String doc, Object defaultValue, ConfigDef.Validator validator, ConfigDef.Type type, boolean isRequired, String group) {
     this.name = name;
     this.importance = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, importance.toString());
     this.doc = !Strings.isNullOrEmpty(doc) ? doc : "";
@@ -36,38 +37,73 @@ public class TemplateConfigEntry {
     this.validator = null != validator ? validator.toString() : "";
     this.type = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, type.toString());
     this.isRequired = isRequired;
-  }
-
-  public String name() {
-    return name;
-  }
-
-  public String importance() {
-    return importance;
-  }
-
-  public String doc() {
-    return doc;
-  }
-
-  public String defaultValue() {
-    return defaultValue;
-  }
-
-  public String validator() {
-    return validator;
-  }
-
-  public String type() {
-    return this.type;
+    this.group = group;
   }
 
   public static TemplateConfigEntry of(ConfigDef.ConfigKey configKey) {
 
     return new TemplateConfigEntry(configKey.name, configKey.importance,
         configKey.documentation, configKey.defaultValue, configKey.validator, configKey.type,
-        !configKey.hasDefault()
+        !configKey.hasDefault(),
+        configKey.group
     );
+
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getImportance() {
+    return importance;
+  }
+
+  public String getDoc() {
+    return doc;
+  }
+
+  public String getDefaultValue() {
+    return defaultValue;
+  }
+
+  public String getValidator() {
+    return validator;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  //  public String name() {
+//    return name;
+//  }
+//
+//  public String importance() {
+//    return importance;
+//  }
+//
+//  public String doc() {
+//    return doc;
+//  }
+//
+//  public String defaultValue() {
+//    return defaultValue;
+//  }
+//
+//  public String validator() {
+//    return validator;
+//  }
+//
+//  public String type() {
+//    return this.type;
+//  }
+//
+//  public String group() {
+//    return this.group;
+//  }
+
+  public String getGroup() {
+    return group;
   }
 
   public boolean isRequired() {

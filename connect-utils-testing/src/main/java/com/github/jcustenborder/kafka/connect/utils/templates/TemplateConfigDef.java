@@ -54,12 +54,12 @@ public class TemplateConfigDef implements Table {
 
     for (TemplateConfigEntry entry : this.configs) {
       result.add(ImmutableList.of(
-          entry.name(),
-          entry.type(),
-          entry.importance(),
-          entry.defaultValue(),
-          entry.validator(),
-          entry.doc()
+          entry.getName(),
+          entry.getType(),
+          entry.getImportance(),
+          entry.getDefaultValue(),
+          entry.getValidator(),
+          entry.getDoc()
           )
       );
     }
@@ -67,6 +67,9 @@ public class TemplateConfigDef implements Table {
     return ImmutableList.copyOf(result);
   }
 
+  public List<TemplateConfigEntry> getConfigs() {
+    return this.configs;
+  }
   public List<TemplateConfigEntry> getRequiredConfigs() {
     return this.configs.stream().filter(entry -> entry.isRequired()).collect(Collectors.toList());
   }

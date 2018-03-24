@@ -15,15 +15,23 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.templates.markdown;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.jcustenborder.kafka.connect.utils.templates.ConnectorTemplate;
 import com.github.jcustenborder.kafka.connect.utils.templates.Table;
+import com.github.jcustenborder.kafka.connect.utils.templates.TemplateHelper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
-public class MarkdownTemplateHelper {
+public class MarkdownTemplateHelper extends TemplateHelper {
+
+
   static void lengths(List<Integer> lengths, List<List<String>> rows) {
     if (lengths.isEmpty()) {
       for (int i = 0; i < rows.get(0).size(); i++) {
@@ -43,6 +51,45 @@ public class MarkdownTemplateHelper {
         lengths.set(i, value);
       }
     }
+
+  }
+
+
+  public String jsonExample(ConnectorTemplate template) {
+    ObjectNode outputNode = createJsonNode(template);
+
+    StringWriter writer = new StringWriter();
+    writer.write("```json");
+    writer.write('\n');
+    try {
+      this.objectMapper.writeValue(writer, outputNode);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+    writer.write('\n');
+    writer.write("```");
+
+    return writer.toString();
+  }
+
+
+  public String propertiesExample(ConnectorTemplate template) {
+    StringWriter writer = new StringWriter();
+    writer.write("```properties");
+    writer.write('\n');
+
+    Properties properties = createProperties(template);
+
+    try {
+      properties.store(writer, "");
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+    writer.write("```");
+
+    String result = writer.toString();
+    result = result.replaceAll("#.*\\n", "");
+    return result.trim();
 
   }
 

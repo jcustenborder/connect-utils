@@ -66,6 +66,7 @@ public class TestSinkConnector extends SinkConnector {
   @Override
   public ConfigDef config() {
     return new ConfigDef()
-        .define("testing.bar", ConfigDef.Type.INT, ConfigDef.Importance.HIGH, "Testing the bar object.");
+        .define("testing.bar", ConfigDef.Type.INT, ConfigDef.Importance.HIGH, "Testing the bar object.")
+        .define("testing.foo", ConfigDef.Type.INT, ConfigDef.Importance.HIGH, "Testing the bar object.");
   }
 }
