@@ -205,6 +205,12 @@ public abstract class BaseDocumentationTest {
       try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
         process(writer, template, configurable);
       }
+
+      for (Example example : configurable.getExamples()) {
+        example.writeJsonExample(parentDirectory);
+        example.writePropertiesExample(parentDirectory);
+      }
+
     });
   }
 
@@ -295,36 +301,44 @@ public abstract class BaseDocumentationTest {
   }
 
   @TestFactory
-  public Stream<DynamicTest> rstTransformations() {
+  public Stream<DynamicTest> rstTransformations() throws IOException, TemplateException {
+    if (!this.pluginData.getTransformations().isEmpty()) {
+      final File outputFile = new File(outputDirectory, "transformations.rst");
+      if (!this.pluginData.getSinkConnectors().isEmpty() ||
+          !this.pluginData.getSourceConnectors().isEmpty()) {
+        Template template = configuration.getTemplate("rst/transformations.rst.ftl");
+        try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+          process(writer, template, this.pluginData);
+        }
+      }
+    }
+
     final File parentDirectory = new File(outputDirectory, "transformations");
     final String templateName = "rst/transformation.rst.ftl";
     return this.pluginData.getTransformations().stream().map(connectorTemplate -> transformRstTest(connectorTemplate, templateName, parentDirectory));
   }
 
   @TestFactory
-  public Stream<DynamicTest> rstSchema() throws IOException {
+  public Stream<DynamicTest> rstSchemas() throws IOException, TemplateException {
     final File parentDirectory = new File(outputDirectory, "schemas");
-    if (!parentDirectory.exists()) {
-      parentDirectory.mkdirs();
+    final List<Schema> schemas = schemas();
+
+    if (!schemas.isEmpty()) {
+      if (!parentDirectory.exists()) {
+        parentDirectory.mkdirs();
+      }
+
+      final File outputFile = new File(outputDirectory, "schemas.rst");
+      final String templateName = "rst/schemas.rst.ftl";
+
+      if (!this.pluginData.getSinkConnectors().isEmpty() ||
+          !this.pluginData.getSourceConnectors().isEmpty()) {
+        Template template = configuration.getTemplate(templateName);
+        try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+          process(writer, template, this.pluginData);
+        }
+      }
     }
-
-    List<Schema> schemas = schemas();
-
-    if (null != schemas && !schemas.isEmpty()) {
-      final File schemaRstPath = new File(outputDirectory, "schemas.rst");
-      final String schemaRst = "=======\n" +
-          "Schemas\n" +
-          "=======\n" +
-          "\n" +
-          ".. toctree::\n" +
-          "    :maxdepth: 0\n" +
-          "    :caption: Schemas:\n" +
-          "    :glob:\n" +
-          "\n" +
-          "    schemas/*";
-      Files.write(schemaRst, schemaRstPath, Charsets.UTF_8);
-    }
-
 
     final String templateName = "rst/schema.rst.ftl";
     return this.schemas().stream()
@@ -353,7 +367,21 @@ public abstract class BaseDocumentationTest {
   }
 
   @Test
-  public void rst() throws IOException, TemplateException {
+  public void rstConnectors() throws IOException, TemplateException {
+    final File outputFile = new File(outputDirectory, "connectors.rst");
+    final String templateName = "rst/connectors.rst.ftl";
+
+    if (!this.pluginData.getSinkConnectors().isEmpty() ||
+        !this.pluginData.getSourceConnectors().isEmpty()) {
+      Template template = configuration.getTemplate(templateName);
+      try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+        process(writer, template, this.pluginData);
+      }
+    }
+  }
+
+  @Test
+  public void readmeRST() throws IOException, TemplateException {
     final File outputFile = new File("target", "README.rst");
     Template template = configuration.getTemplate("rst/README.rst.ftl");
     log.info("Writing {}", outputFile);
@@ -364,7 +392,7 @@ public abstract class BaseDocumentationTest {
   }
 
   @Test
-  public void markdown() throws IOException, TemplateException {
+  public void readmeMD() throws IOException, TemplateException {
     final File outputFile = new File("target", "README.md");
     Template template = configuration.getTemplate("md/README.md.ftl");
     final String output;

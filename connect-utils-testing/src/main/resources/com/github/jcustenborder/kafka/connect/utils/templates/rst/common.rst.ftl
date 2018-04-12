@@ -115,7 +115,13 @@ example.
 
 <#if example.type == "Connector">
 
+**Distributed Mode Json**
+
 ${rstHelper.jsonExample(example)}
+
+**Standalone Mode Properties**
+
+${rstHelper.propertiesExample(example)}
 
 <#elseif example.type == "Transformation">
 transformation

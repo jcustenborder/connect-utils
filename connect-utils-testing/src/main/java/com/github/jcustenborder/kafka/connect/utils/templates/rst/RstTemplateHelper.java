@@ -83,28 +83,21 @@ public class RstTemplateHelper extends TemplateHelper {
   public String jsonExample(Example example) {
     StringWriter writer = new StringWriter();
 
-    final ObjectNode outputNode = createJsonNode(example);
-    final String json;
-    try {
-      json = this.objectMapper.writeValueAsString(outputNode);
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(e);
-    }
+    writer.write(".. literalinclude:: " + example.getExampleJsonFile());
+    writer.write('\n');
+    writer.write("    :language: JSON");
+    writer.write('\n');
+//    writer.write("    :name: connector.json");
+//    writer.write('\n');
+    return writer.toString();
+  }
 
-    writer.write(".. code-block:: json");
+  public String propertiesExample(Example example) {
+    StringWriter writer = new StringWriter();
+
+    writer.write(".. literalinclude:: " + example.getExamplePropertiesFile());
     writer.write('\n');
-    writer.write("    :caption: Connect Distributed REST example");
-    writer.write('\n');
-    writer.write("    :name: connector.json");
-    writer.write('\n');
-    List<Integer> emphasizeLines = emphasizeLines(json);
-    if (!emphasizeLines.isEmpty()) {
-      writer.write("    :emphasize-lines: ");
-      writer.write(Joiner.on(',').join(emphasizeLines));
-      writer.write('\n');
-    }
-    writer.write('\n');
-    writer.write(indent(json));
+    writer.write("    :language: properties");
     writer.write('\n');
     return writer.toString();
   }
@@ -129,6 +122,8 @@ public class RstTemplateHelper extends TemplateHelper {
     }
     return writer.toString();
   }
+
+
 
   public String propertiesExample(Configurable template) {
     StringWriter writer = new StringWriter();

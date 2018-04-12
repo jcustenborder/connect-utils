@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@ import java.util.List;
 public class SchemaData {
 
   final String name;
+  final String shortName;
   final String doc;
   final Schema.Type type;
   final List<FieldData> fields;
@@ -36,6 +37,19 @@ public class SchemaData {
 
   private SchemaData(Schema schema) {
     this.name = schema.name();
+
+    if(Strings.isNullOrEmpty(this.name)) {
+      this.shortName = this.name;
+    } else {
+      int i = this.name.lastIndexOf(".");
+      if (i > 0) {
+        this.shortName = this.name.substring(i + 1);
+      } else {
+        this.shortName = this.name;
+      }
+    }
+
+
     this.doc = Strings.isNullOrEmpty(schema.doc()) ? "" : schema.doc();
     this.type = schema.type();
     this.required = !schema.isOptional();
@@ -57,6 +71,10 @@ public class SchemaData {
 
   public String getName() {
     return name;
+  }
+
+  public String getShortName() {
+    return shortName;
   }
 
   public String getDoc() {
@@ -115,5 +133,7 @@ public class SchemaData {
     public SchemaData getSchema() {
       return this.schema;
     }
+
+
   }
 }

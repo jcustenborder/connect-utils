@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
+
+import com.google.common.base.CaseFormat;
 
 public class AnnotationHelper {
 
@@ -26,7 +28,7 @@ public class AnnotationHelper {
     Title annotation = c.getAnnotation(Title.class);
     return (null != annotation) ? annotation.value() : c.getSimpleName();
   }
-  
+
   public static String danger(Class<?> c) {
     DocumentationDanger annotation = c.getAnnotation(DocumentationDanger.class);
     return (null != annotation) ? annotation.value() : null;
@@ -80,5 +82,10 @@ public class AnnotationHelper {
   public static String warning(Package p) {
     DocumentationWarning annotation = p.getAnnotation(DocumentationWarning.class);
     return (null != annotation) ? annotation.value() : null;
+  }
+
+  public static String title(Package p) {
+    Title annotation = p.getAnnotation(Title.class);
+    return (null != annotation) ? annotation.value() : CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, p.getName());
   }
 }

@@ -56,27 +56,27 @@ curl -s -X PUT -H 'Content-Type: application/json' --data @connector.json http:/
 <#if connector.danger??>
 ### Danger
 
-${ connector.danger}
+${connector.danger}
 </#if>
 <#if connector.warning??>
 ### Warning
 
-${ connector.warning}
+${connector.warning}
 </#if>
 <#if connector.important??>
 ### Important
 
-${ connector.important}
+${connector.important}
 </#if>
 <#if connector.note??>
 ### Note
 
-${ connector.note}
+${connector.note}
 </#if>
 <#if connector.tip??>
 ### Tip
 
-${ connector.tip}
+${connector.tip}
 </#if>
 </#macro>
 

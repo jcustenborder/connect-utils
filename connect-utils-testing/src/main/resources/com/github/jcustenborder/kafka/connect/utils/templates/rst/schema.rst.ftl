@@ -1,11 +1,13 @@
 <#-- @formatter:off --><#include "common.rst.ftl">
-<@section text=input.name />
+<@section text=input.shortName />
 
 <#if input.doc?has_content >
 ${input.doc}
 </#if>
 
 <#if input.type == "STRUCT">
+
+<@subsection text="Fields"/>
 
 <#list input.fields as field>
 

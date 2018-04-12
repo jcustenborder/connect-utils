@@ -38,6 +38,7 @@ public class PluginData {
   private final String danger;
   private final String note;
   private final String introduction;
+  private final String title;
 
   private PluginData(Package p, List<SourceConnectorData> sourceConnectors, List<SinkConnectorData> sinkConnectors, List<TransformationData> transformations) {
     this.sourceConnectors = ImmutableList.copyOf(sourceConnectors);
@@ -50,6 +51,7 @@ public class PluginData {
     this.danger = AnnotationHelper.danger(p);
     this.note = AnnotationHelper.note(p);
     this.introduction = AnnotationHelper.introduction(p);
+    this.title = AnnotationHelper.title(p);
   }
 
   public static PluginData from(
@@ -135,5 +137,9 @@ public class PluginData {
 
   public String getIntroduction() {
     return introduction;
+  }
+
+  public String getTitle() {
+    return title;
   }
 }
