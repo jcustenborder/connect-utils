@@ -1,7 +1,10 @@
 <#-- @formatter:off --><#macro config connector>
 ### Configuration
 
-<#list connector.config.configs as item>
+<#list connector.config.groups as group>
+<#list group.items as item >
+#### ${group.name}
+
 ##### `${item.name}`
 *Importance:* ${item.importance}
 
@@ -15,6 +18,7 @@
 </#if>
 
 ${item.doc}
+</#list>
 </#list>
 
 #### Examples
@@ -48,6 +52,34 @@ curl -s -X PUT -H 'Content-Type: application/json' --data @connector.json http:/
 
 </#macro>
 
+<#macro banners connector>
+<#if connector.danger??>
+### Danger
+
+${ connector.danger}
+</#if>
+<#if connector.warning??>
+### Warning
+
+${ connector.warning}
+</#if>
+<#if connector.important??>
+### Important
+
+${ connector.important}
+</#if>
+<#if connector.note??>
+### Note
+
+${ connector.note}
+</#if>
+<#if connector.tip??>
+### Tip
+
+${ connector.tip}
+</#if>
+</#macro>
+
 <#macro details connector>
 ## ${connector.title}
 
@@ -55,33 +87,6 @@ curl -s -X PUT -H 'Content-Type: application/json' --data @connector.json http:/
 ${connector.description}
 </#if>
 
-<#if connector.danger??>
-### Danger
+<@banners connector=connector/>
 
-${ connector.danger}
-</#if>
-
-<#if connector.warning??>
-### Warning
-
-${ connector.warning}
-</#if>
-
-<#if connector.important??>
-### Important
-
-${ connector.important}
-</#if>
-
-<#if connector.note??>
-### Note
-
-${ connector.note}
-</#if>
-
-<#if connector.tip??>
-### Tip
-
-${ connector.tip}
-</#if>
 </#macro>

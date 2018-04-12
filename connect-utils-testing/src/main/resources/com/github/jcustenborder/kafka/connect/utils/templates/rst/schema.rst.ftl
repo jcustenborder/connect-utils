@@ -1,8 +1,28 @@
 <#-- @formatter:off --><#include "common.rst.ftl">
-<@section text=input.title />
+<@section text=input.name />
 
-<#if input.schema.doc()?has_content >
-${input.schema.doc()}
+<#if input.doc?has_content >
+${input.doc}
 </#if>
 
-${helper.table(input)}
+<#if input.type == "STRUCT">
+
+<#list input.fields as field>
+
+<@subsubsection text=field.name/>
+
+<#if field.name?has_content >
+${field.schema.doc}
+</#if>
+
+**Optional:** ${field.schema.required?string('yes', 'no')}
+
+**Type:** ${field.schema.displayType}
+
+<#if field.schema.defaultValue?has_content>**Default Value:** ${field.schema.defaultValue}
+
+</#if>
+
+</#list>
+
+</#if>

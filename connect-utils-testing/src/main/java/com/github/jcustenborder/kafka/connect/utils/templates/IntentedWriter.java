@@ -23,6 +23,10 @@ import java.io.Writer;
 public class IntentedWriter extends PrintWriter {
   int indent = 0;
 
+  public IntentedWriter(Writer out) {
+    super(out);
+  }
+
   public void increase() {
     indent++;
   }
@@ -30,11 +34,6 @@ public class IntentedWriter extends PrintWriter {
   public void decrease() {
     indent--;
   }
-
-  public IntentedWriter(Writer out) {
-    super(out);
-  }
-
 
   @Override
   public void write(String s) {

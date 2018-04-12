@@ -17,12 +17,10 @@ package com.github.jcustenborder.kafka.connect.utils.templates.rst;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.jcustenborder.kafka.connect.utils.templates.ConnectorTemplate;
-import com.github.jcustenborder.kafka.connect.utils.templates.IntentedWriter;
-import com.github.jcustenborder.kafka.connect.utils.templates.Table;
+import com.github.jcustenborder.kafka.connect.utils.docs.Example;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.Configurable;
 import com.github.jcustenborder.kafka.connect.utils.templates.TemplateHelper;
 import com.google.common.base.Joiner;
-import com.opencsv.CSVWriter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +31,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class RstTemplateHelper extends TemplateHelper {
 
@@ -54,7 +51,7 @@ public class RstTemplateHelper extends TemplateHelper {
     return result;
   }
 
-  public String jsonExample(ConnectorTemplate template) {
+  public String jsonExample(Configurable template) {
     StringWriter writer = new StringWriter();
 
     final ObjectNode outputNode = createJsonNode(template);
@@ -66,6 +63,37 @@ public class RstTemplateHelper extends TemplateHelper {
     }
 
     writer.write(".. code-block:: json");
+    writer.write('\n');
+    writer.write("    :caption: Connect Distributed REST example");
+    writer.write('\n');
+    writer.write("    :name: connector.json");
+    writer.write('\n');
+    List<Integer> emphasizeLines = emphasizeLines(json);
+    if (!emphasizeLines.isEmpty()) {
+      writer.write("    :emphasize-lines: ");
+      writer.write(Joiner.on(',').join(emphasizeLines));
+      writer.write('\n');
+    }
+    writer.write('\n');
+    writer.write(indent(json));
+    writer.write('\n');
+    return writer.toString();
+  }
+
+  public String jsonExample(Example example) {
+    StringWriter writer = new StringWriter();
+
+    final ObjectNode outputNode = createJsonNode(example);
+    final String json;
+    try {
+      json = this.objectMapper.writeValueAsString(outputNode);
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException(e);
+    }
+
+    writer.write(".. code-block:: json");
+    writer.write('\n');
+    writer.write("    :caption: Connect Distributed REST example");
     writer.write('\n');
     writer.write("    :name: connector.json");
     writer.write('\n');
@@ -102,7 +130,7 @@ public class RstTemplateHelper extends TemplateHelper {
     return writer.toString();
   }
 
-  public String propertiesExample(ConnectorTemplate template) {
+  public String propertiesExample(Configurable template) {
     StringWriter writer = new StringWriter();
     Properties properties = createProperties(template);
 
@@ -128,27 +156,5 @@ public class RstTemplateHelper extends TemplateHelper {
     writer.write('\n');
     writer.write(result);
     return writer.toString();
-  }
-
-  public String table(Table table) {
-    try (StringWriter writer = new StringWriter()) {
-      try (IntentedWriter printWriter = new IntentedWriter(writer)) {
-        printWriter.write(String.format(".. csv-table:: %s\n", table.getTitle()));
-        printWriter.increase();
-        printWriter.write(String.format(":header: \"%s\"\n", Joiner.on("\", \"").join(table.getHeaders())));
-        printWriter.write(":widths: auto\n");
-        printWriter.println();
-
-        try (CSVWriter csvWriter = new CSVWriter(printWriter)) {
-          final List<String[]> rows = table.getRowData().stream()
-              .map(strings -> strings.toArray(new String[strings.size()]))
-              .collect(Collectors.toList());
-          csvWriter.writeAll(rows);
-        }
-      }
-      return writer.toString();
-    } catch (IOException ex) {
-      throw new IllegalStateException(ex);
-    }
   }
 }

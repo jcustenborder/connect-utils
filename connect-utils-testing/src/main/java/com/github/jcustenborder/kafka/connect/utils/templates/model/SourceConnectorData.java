@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jcustenborder.kafka.connect.utils.templates;
+package com.github.jcustenborder.kafka.connect.utils.templates.model;
 
-import java.util.List;
-
-public interface Table {
-  String getTitle();
-
-  List<String> getHeaders();
-
-  List<List<String>> getRowData();
+public class SourceConnectorData extends Configurable {
+  public SourceConnectorData(Class<?> cls) {
+    super(cls);
+  }
 }

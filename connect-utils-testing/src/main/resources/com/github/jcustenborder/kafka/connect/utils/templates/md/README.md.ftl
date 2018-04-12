@@ -1,6 +1,10 @@
 <#-- @formatter:off --><#include "common.md.ftl">
 # Introduction
 
+<#if input.introduction?has_content>${input.introduction}</#if>
+
+<@banners connector=input/>
+
 <#if input.sourceConnectors?has_content>
 # Source Connectors
 
