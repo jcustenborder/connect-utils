@@ -7,7 +7,6 @@
   "important": "Praesent sem felis, pellentesque nec volutpat in, eleifend at quam. Morbi venenatis magna eu lectus cursus, ut gravida lectus condimentum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Curabitur porta sed arcu suscipit luctus. Fusce dapibus mauris id libero dapibus, id ullamcorper arcu fringilla. Nulla aliquet mattis urna. Sed nibh ligula, ultricies at lacinia non, pellentesque vel lectus.",
   "tip": "Suspendisse sit amet purus nec est tempor vestibulum. In malesuada volutpat odio ac sodales. Integer laoreet enim ante, ac porttitor ante consequat id. Nulla eu aliquam enim. Donec risus eros, condimentum non magna vitae, lobortis sollicitudin arcu. Nullam id diam lorem. Sed in fringilla sem. Morbi sit amet tincidunt diam. Pellentesque ornare libero sed metus blandit pulvinar. Ut mattis nec risus vel pulvinar. Nam quis eleifend elit. Cras est erat, ullamcorper at velit id, porttitor auctor purus. Aenean consectetur ligula sem, nec lacinia nisl elementum ac. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
   "config":{
-    "testing.bar": "321",
-    "testing.foo": "123"
+    "important": "321"
   }
 }

@@ -124,7 +124,14 @@ ${rstHelper.jsonExample(example)}
 ${rstHelper.propertiesExample(example)}
 
 <#elseif example.type == "Transformation">
-transformation
+
+**Distributed Mode Json**
+
+${rstHelper.jsonExample(example)}
+
+**Standalone Mode Properties**
+
+${rstHelper.propertiesExample(example)}
 
 <#elseif example.type == "Converter">
 converter

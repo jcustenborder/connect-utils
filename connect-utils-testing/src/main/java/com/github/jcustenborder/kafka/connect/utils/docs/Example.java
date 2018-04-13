@@ -44,10 +44,6 @@ public class Example {
   @JsonIgnore
   String resourceFile;
   @JsonIgnore
-  String exampleJsonFile;
-  @JsonIgnore
-  String examplePropertiesFile;
-  @JsonIgnore
   Type type;
 
   @JsonProperty
@@ -67,13 +63,57 @@ public class Example {
   @JsonProperty
   String tip;
 
+  public String getExamplePrefix() {
+    StringBuilder builder = new StringBuilder();
+
+    if (Transformation.class.isAssignableFrom(this.className)) {
+      if ("Key".equalsIgnoreCase(this.className.getSimpleName()) || "Value".equalsIgnoreCase(this.className.getSimpleName())) {
+        builder.append(this.className.getSuperclass().getSimpleName());
+        builder.append('.');
+        builder.append(this.className.getSimpleName());
+      } else {
+        builder.append(this.className.getSimpleName());
+      }
+    } else {
+      builder.append(this.className.getSimpleName());
+    }
+    return builder.toString();
+  }
+
+  public String validateTestCaseName() {
+    return new File(getExamplePrefix(), this.resourceFile).toString();
+  }
+
   public String getExampleJsonFile() {
-    return exampleJsonFile;
+    StringBuilder builder = new StringBuilder();
+    builder.append(getExamplePrefix());
+    builder.append('.');
+    String n = Files.getNameWithoutExtension(this.resourceFile);
+    builder.append(n);
+    return getExamplePrefix() + "." + n + ".example.json";
   }
 
   public String getExamplePropertiesFile() {
-    return examplePropertiesFile;
+    StringBuilder builder = new StringBuilder();
+    builder.append(getExamplePrefix());
+    builder.append('.');
+    String n = Files.getNameWithoutExtension(this.resourceFile);
+    builder.append(n);
+    return getExamplePrefix() + "." + n + ".example.properties";
   }
+
+  String transformKey() {
+    StringBuilder builder = new StringBuilder();
+    if ("Key".equalsIgnoreCase(this.className.getSimpleName()) || "Value".equalsIgnoreCase(this.className.getSimpleName())) {
+      builder.append(this.className.getSuperclass().getSimpleName());
+      builder.append(this.className.getSimpleName());
+    } else {
+      builder.append(this.className.getSimpleName());
+    }
+    String result = builder.toString();
+    return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, result);
+  }
+
 
   public static Example load(Class cls, String resourceName) {
     log.info("Loading {} with class {}", resourceName, cls);
@@ -81,9 +121,7 @@ public class Example {
       Example example = ObjectMapperFactory.INSTANCE.readValue(inputStream, Example.class);
       example.className = cls;
       example.resourceFile = new File(resourceName).getName();
-      String n = Files.getNameWithoutExtension(resourceName);
-      example.exampleJsonFile = String.format("%s.example.%s.json", cls.getSimpleName(), n);
-      example.examplePropertiesFile = String.format("%s.example.%s.properties", cls.getSimpleName(), n);
+
 
       if (Connector.class.isAssignableFrom(cls)) {
         example.type = Type.Connector;
@@ -103,41 +141,26 @@ public class Example {
     return type;
   }
 
-  public void setType(Type type) {
-    this.type = type;
-  }
 
   public String getDanger() {
     return danger;
   }
 
-  public void setDanger(String danger) {
-    this.danger = danger;
-  }
 
   public String getImportant() {
     return important;
   }
 
-  public void setImportant(String important) {
-    this.important = important;
-  }
 
   public String getWarning() {
     return warning;
   }
 
-  public void setWarning(String warning) {
-    this.warning = warning;
-  }
 
   public String getTip() {
     return tip;
   }
 
-  public void setTip(String tip) {
-    this.tip = tip;
-  }
 
   public String resourceFile() {
     return this.resourceFile;
@@ -155,49 +178,31 @@ public class Example {
     return name;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
 
   public String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
 
   public String getNote() {
     return note;
   }
 
-  public void setNote(String note) {
-    this.note = note;
-  }
 
   public Class getClassName() {
     return className;
   }
 
-  public void setClassName(Class className) {
-    this.className = className;
-  }
 
   public String getResourceFile() {
     return resourceFile;
   }
 
-  public void setResourceFile(String resourceFile) {
-    this.resourceFile = resourceFile;
-  }
 
   public Map<String, String> getConfig() {
     return config;
   }
 
-  public void setConfig(Map<String, String> config) {
-    this.config = config;
-  }
 
   private ObjectNode connectorJson() {
     ObjectNode node = ObjectMapperFactory.INSTANCE.createObjectNode();
@@ -233,6 +238,38 @@ public class Example {
     return properties;
   }
 
+  private ObjectNode transformationJson() {
+    ObjectNode node = ObjectMapperFactory.INSTANCE.createObjectNode();
+    node.put("name", "connector1");
+
+    ObjectNode config = ObjectMapperFactory.INSTANCE.createObjectNode();
+    node.set("config", config);
+    config.put("connector.class", "...");
+    config.put("tasks.max", "1");
+    String key = transformKey();
+
+
+    config.put("transforms", key);
+    config.put(key + ".type", this.className.getName());
+    for (Map.Entry<String, String> kvp : this.config.entrySet()) {
+      config.put(key + "." + kvp.getKey(), kvp.getValue());
+    }
+    return node;
+  }
+
+  private Properties transformationProperties() {
+    Properties properties = new Properties();
+    properties.put("connector.class", "...");
+    properties.put("tasks.max", "1");
+    String key = transformKey();
+    config.put("transforms", key);
+    config.put(key + ".type", this.className.getName());
+    for (Map.Entry<String, String> kvp : this.config.entrySet()) {
+      properties.put(key + "." + kvp.getKey(), kvp.getValue());
+    }
+    return properties;
+  }
+
   public void writePropertiesExample(File parentFolder) throws IOException {
     final Properties example;
 
@@ -240,16 +277,20 @@ public class Example {
       case Connector:
         example = connectorProperties();
         break;
+      case Transformation:
+        example = transformationProperties();
+        break;
       default:
         throw new UnsupportedOperationException(
             String.format("%s is not supported", this.type)
         );
     }
-    File outputFile = new File(parentFolder, this.examplePropertiesFile);
+    File outputFile = new File(parentFolder, this.getExamplePropertiesFile());
     try (FileWriter writer = new FileWriter(outputFile)) {
       example.store(writer, "");
     }
   }
+
 
   public void writeJsonExample(File parentFolder) throws IOException {
     final ObjectNode example;
@@ -258,12 +299,15 @@ public class Example {
       case Connector:
         example = connectorJson();
         break;
+      case Transformation:
+        example = transformationJson();
+        break;
       default:
         throw new UnsupportedOperationException(
             String.format("%s is not supported", this.type)
         );
     }
-    File outputFile = new File(parentFolder, this.exampleJsonFile);
+    File outputFile = new File(parentFolder, this.getExampleJsonFile());
     ObjectMapperFactory.INSTANCE.configure(SerializationFeature.INDENT_OUTPUT, true);
     ObjectMapperFactory.INSTANCE.writeValue(outputFile, example);
 

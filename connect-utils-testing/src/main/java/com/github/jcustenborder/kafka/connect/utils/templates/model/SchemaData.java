@@ -38,7 +38,7 @@ public class SchemaData {
   private SchemaData(Schema schema) {
     this.name = schema.name();
 
-    if(Strings.isNullOrEmpty(this.name)) {
+    if (Strings.isNullOrEmpty(this.name)) {
       this.shortName = this.name;
     } else {
       int i = this.name.lastIndexOf(".");

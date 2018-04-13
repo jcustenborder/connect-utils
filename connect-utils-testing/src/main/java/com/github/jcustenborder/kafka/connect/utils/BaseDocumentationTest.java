@@ -126,10 +126,18 @@ public abstract class BaseDocumentationTest {
 
   static Map<Class, PluginData> pluginTemplateLookup = new LinkedHashMap<>();
 
+  final File outputDirectory = new File("target/docs");
+
+
   @BeforeEach
   public void before() throws MalformedURLException {
     log.info("before() - {}", this.getClass());
     Package pkg = this.getPackage();
+
+    if (!outputDirectory.isDirectory()) {
+      outputDirectory.mkdirs();
+    }
+
 
     this.pluginData = pluginTemplateLookup.computeIfAbsent(this.getClass(), c -> {
       Reflections reflections = new Reflections(new ConfigurationBuilder()
@@ -224,6 +232,11 @@ public abstract class BaseDocumentationTest {
     return dynamicTest(testName, () -> {
       final File outputFile = new File(parentDirectory, testName.toLowerCase() + ".rst");
 
+      for (Example example : transformationTemplate.getExamples()) {
+        example.writeJsonExample(parentDirectory);
+        example.writePropertiesExample(parentDirectory);
+      }
+
       Template template = configuration.getTemplate(templateName);
       log.info("Writing {}", outputFile);
       try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
@@ -232,7 +245,6 @@ public abstract class BaseDocumentationTest {
     });
   }
 
-  final File outputDirectory = new File("target/docs");
 
   @TestFactory
   public Stream<DynamicTest> rstSources() {
@@ -263,7 +275,7 @@ public abstract class BaseDocumentationTest {
     this.pluginData.all().stream().forEach(p -> examples.addAll(p.getExamples()));
 
     return examples.stream()
-        .map(e -> dynamicTest(String.format("%s/%s", e.className().getSimpleName(), e.resourceFile()), () -> {
+        .map(e -> dynamicTest(e.validateTestCaseName(), () -> {
           Object instance = e.className().newInstance();
           final ConfigDef configDef;
           if (instance instanceof SourceConnector) {
