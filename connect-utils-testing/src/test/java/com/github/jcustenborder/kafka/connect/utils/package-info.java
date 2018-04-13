@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jcustenborder.kafka.connect.utils.templates;
+@Introduction("This is an example of an introduction section for a plugin.")
+@Title("Testing")
+package com.github.jcustenborder.kafka.connect.utils;
 
-public class SourceConnectorTemplate extends ConnectorTemplate {
-  public SourceConnectorTemplate(Class<?> cls) {
-    super(cls);
-  }
-}
+import com.github.jcustenborder.kafka.connect.utils.config.Introduction;
+import com.github.jcustenborder.kafka.connect.utils.config.Title;

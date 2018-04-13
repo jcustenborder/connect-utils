@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jcustenborder.kafka.connect.utils.templates;
+package com.github.jcustenborder.kafka.connect.utils.config;
 
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface Table {
-  String getTitle();
-
-  List<String> getHeaders();
-
-  List<List<String>> getRowData();
+@Target({ElementType.PACKAGE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Introduction {
+  String value();
 }

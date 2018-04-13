@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jcustenborder.kafka.connect.utils.templates;
+package com.github.jcustenborder.kafka.connect.utils.templates.model;
 
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationDanger;
@@ -32,8 +32,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TemplateInput {
-  private static final Logger log = LoggerFactory.getLogger(TemplateInput.class);
+public class Input {
+  private static final Logger log = LoggerFactory.getLogger(Input.class);
   private String title;
   private String description;
   private String className;
@@ -42,43 +42,7 @@ public class TemplateInput {
   private String important;
   private String danger;
   private String note;
-  private TemplateConfigDef config;
-
-  public String getTitle() {
-    return title;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public String getClassName() {
-    return className;
-  }
-
-  public String getWarning() {
-    return warning;
-  }
-
-  public String getTip() {
-    return tip;
-  }
-
-  public String getNote() {
-    return note;
-  }
-
-  public String getImportant() {
-    return important;
-  }
-
-  public String getDanger() {
-    return danger;
-  }
-
-  public TemplateConfigDef getConfig() {
-    return this.config;
-  }
+  private Configuration config;
 
   private static String title(Class<?> aClass) {
     final String result;
@@ -164,7 +128,7 @@ public class TemplateInput {
     return result;
   }
 
-  private static void populateTemplate(Class<?> aClass, TemplateInput result, ConfigDef config) {
+  private static void populateTemplate(Class<?> aClass, Input result, ConfigDef config) {
     result.className = aClass.getName();
     result.title = title(aClass);
     result.description = description(aClass);
@@ -172,11 +136,11 @@ public class TemplateInput {
     result.warning = warning(aClass);
     result.important = important(aClass);
     result.danger = danger(aClass);
-    result.config = TemplateConfigDef.from(config);
+    result.config = Configuration.from(config);
   }
 
-  public static TemplateInput fromTransformation(Class<? extends Transformation> transform) throws IllegalAccessException, InstantiationException {
-    final TemplateInput result = new TemplateInput();
+  public static Input fromTransformation(Class<? extends Transformation> transform) throws IllegalAccessException, InstantiationException {
+    final Input result = new Input();
 
     Transformation sourceConnector = transform.newInstance();
     ConfigDef config = sourceConnector.config();
@@ -187,9 +151,8 @@ public class TemplateInput {
     return result;
   }
 
-
-  public static TemplateInput fromConnector(Class<? extends Connector> connectorClass) throws IllegalAccessException, InstantiationException {
-    final TemplateInput result = new TemplateInput();
+  public static Input fromConnector(Class<? extends Connector> connectorClass) throws IllegalAccessException, InstantiationException {
+    final Input result = new Input();
     Connector connector = connectorClass.newInstance();
     ConfigDef config = connector.config();
     assertNotNull(config, "config() cannot return a null.");
@@ -205,6 +168,42 @@ public class TemplateInput {
     if (length > current) {
       columnLengths.put(name, length);
     }
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getClassName() {
+    return className;
+  }
+
+  public String getWarning() {
+    return warning;
+  }
+
+  public String getTip() {
+    return tip;
+  }
+
+  public String getNote() {
+    return note;
+  }
+
+  public String getImportant() {
+    return important;
+  }
+
+  public String getDanger() {
+    return danger;
+  }
+
+  public Configuration getConfig() {
+    return this.config;
   }
 
 }

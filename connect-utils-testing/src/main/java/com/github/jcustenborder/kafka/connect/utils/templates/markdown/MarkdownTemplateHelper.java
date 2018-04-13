@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,16 +16,12 @@
 package com.github.jcustenborder.kafka.connect.utils.templates.markdown;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.jcustenborder.kafka.connect.utils.templates.ConnectorTemplate;
-import com.github.jcustenborder.kafka.connect.utils.templates.Table;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.Configurable;
 import com.github.jcustenborder.kafka.connect.utils.templates.TemplateHelper;
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -55,7 +51,7 @@ public class MarkdownTemplateHelper extends TemplateHelper {
   }
 
 
-  public String jsonExample(ConnectorTemplate template) {
+  public String jsonExample(Configurable template) {
     ObjectNode outputNode = createJsonNode(template);
 
     StringWriter writer = new StringWriter();
@@ -73,7 +69,7 @@ public class MarkdownTemplateHelper extends TemplateHelper {
   }
 
 
-  public String propertiesExample(ConnectorTemplate template) {
+  public String propertiesExample(Configurable template) {
     StringWriter writer = new StringWriter();
     writer.write("```properties");
     writer.write('\n');
@@ -91,51 +87,5 @@ public class MarkdownTemplateHelper extends TemplateHelper {
     result = result.replaceAll("#.*\\n", "");
     return result.trim();
 
-  }
-
-
-  public String table(Table table) {
-    StringBuilder builder = new StringBuilder();
-    List<Integer> lengths = new ArrayList<>();
-    lengths(lengths, Arrays.asList(table.getHeaders()));
-    lengths(lengths, table.getRowData());
-
-    int index = 0;
-    List<String> rowData = new ArrayList<>(lengths.size());
-    for (String columnHeader : table.getHeaders()) {
-      final int length = lengths.get(index);
-      String text = Strings.padEnd(columnHeader, length, ' ');
-      rowData.add(text);
-      index++;
-    }
-    builder.append("| ");
-    builder.append(Joiner.on(" | ").join(rowData));
-    builder.append("|\n");
-
-    rowData.clear();
-    for (Integer length : lengths) {
-      rowData.add(Strings.repeat("-", length));
-    }
-    builder.append("| ");
-    builder.append(Joiner.on(" | ").join(rowData));
-    builder.append("|\n");
-
-    for (List<String> row : table.getRowData()) {
-      index = 0;
-      rowData.clear();
-
-      for (String columnData : row) {
-        final int length = lengths.get(index);
-        String text = Strings.padEnd(columnData, length, ' ');
-        rowData.add(text);
-        index++;
-      }
-      builder.append("| ");
-      builder.append(Joiner.on(" | ").join(rowData));
-      builder.append("|\n");
-      index++;
-    }
-
-    return builder.toString();
   }
 }

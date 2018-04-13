@@ -15,18 +15,18 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import com.github.jcustenborder.kafka.connect.utils.templates.ConnectorTemplate;
-import com.github.jcustenborder.kafka.connect.utils.templates.PluginTemplate;
-import com.github.jcustenborder.kafka.connect.utils.templates.SourceConnectorTemplate;
-import com.github.jcustenborder.kafka.connect.utils.templates.TemplateSchema;
-import com.github.jcustenborder.kafka.connect.utils.templates.TransformationTemplate;
+import com.github.jcustenborder.kafka.connect.utils.docs.Example;
 import com.github.jcustenborder.kafka.connect.utils.templates.markdown.MarkdownTemplateHelper;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.Configurable;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.PluginData;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.SchemaData;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.SourceConnectorData;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.TransformationData;
 import com.github.jcustenborder.kafka.connect.utils.templates.rst.RstTemplateHelper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
@@ -40,6 +40,7 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.Graph;
 import guru.nidi.graphviz.model.Label;
 import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.common.config.ConfigValue;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.apache.kafka.connect.source.SourceConnector;
@@ -50,6 +51,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
@@ -64,6 +66,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,6 +76,7 @@ import java.util.stream.Stream;
 import static guru.nidi.graphviz.model.Factory.graph;
 import static guru.nidi.graphviz.model.Factory.node;
 import static guru.nidi.graphviz.model.Factory.to;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public abstract class BaseDocumentationTest {
@@ -82,7 +86,13 @@ public abstract class BaseDocumentationTest {
     return Arrays.asList();
   }
 
+  @Deprecated
   protected abstract String[] packages();
+
+  protected Package getPackage() {
+    return this.getClass().getPackage();
+  }
+
 
   static Configuration configuration;
   static ClassTemplateLoader loader;
@@ -101,40 +111,47 @@ public abstract class BaseDocumentationTest {
   }
 
 
-  Reflections reflections;
-
-  <T> List<Class<? extends T>> list(Class<T> cls) {
+  static <T> List<Class<? extends T>> list(Reflections reflections, Package pkg, Class<? extends T> cls) {
     List<Class<? extends T>> classes = reflections.getSubTypesOf(cls)
         .stream()
-        .filter(aClass -> packages.contains(aClass.getPackage().getName()))
-        .filter(aClass -> Modifier.isPublic(aClass.getModifiers()))
-        .filter(aClass -> !Modifier.isAbstract(aClass.getModifiers()))
+        .filter(c -> c.getName().startsWith(pkg.getName()))
+        .filter(c -> Modifier.isPublic(c.getModifiers()))
+        .filter(c -> !Modifier.isAbstract(c.getModifiers()))
         .collect(Collectors.toList());
     classes.sort(Comparator.comparing(Class::getName));
     return classes;
   }
 
-  PluginTemplate pluginTemplate;
-  Set<String> packages;
+  PluginData pluginData;
+
+  static Map<Class, PluginData> pluginTemplateLookup = new LinkedHashMap<>();
+
+  final File outputDirectory = new File("target/docs");
+
 
   @BeforeEach
   public void before() throws MalformedURLException {
-    log.info("before() - Configuring reflections to use package '{}'", packages());
+    log.info("before() - {}", this.getClass());
+    Package pkg = this.getPackage();
 
-    if (null == this.reflections) {
-      this.reflections = new Reflections(new ConfigurationBuilder()
-          .setUrls(ClasspathHelper.forJavaClassPath())
-          .forPackages(packages())
-      );
+    if (!outputDirectory.isDirectory()) {
+      outputDirectory.mkdirs();
     }
 
-    this.packages = ImmutableSet.copyOf(packages());
 
-    List<Class<? extends Transformation>> transformClasses = list(Transformation.class);
-    List<Class<? extends SourceConnector>> sourceConnectorClasses = list(SourceConnector.class);
-    List<Class<? extends SinkConnector>> sinkConnectorClasses = list(SinkConnector.class);
+    this.pluginData = pluginTemplateLookup.computeIfAbsent(this.getClass(), c -> {
+      Reflections reflections = new Reflections(new ConfigurationBuilder()
+          .setUrls(ClasspathHelper.forJavaClassPath())
+          .forPackages(pkg.getName())
+          .addScanners(new ResourcesScanner())
+      );
+      Set<String> resources = reflections.getResources(p -> p.endsWith(".json"));
 
-    this.pluginTemplate = PluginTemplate.from(sourceConnectorClasses, sinkConnectorClasses, transformClasses);
+      List<Class<? extends Transformation>> transformClasses = list(reflections, pkg, Transformation.class);
+      List<Class<? extends SourceConnector>> sourceConnectorClasses = list(reflections, pkg, SourceConnector.class);
+      List<Class<? extends SinkConnector>> sinkConnectorClasses = list(reflections, pkg, SinkConnector.class);
+      return PluginData.from(pkg, resources, sourceConnectorClasses, sinkConnectorClasses, transformClasses);
+    });
   }
 
   protected List<Map.Entry<String, ConfigDef.ConfigKey>> required(ConfigDef configDef) {
@@ -149,22 +166,22 @@ public abstract class BaseDocumentationTest {
     return ImmutableList.copyOf(entries);
   }
 
-  DynamicTest connectorRstTest(ConnectorTemplate connectorTemplate, final String templateName, final File parentDirectory) {
+  DynamicTest connectorRstTest(Configurable configurable, final String templateName, final File parentDirectory) {
     if (!parentDirectory.isDirectory()) {
       parentDirectory.mkdirs();
     }
 
 
-    return dynamicTest(connectorTemplate.getSimpleName(), () -> {
-      final File graphOutputFile = new File(parentDirectory, connectorTemplate.getDiagramFileName());
+    return dynamicTest(configurable.getSimpleName(), () -> {
+      final File graphOutputFile = new File(parentDirectory, configurable.getDiagramFileName());
 
       final Graph g;
-      if (connectorTemplate instanceof SourceConnectorTemplate) {
+      if (configurable instanceof SourceConnectorData) {
         g = graph()
             .graphAttr().with(RankDir.LEFT_TO_RIGHT)
             .directed()
             .with(
-                node(connectorTemplate.getSimpleName()).with(Shape.RECTANGLE)
+                node(configurable.getSimpleName()).with(Shape.RECTANGLE)
                     .link(
                         to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node("Kafka").with(Shape.RECTANGLE)).with(Label.of("Writes messages to")))).with(Label.of("Hosted by"))
 
@@ -177,7 +194,7 @@ public abstract class BaseDocumentationTest {
             .with(
                 node("Kafka").with(Shape.RECTANGLE)
                     .link(
-                        to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node(connectorTemplate.getSimpleName()).with(Shape.RECTANGLE)).with(Label.of("Writes data to")))).with(Label.of("Pulls Data from"))
+                        to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node(configurable.getSimpleName()).with(Shape.RECTANGLE)).with(Label.of("Writes data to")))).with(Label.of("Pulls Data from"))
 
                     )
             );
@@ -189,17 +206,23 @@ public abstract class BaseDocumentationTest {
           .render(Format.SVG_STANDALONE)
           .toFile(graphOutputFile);
 
-      final File outputFile = new File(parentDirectory, connectorTemplate.getSimpleName() + ".rst");
+      final File outputFile = new File(parentDirectory, configurable.getSimpleName() + ".rst");
 
       Template template = configuration.getTemplate(templateName);
       log.info("Writing {}", outputFile);
       try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
-        process(writer, template, connectorTemplate);
+        process(writer, template, configurable);
       }
+
+      for (Example example : configurable.getExamples()) {
+        example.writeJsonExample(parentDirectory);
+        example.writePropertiesExample(parentDirectory);
+      }
+
     });
   }
 
-  DynamicTest transformRstTest(TransformationTemplate transformationTemplate, final String templateName, final File parentDirectory) {
+  DynamicTest transformRstTest(TransformationData transformationTemplate, final String templateName, final File parentDirectory) {
     if (!parentDirectory.isDirectory()) {
       parentDirectory.mkdirs();
     }
@@ -209,6 +232,11 @@ public abstract class BaseDocumentationTest {
     return dynamicTest(testName, () -> {
       final File outputFile = new File(parentDirectory, testName.toLowerCase() + ".rst");
 
+      for (Example example : transformationTemplate.getExamples()) {
+        example.writeJsonExample(parentDirectory);
+        example.writePropertiesExample(parentDirectory);
+      }
+
       Template template = configuration.getTemplate(templateName);
       log.info("Writing {}", outputFile);
       try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
@@ -217,20 +245,19 @@ public abstract class BaseDocumentationTest {
     });
   }
 
-  final File outputDirectory = new File("target/docs");
 
   @TestFactory
-  public Stream<DynamicTest> sources() {
+  public Stream<DynamicTest> rstSources() {
     final File parentDirectory = new File(outputDirectory, "sources");
     final String templateName = "rst/source.rst.ftl";
-    return this.pluginTemplate.getSourceConnectors().stream().map(connectorTemplate -> connectorRstTest(connectorTemplate, templateName, parentDirectory));
+    return this.pluginData.getSourceConnectors().stream().map(connectorTemplate -> connectorRstTest(connectorTemplate, templateName, parentDirectory));
   }
 
   @TestFactory
-  public Stream<DynamicTest> sinks() {
+  public Stream<DynamicTest> rstSinks() {
     final File parentDirectory = new File(outputDirectory, "sinks");
     final String templateName = "rst/sink.rst.ftl";
-    return this.pluginTemplate.getSinkConnectors().stream().map(connectorTemplate -> connectorRstTest(connectorTemplate, templateName, parentDirectory));
+    return this.pluginData.getSinkConnectors().stream().map(connectorTemplate -> connectorRstTest(connectorTemplate, templateName, parentDirectory));
   }
 
   void process(Writer writer, Template template, Object input) throws IOException, TemplateException {
@@ -243,36 +270,87 @@ public abstract class BaseDocumentationTest {
   }
 
   @TestFactory
-  public Stream<DynamicTest> transformations() {
-    final File parentDirectory = new File(outputDirectory, "transformations");
-    final String templateName = "rst/transformation.rst.ftl";
-    return this.pluginTemplate.getTransformations().stream().map(connectorTemplate -> transformRstTest(connectorTemplate, templateName, parentDirectory));
+  public Stream<DynamicTest> validateExamples() {
+    List<Example> examples = new ArrayList<>();
+    this.pluginData.all().stream().forEach(p -> examples.addAll(p.getExamples()));
+
+    return examples.stream()
+        .map(e -> dynamicTest(e.validateTestCaseName(), () -> {
+          Object instance = e.className().newInstance();
+          final ConfigDef configDef;
+          if (instance instanceof SourceConnector) {
+            configDef = ((SourceConnector) instance).config();
+          } else if (instance instanceof SinkConnector) {
+            configDef = ((SinkConnector) instance).config();
+          } else if (instance instanceof Transformation) {
+            configDef = ((Transformation) instance).config();
+          } else {
+            throw new UnsupportedOperationException();
+          }
+
+          int errorCount = 0;
+          List<ConfigValue> values = configDef.validate(e.getConfig());
+          for (ConfigValue value : values) {
+            errorCount += value.errorMessages().size();
+          }
+
+          assertEquals(0, errorCount, () -> {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Example validation was not successful.");
+            builder.append('\n');
+
+            for (ConfigValue value : values) {
+              for (String s : value.errorMessages()) {
+                builder.append(value.name());
+                builder.append(": ");
+                builder.append(s);
+                builder.append('\n');
+              }
+            }
+            return builder.toString();
+          });
+        }));
   }
 
   @TestFactory
-  public Stream<DynamicTest> schema() throws IOException {
+  public Stream<DynamicTest> rstTransformations() throws IOException, TemplateException {
+    if (!this.pluginData.getTransformations().isEmpty()) {
+      final File outputFile = new File(outputDirectory, "transformations.rst");
+      if (!this.pluginData.getSinkConnectors().isEmpty() ||
+          !this.pluginData.getSourceConnectors().isEmpty()) {
+        Template template = configuration.getTemplate("rst/transformations.rst.ftl");
+        try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+          process(writer, template, this.pluginData);
+        }
+      }
+    }
+
+    final File parentDirectory = new File(outputDirectory, "transformations");
+    final String templateName = "rst/transformation.rst.ftl";
+    return this.pluginData.getTransformations().stream().map(connectorTemplate -> transformRstTest(connectorTemplate, templateName, parentDirectory));
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> rstSchemas() throws IOException, TemplateException {
     final File parentDirectory = new File(outputDirectory, "schemas");
-    if (!parentDirectory.exists()) {
-      parentDirectory.mkdirs();
+    final List<Schema> schemas = schemas();
+
+    if (!schemas.isEmpty()) {
+      if (!parentDirectory.exists()) {
+        parentDirectory.mkdirs();
+      }
+
+      final File outputFile = new File(outputDirectory, "schemas.rst");
+      final String templateName = "rst/schemas.rst.ftl";
+
+      if (!this.pluginData.getSinkConnectors().isEmpty() ||
+          !this.pluginData.getSourceConnectors().isEmpty()) {
+        Template template = configuration.getTemplate(templateName);
+        try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+          process(writer, template, this.pluginData);
+        }
+      }
     }
-
-    List<Schema> schemas = schemas();
-
-    if (null != schemas && !schemas.isEmpty()) {
-      final File schemaRstPath = new File(outputDirectory, "schemas.rst");
-      final String schemaRst = "=======\n" +
-          "Schemas\n" +
-          "=======\n" +
-          "\n" +
-          ".. toctree::\n" +
-          "    :maxdepth: 0\n" +
-          "    :caption: Schemas:\n" +
-          "    :glob:\n" +
-          "\n" +
-          "    schemas/*";
-      Files.write(schemaRst, schemaRstPath, Charsets.UTF_8);
-    }
-
 
     final String templateName = "rst/schema.rst.ftl";
     return this.schemas().stream()
@@ -292,7 +370,7 @@ public abstract class BaseDocumentationTest {
 
           try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
             Map<String, Object> variables = ImmutableMap.of(
-                "input", TemplateSchema.of(schema),
+                "input", SchemaData.of(schema),
                 "helper", new RstTemplateHelper()
             );
             template.process(variables, writer);
@@ -301,24 +379,38 @@ public abstract class BaseDocumentationTest {
   }
 
   @Test
-  public void rst() throws IOException, TemplateException {
+  public void rstConnectors() throws IOException, TemplateException {
+    final File outputFile = new File(outputDirectory, "connectors.rst");
+    final String templateName = "rst/connectors.rst.ftl";
+
+    if (!this.pluginData.getSinkConnectors().isEmpty() ||
+        !this.pluginData.getSourceConnectors().isEmpty()) {
+      Template template = configuration.getTemplate(templateName);
+      try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+        process(writer, template, this.pluginData);
+      }
+    }
+  }
+
+  @Test
+  public void readmeRST() throws IOException, TemplateException {
     final File outputFile = new File("target", "README.rst");
     Template template = configuration.getTemplate("rst/README.rst.ftl");
     log.info("Writing {}", outputFile);
     try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
-      process(writer, template, this.pluginTemplate);
+      process(writer, template, this.pluginData);
     }
 
   }
 
   @Test
-  public void markdown() throws IOException, TemplateException {
+  public void readmeMD() throws IOException, TemplateException {
     final File outputFile = new File("target", "README.md");
     Template template = configuration.getTemplate("md/README.md.ftl");
     final String output;
     try (StringWriter writer = new StringWriter()) {
       writer.write('\n');
-      process(writer, template, this.pluginTemplate);
+      process(writer, template, this.pluginData);
       output = writer.toString();
     }
     log.info("\n{}", output);

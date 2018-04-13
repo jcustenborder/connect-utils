@@ -13,15 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jcustenborder.kafka.connect.utils.config;
+package com.github.jcustenborder.kafka.connect.utils.templates.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class TransformationData extends Configurable {
+  private final String testName;
 
-@Target({ElementType.TYPE, ElementType.PACKAGE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface DocumentationTip {
-  String value();
+  public TransformationData(Class<?> cls) {
+    super(cls);
+
+    if (null != cls.getDeclaringClass()) {
+      testName = String.format(
+          "%s.%s",
+          cls.getDeclaringClass().getSimpleName(),
+          cls.getSimpleName()
+      );
+    } else {
+      testName = cls.getSimpleName();
+    }
+  }
+
+  public String getTestName() {
+    return testName;
+  }
 }

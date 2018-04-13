@@ -54,8 +54,11 @@ one of your Kafka Connect worker(s).
 
 </#macro>
 
-<#macro configuration connector>
-<#list connector.config.configs as item>
+<#macro configuration configurable>
+<#list configurable.config.groups as group>
+<@subsection text = group.name />
+
+<#list group.items as item>
 
 <@subsubsection text=item.name/>
 
@@ -72,6 +75,10 @@ one of your Kafka Connect worker(s).
 
 ${item.doc}
 </#list>
+
+</#list>
+
+
 </#macro>
 
 <#macro tableBar columnLengths column character="-"><#list 0..<columnLengths[column] as i>${character}</#list></#macro>
@@ -90,10 +97,49 @@ ${item.doc}
 <#macro configExamples input>
 <@subsection text="Configuration"/>
 
-<@configuration connector=input />
+<@configuration configurable=input />
 
 <@subsection text="Examples"/>
 
+<#if input.examples?has_content>
+<#list input.examples as example>
+<@subsubsection text="${example.name}" />
+
+${example.description}
+
+<@notes input=example />
+
+Select one of the following configuration methods based on how you have deployed Kafka Connect.
+Distributed Mode will the the JSON / REST examples. Standalone mode will use the properties based
+example.
+
+<#if example.type == "Connector">
+
+**Distributed Mode Json**
+
+${rstHelper.jsonExample(example)}
+
+**Standalone Mode Properties**
+
+${rstHelper.propertiesExample(example)}
+
+<#elseif example.type == "Transformation">
+
+**Distributed Mode Json**
+
+${rstHelper.jsonExample(example)}
+
+**Standalone Mode Properties**
+
+${rstHelper.propertiesExample(example)}
+
+<#elseif example.type == "Converter">
+converter
+
+</#if>
+
+</#list>
+<#else >
 <@subsubsection text="Property based example" />
 
 <@configProperties connector=input />
@@ -101,6 +147,8 @@ ${item.doc}
 <@subsubsection text="Rest based example" />
 
 <@configJson connector=input />
+</#if>
+
 </#macro>
 
 <#macro notes input>

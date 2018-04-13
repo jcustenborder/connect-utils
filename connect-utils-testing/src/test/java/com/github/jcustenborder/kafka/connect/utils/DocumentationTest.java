@@ -31,7 +31,18 @@ public class DocumentationTest extends BaseDocumentationTest {
             .name("com.github.jcustenborder.kafka.connect.utils.DocumentationTest")
             .doc("This is a test schema used for the documentation.")
             .field("noDoc", Schema.OPTIONAL_STRING_SCHEMA)
-            .field("Doc", SchemaBuilder.string().doc("Testing").build())
+            .field("Doc", SchemaBuilder.string().doc("Lorem ipsum dolor sit amet, " +
+                "consectetur adipiscing elit. Nulla commodo interdum nunc, hendrerit accumsan " +
+                "lorem bibendum eget. Pellentesque vel vestibulum velit, eu tempor tellus. Ut et" +
+                "sapien augue. Suspendisse quis dictum eros. Curabitur gravida rhoncus ipsum, congue " +
+                "pellentesque enim dignissim et. Nunc laoreet, velit non interdum hendrerit, mauris " +
+                "velit aliquet enim, et tincidunt nunc eros ac mauris. Maecenas semper odio nec " +
+                "tellus interdum imperdiet. Donec vehicula nisl ligula, sed bibendum massa " +
+                "venenatis vel. Maecenas porta, lorem lobortis imperdiet luctus, ante ex interdum " +
+                "augue, ullamcorper rhoncus leo libero non purus. Aliquam ullamcorper, dui nec " +
+                "molestie tincidunt, purus lorem condimentum leo, ac pretium justo mi id tortor. " +
+                "Donec tempor est ut feugiat euismod. In vel enim non odio rutrum tincidunt sed " +
+                "eget erat.").build())
             .field("defaultValue", SchemaBuilder.int32().defaultValue(123).build())
             .build(),
         SchemaBuilder.map(
