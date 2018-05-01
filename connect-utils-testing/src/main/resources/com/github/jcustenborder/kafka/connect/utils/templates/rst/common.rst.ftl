@@ -62,6 +62,8 @@ one of your Kafka Connect worker(s).
 
 <@subsubsection text=item.name/>
 
+${item.doc}
+
 **Importance:** ${item.importance}
 
 **Type:** ${item.type}
@@ -73,7 +75,6 @@ one of your Kafka Connect worker(s).
 
 </#if>
 
-${item.doc}
 </#list>
 
 </#list>
