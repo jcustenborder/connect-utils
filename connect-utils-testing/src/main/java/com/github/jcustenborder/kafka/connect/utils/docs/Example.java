@@ -214,7 +214,7 @@ public class Example {
 
     ObjectNode config = ObjectMapperFactory.INSTANCE.createObjectNode();
     node.set("config", config);
-    config.put("connector.class", this.className.getSimpleName());
+    config.put("connector.class", this.className.getName());
     config.put("tasks.max", "1");
     if (SinkConnector.class.isAssignableFrom(this.className)) {
       config.put("topics", "topic1,topic2,topic3");
@@ -227,7 +227,7 @@ public class Example {
 
   private Properties connectorProperties() {
     Properties properties = new Properties();
-    properties.put("connector.class", this.className.getSimpleName());
+    properties.put("connector.class", this.className.getName());
     properties.put("tasks.max", "1");
     if (SinkConnector.class.isAssignableFrom(this.className)) {
       config.put("topics", "topic1,topic2,topic3");
