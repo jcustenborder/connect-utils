@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -125,26 +125,20 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
   public boolean drain(List<SourceRecord> records, int emptyWaitMs) {
     Preconditions.checkNotNull(records, "records cannot be null");
     Preconditions.checkArgument(emptyWaitMs >= 0, "emptyWaitMs should be greater than or equal to 0.");
-    log.trace("drain() - Determining size for this run. batchSize={}, records.size()={}", this.batchSize, records.size());
-    final int count = Math.min(this.batchSize, this.size());
 
-    log.trace("drain() - Attempting to draining {} record(s).", count);
-    for (int i = 0; i < count; i++) {
-      SourceRecord record = this.poll();
-
-      if (null != record) {
-        records.add(record);
-      } else {
-        log.trace("drain() - Poll returned null. exiting");
-        break;
-      }
+    int count = 0;
+    SourceRecord record;
+    log.trace("drain() - Attempting to draining {} record(s).", this.batchSize);
+    while (count <= this.batchSize && null != (record = this.poll())) {
+      records.add(record);
+      count++;
     }
 
-    if (records.isEmpty() && emptyWaitMs > 0) {
+    if (count == 0 && emptyWaitMs > 0) {
       log.trace("drain() - Found no records, sleeping {} ms.", emptyWaitMs);
       this.time.sleep(emptyWaitMs);
     }
 
-    return !records.isEmpty();
+    return count > 0;
   }
 }
