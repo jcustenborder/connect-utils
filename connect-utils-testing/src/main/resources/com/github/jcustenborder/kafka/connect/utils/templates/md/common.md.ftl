@@ -2,10 +2,14 @@
 ### Configuration
 
 <#list connector.config.groups as group>
-<#list group.items as item >
 #### ${group.name}
 
+<#list group.items as item >
+
 ##### `${item.name}`
+
+${item.doc}
+
 *Importance:* ${item.importance}
 
 *Type:* ${item.type}
@@ -17,7 +21,6 @@
 
 </#if>
 
-${item.doc}
 </#list>
 </#list>
 
