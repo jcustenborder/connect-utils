@@ -23,12 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ValidEnumTests {
 
-  public enum TestEnum {
-    one,
-    two,
-    three
-  }
-
   @Test
   public void valid() {
     ValidEnum validEnum = ValidEnum.of(TestEnum.class);
