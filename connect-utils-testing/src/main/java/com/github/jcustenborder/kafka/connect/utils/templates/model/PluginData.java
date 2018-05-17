@@ -16,7 +16,6 @@
 package com.github.jcustenborder.kafka.connect.utils.templates.model;
 
 import com.github.jcustenborder.kafka.connect.utils.config.AnnotationHelper;
-import com.github.jcustenborder.kafka.connect.utils.docs.Example;
 import com.google.common.collect.ImmutableList;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.apache.kafka.connect.source.SourceConnector;

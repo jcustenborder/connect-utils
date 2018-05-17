@@ -17,7 +17,7 @@ package com.github.jcustenborder.kafka.connect.utils.templates.rst;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.jcustenborder.kafka.connect.utils.docs.Example;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.Example;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.Configurable;
 import com.github.jcustenborder.kafka.connect.utils.templates.TemplateHelper;
 import com.google.common.base.Joiner;

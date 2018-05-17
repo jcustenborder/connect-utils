@@ -26,6 +26,8 @@
 
 <@config connector=connector/>
 
+<@examples connector=connector/>
+
 </#list>
 </#if>
 
@@ -39,4 +41,13 @@
 <@config connector=transformation/>
 
 </#list>
+
+# Development
+
+## Building the source
+
+```bash
+mvn clean package
+```
+
 </#if>
