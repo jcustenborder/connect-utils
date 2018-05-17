@@ -368,7 +368,7 @@ public class Example {
 
   public void writeJsonExample(File parentFolder) throws IOException {
     File outputFile = new File(parentFolder, this.getExampleJsonFile());
-    try(Writer writer = new FileWriter(outputFile)) {
+    try (Writer writer = new FileWriter(outputFile)) {
       writeJsonExample(writer);
     }
   }
