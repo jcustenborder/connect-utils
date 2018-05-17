@@ -15,7 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import com.github.jcustenborder.kafka.connect.utils.docs.Example;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.Example;
 import com.github.jcustenborder.kafka.connect.utils.templates.markdown.MarkdownTemplateHelper;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.Configurable;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.PluginData;

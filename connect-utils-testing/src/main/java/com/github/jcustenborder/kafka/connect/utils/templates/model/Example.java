@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jcustenborder.kafka.connect.utils.docs;
+package com.github.jcustenborder.kafka.connect.utils.templates.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jcustenborder.kafka.connect.utils.jackson.ObjectMapperFactory;
 import com.google.common.base.CaseFormat;
+import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import org.apache.kafka.connect.connector.Connector;
 import org.apache.kafka.connect.sink.SinkConnector;
@@ -33,8 +34,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Set;
 
 public class Example {
   private static final Logger log = LoggerFactory.getLogger(Example.class);
@@ -52,6 +56,8 @@ public class Example {
   String description;
   @JsonProperty
   Map<String, String> config;
+  @JsonProperty
+  Map<String, Map<String, String>> transformations;
   @JsonProperty
   String note;
   @JsonProperty
@@ -222,19 +228,43 @@ public class Example {
     for (Map.Entry<String, String> kvp : this.config.entrySet()) {
       config.put(kvp.getKey(), kvp.getValue());
     }
+    if (null != this.transformations && !transformations.isEmpty()) {
+      Set<String> transformKeys = this.transformations.keySet();
+      config.put("transforms", Joiner.on(',').join(transformKeys));
+      for (String transformKey : transformKeys) {
+        Map<String, String> transformSettings = this.transformations.get(transformKey);
+        for (Map.Entry<String, String> kvp : transformSettings.entrySet()) {
+          final String key = String.format("transforms.%s.%s", transformKey, kvp.getKey());
+          config.put(key, kvp.getValue());
+        }
+      }
+    }
+
     return node;
   }
 
-  private Properties connectorProperties() {
-    Properties properties = new Properties();
+  private Map<String, String> connectorProperties() {
+    Map<String, String> properties = new LinkedHashMap<>();
     properties.put("connector.class", this.className.getName());
     properties.put("tasks.max", "1");
     if (SinkConnector.class.isAssignableFrom(this.className)) {
-      config.put("topics", "topic1,topic2,topic3");
+      properties.put("topics", "topic1,topic2,topic3");
     }
     for (Map.Entry<String, String> kvp : this.config.entrySet()) {
       properties.put(kvp.getKey(), kvp.getValue());
     }
+    if (null != this.transformations && !transformations.isEmpty()) {
+      Set<String> transformKeys = this.transformations.keySet();
+      properties.put("transforms", Joiner.on(',').join(transformKeys));
+      for (String transformKey : transformKeys) {
+        Map<String, String> transformSettings = this.transformations.get(transformKey);
+        for (Map.Entry<String, String> kvp : transformSettings.entrySet()) {
+          final String key = String.format("transforms.%s.%s", transformKey, kvp.getKey());
+          properties.put(key, kvp.getValue());
+        }
+      }
+    }
+
     return properties;
   }
 
@@ -257,8 +287,8 @@ public class Example {
     return node;
   }
 
-  private Properties transformationProperties() {
-    Properties properties = new Properties();
+  private Map<String, String> transformationProperties() {
+    Map<String, String> properties = new LinkedHashMap<>();
     properties.put("connector.class", "...");
     properties.put("tasks.max", "1");
     String key = transformKey();
@@ -271,7 +301,14 @@ public class Example {
   }
 
   public void writePropertiesExample(File parentFolder) throws IOException {
-    final Properties example;
+    File outputFile = new File(parentFolder, this.getExamplePropertiesFile());
+    try (FileWriter writer = new FileWriter(outputFile)) {
+      writePropertiesExample(writer);
+    }
+  }
+
+  public void writePropertiesExample(Writer writer) throws IOException {
+    final Map<String, String> example;
 
     switch (this.type) {
       case Connector:
@@ -285,14 +322,31 @@ public class Example {
             String.format("%s is not supported", this.type)
         );
     }
-    File outputFile = new File(parentFolder, this.getExamplePropertiesFile());
-    try (FileWriter writer = new FileWriter(outputFile)) {
-      example.store(writer, "");
+    store(writer, example);
+  }
+
+  static void store(Writer writer, Map<String, String> properties) throws IOException {
+    for (Map.Entry<String, String> kvp : properties.entrySet()) {
+      writer.append(
+          String.format("%s=%s", kvp.getKey(), kvp.getValue())
+      );
+      writer.write('\n');
     }
   }
 
+  public String getMarkdownProperties() throws IOException {
+    StringWriter writer = new StringWriter();
+    writePropertiesExample(writer);
+    return writer.toString();
+  }
 
-  public void writeJsonExample(File parentFolder) throws IOException {
+  public String getMarkdownJson() throws IOException {
+    StringWriter writer = new StringWriter();
+    writeJsonExample(writer);
+    return writer.toString();
+  }
+
+  public void writeJsonExample(Writer writer) throws IOException {
     final ObjectNode example;
 
     switch (this.type) {
@@ -307,10 +361,16 @@ public class Example {
             String.format("%s is not supported", this.type)
         );
     }
-    File outputFile = new File(parentFolder, this.getExampleJsonFile());
-    ObjectMapperFactory.INSTANCE.configure(SerializationFeature.INDENT_OUTPUT, true);
-    ObjectMapperFactory.INSTANCE.writeValue(outputFile, example);
 
+    ObjectMapperFactory.INSTANCE.configure(SerializationFeature.INDENT_OUTPUT, true);
+    ObjectMapperFactory.INSTANCE.writeValue(writer, example);
+  }
+
+  public void writeJsonExample(File parentFolder) throws IOException {
+    File outputFile = new File(parentFolder, this.getExampleJsonFile());
+    try (Writer writer = new FileWriter(outputFile)) {
+      writeJsonExample(writer);
+    }
   }
 
 

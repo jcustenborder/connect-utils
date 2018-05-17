@@ -18,7 +18,7 @@ package com.github.jcustenborder.kafka.connect.utils.templates;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.jcustenborder.kafka.connect.utils.docs.Example;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.Example;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.Configurable;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.Configuration;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.SinkConnectorData;
