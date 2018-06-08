@@ -117,6 +117,37 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
   }
 
   @Override
+  public List<SourceRecord> getBatch() {
+    return getBatch(this.emptyWaitMs);
+  }
+
+  @Override
+  public List<SourceRecord> getBatch(int emptyWaitMs) {
+    Preconditions.checkArgument(emptyWaitMs >= 0, "emptyWaitMs should be greater than or equal to 0.");
+    final List<SourceRecord> result = newList();
+
+    int count = 0;
+    SourceRecord record;
+    log.trace("drain() - Attempting to draining {} record(s).", this.batchSize);
+    while (count <= this.batchSize && null != (record = this.poll())) {
+      result.add(record);
+      count++;
+    }
+
+    if (count == 0) {
+      if(emptyWaitMs > 0) {
+        log.trace("drain() - Found no records, sleeping {} ms.", emptyWaitMs);
+        this.time.sleep(emptyWaitMs);
+      } else {
+        log.trace("drain() - Found no records.", emptyWaitMs);
+      }
+      return null;
+    }
+
+    return result;
+  }
+
+  @Override
   public boolean drain(List<SourceRecord> records) {
     return drain(records, this.emptyWaitMs);
   }

@@ -32,8 +32,19 @@ public interface SourceRecordDeque extends Deque<SourceRecord> {
    * Method will create a new list based on the batch size and drain records to it.
    * @return
    */
+  @Deprecated
   List<SourceRecord> drain();
 
+  /**
+   * Method will create a new list based on the batch size and drain records to it.
+   * @return
+   */
+  List<SourceRecord> getBatch(int emptyWaitMs);
+  /**
+   * Method will create a new list based on the batch size and drain records to it.
+   * @return
+   */
+  List<SourceRecord> getBatch();
   /**
    * Method is used drain the records from the queue to the supplied list. newList() should be called
    * to create a list that has the same initial capacity of the batch size.
@@ -41,6 +52,7 @@ public interface SourceRecordDeque extends Deque<SourceRecord> {
    * @return true if records were drained. false if not.
    *
    */
+  @Deprecated
   boolean drain(List<SourceRecord> records);
 
   /**
@@ -50,5 +62,6 @@ public interface SourceRecordDeque extends Deque<SourceRecord> {
    * @param emptyWaitMs Time in milliseconds to wait if no records were drained.
    * @return true if records were drained. false if not.
    */
+  @Deprecated
   boolean drain(List<SourceRecord> records, int emptyWaitMs);
 }

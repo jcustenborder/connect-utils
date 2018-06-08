@@ -28,6 +28,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -95,4 +96,13 @@ public class SourceRecordDequeTest {
       }
     });
   }
+
+  @Test
+  public void getBatch() {
+    SourceRecordDeque deque = this.builder.emptyWaitMs(100).build();
+    List<SourceRecord> records =  deque.getBatch();
+    assertNull(records, "Records should be null.");
+    verify(this.time, atLeastOnce()).sleep(100);
+  }
+
 }
