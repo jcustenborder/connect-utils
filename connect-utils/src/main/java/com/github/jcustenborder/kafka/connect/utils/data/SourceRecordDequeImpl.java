@@ -135,7 +135,7 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
     }
 
     if (count == 0) {
-      if(emptyWaitMs > 0) {
+      if (emptyWaitMs > 0) {
         log.trace("drain() - Found no records, sleeping {} ms.", emptyWaitMs);
         this.time.sleep(emptyWaitMs);
       } else {
