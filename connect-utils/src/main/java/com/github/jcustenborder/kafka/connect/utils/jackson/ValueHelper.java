@@ -184,7 +184,7 @@ class ValueHelper {
         } else if (value instanceof Map) {
           log.trace("Map");
           Map<String, Object> map = (Map<String, Object>) value;
-          if (map.containsKey("schema") && map.get("fieldValues") instanceof List) {
+          if (map.containsKey("schema") && map.get("keyValues") instanceof List) {
             log.trace("struct stored as map.");
             Struct struct = ObjectMapperFactory.INSTANCE.convertValue(value, Struct.class);
             result = struct;
