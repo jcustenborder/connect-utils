@@ -22,6 +22,7 @@ import org.apache.kafka.connect.header.Header;
 import org.apache.kafka.connect.header.Headers;
 import org.apache.kafka.connect.source.SourceRecord;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -108,6 +109,7 @@ public class AssertConnectRecord {
     final String prefix = null != message ? message + ": " : "";
     if (null == expected) {
       assertNull(actual, prefix + "actual should be null.");
+      return;
     }
     assertNotNull(actual, prefix + "actual should not be null.");
     assertEquals(expected.key(), expected.key(), prefix + "key() does not match.");
@@ -142,16 +144,17 @@ public class AssertConnectRecord {
         .collect(Collectors.toSet());
 
     for (String key : expectedKeys) {
-      Header[] expectedHeaderSet = expectedHeaders.get(key).toArray(new Header[expectedHeaders.size()]);
-      Header[] actualHeaderSet = actualHeaders.get(key).toArray(new Header[actualHeaders.size()]);
+      List<Header> expectedHeaderSet = expectedHeaders.get(key).stream().collect(Collectors.toList());
+      List<Header> actualHeaderSet = actualHeaders.get(key).stream().collect(Collectors.toList());
 
       if (null == expectedHeaderSet) {
         assertNull(actualHeaderSet, prefix + "header \"" + key + "\" should be null.");
+        continue;
       }
       assertNotNull(actualHeaderSet, prefix + "header \"" + key + "\" should be null.");
-      assertEquals(expectedHeaderSet.length, actualHeaderSet.length, "length does not match.");
-      for (int i = 0; i < expectedHeaderSet.length; i++) {
-        assertHeader(expectedHeaderSet[i], actualHeaderSet[i],
+      assertEquals(expectedHeaderSet.size(), actualHeaderSet.size(), "length does not match.");
+      for (int i = 0; i < expectedHeaderSet.size(); i++) {
+        assertHeader(expectedHeaderSet.get(i), actualHeaderSet.get(i),
             String.format("%sheader for key '%s' does not match at index %s", prefix, key, i)
         );
       }
