@@ -33,6 +33,7 @@ public class ObjectMapperFactory {
     INSTANCE.registerModule(new SinkRecordSerializationModule());
     INSTANCE.registerModule(new SourceRecordSerializationModule());
     INSTANCE.registerModule(new TimeSerializationModule());
+    INSTANCE.registerModule(new HeaderSerializationModule());
   }
 
 }
