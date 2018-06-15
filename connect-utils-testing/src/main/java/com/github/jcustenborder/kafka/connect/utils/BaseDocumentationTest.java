@@ -15,12 +15,11 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import com.github.jcustenborder.kafka.connect.utils.templates.model.Example;
 import com.github.jcustenborder.kafka.connect.utils.templates.markdown.MarkdownTemplateHelper;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.Configurable;
+import com.github.jcustenborder.kafka.connect.utils.templates.model.Example;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.PluginData;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.SchemaData;
-import com.github.jcustenborder.kafka.connect.utils.templates.model.SourceConnectorData;
 import com.github.jcustenborder.kafka.connect.utils.templates.model.TransformationData;
 import com.github.jcustenborder.kafka.connect.utils.templates.rst.RstTemplateHelper;
 import com.google.common.base.Charsets;
@@ -33,12 +32,6 @@ import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import guru.nidi.graphviz.attribute.RankDir;
-import guru.nidi.graphviz.attribute.Shape;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.Graph;
-import guru.nidi.graphviz.model.Label;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigValue;
 import org.apache.kafka.connect.data.Schema;
@@ -73,9 +66,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static guru.nidi.graphviz.model.Factory.graph;
-import static guru.nidi.graphviz.model.Factory.node;
-import static guru.nidi.graphviz.model.Factory.to;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -166,57 +156,24 @@ public abstract class BaseDocumentationTest {
     return ImmutableList.copyOf(entries);
   }
 
-  DynamicTest connectorRstTest(Configurable configurable, final String templateName, final File parentDirectory) {
+  DynamicTest connectorRstTest(final File outputFile, Configurable configurable, final String templateName, final boolean writeExamples) {
+    final File parentDirectory = outputFile.getParentFile();
     if (!parentDirectory.isDirectory()) {
       parentDirectory.mkdirs();
     }
 
-
     return dynamicTest(configurable.getSimpleName(), () -> {
-      final File graphOutputFile = new File(parentDirectory, configurable.getDiagramFileName());
-
-      final Graph g;
-      if (configurable instanceof SourceConnectorData) {
-        g = graph()
-            .graphAttr().with(RankDir.LEFT_TO_RIGHT)
-            .directed()
-            .with(
-                node(configurable.getSimpleName()).with(Shape.RECTANGLE)
-                    .link(
-                        to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node("Kafka").with(Shape.RECTANGLE)).with(Label.of("Writes messages to")))).with(Label.of("Hosted by"))
-
-                    )
-            );
-      } else {
-        g = graph()
-            .graphAttr().with(RankDir.LEFT_TO_RIGHT)
-            .directed()
-            .with(
-                node("Kafka").with(Shape.RECTANGLE)
-                    .link(
-                        to(node("Kafka Connect").with(Shape.RECTANGLE).link(to(node(configurable.getSimpleName()).with(Shape.RECTANGLE)).with(Label.of("Writes data to")))).with(Label.of("Pulls Data from"))
-
-                    )
-            );
-      }
-
-
-      Graphviz.fromGraph(g)
-          .width(350)
-          .render(Format.SVG_STANDALONE)
-          .toFile(graphOutputFile);
-
-      final File outputFile = new File(parentDirectory, configurable.getSimpleName() + ".rst");
-
       Template template = configuration.getTemplate(templateName);
       log.info("Writing {}", outputFile);
       try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
         process(writer, template, configurable);
       }
 
-      for (Example example : configurable.getExamples()) {
-        example.writeJsonExample(parentDirectory);
-        example.writePropertiesExample(parentDirectory);
+      if (writeExamples) {
+        for (Example example : configurable.getExamples()) {
+          example.writeJsonExample(parentDirectory);
+          example.writePropertiesExample(parentDirectory);
+        }
       }
 
     });
@@ -248,16 +205,15 @@ public abstract class BaseDocumentationTest {
 
   @TestFactory
   public Stream<DynamicTest> rstSources() {
-    final File parentDirectory = new File(outputDirectory, "sources");
     final String templateName = "rst/source.rst.ftl";
-    return this.pluginData.getSourceConnectors().stream().map(connectorTemplate -> connectorRstTest(connectorTemplate, templateName, parentDirectory));
+    return this.pluginData.getSourceConnectors().stream()
+        .map(connectorTemplate -> connectorRstTest(connectorTemplate.connectorRst(this.outputDirectory), connectorTemplate, templateName, true));
   }
 
   @TestFactory
   public Stream<DynamicTest> rstSinks() {
-    final File parentDirectory = new File(outputDirectory, "sinks");
     final String templateName = "rst/sink.rst.ftl";
-    return this.pluginData.getSinkConnectors().stream().map(connectorTemplate -> connectorRstTest(connectorTemplate, templateName, parentDirectory));
+    return this.pluginData.getSinkConnectors().stream().map(connectorTemplate -> connectorRstTest(connectorTemplate.connectorRst(this.outputDirectory), connectorTemplate, templateName, true));
   }
 
   void process(Writer writer, Template template, Object input) throws IOException, TemplateException {
@@ -415,6 +371,84 @@ public abstract class BaseDocumentationTest {
     }
     log.info("\n{}", output);
     Files.write(output, outputFile, Charsets.UTF_8);
+  }
 
+  final File confluentDocsDir = new File("target", "confluent-docs");
+
+  @Test
+  public void confluent() throws IOException, TemplateException {
+    Map<String, String> templates = ImmutableMap.of(
+        "confluent/index.rst.ftl", "index.rst"
+    );
+
+    for (Map.Entry<String, String> kvp : templates.entrySet()) {
+      final File outputFile = new File(confluentDocsDir, kvp.getValue());
+      final File parentDir = outputFile.getParentFile();
+      if (!parentDir.isDirectory()) {
+        parentDir.mkdirs();
+      }
+      Template template = configuration.getTemplate(kvp.getKey());
+      final String output;
+      try (StringWriter writer = new StringWriter()) {
+        writer.write('\n');
+        process(writer, template, this.pluginData);
+        output = writer.toString();
+      }
+      Files.write(output, outputFile, Charsets.UTF_8);
+    }
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> confluentSources() {
+    final String templateName = "confluent/source.rst.ftl";
+    return this.pluginData.getSourceConnectors().stream()
+        .map(connectorTemplate -> connectorRstTest(
+            connectorTemplate.confluentConnectorRst(this.confluentDocsDir), connectorTemplate, templateName, false)
+        );
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> confluentSourceConfigs() {
+    final String templateName = "confluent/config.rst.ftl";
+    return this.pluginData.getSourceConnectors().stream()
+        .map(connectorTemplate -> connectorRstTest(
+            connectorTemplate.confluentConfigRst(this.confluentDocsDir), connectorTemplate, templateName, false)
+        );
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> confluentSourceExamples() {
+    final String templateName = "confluent/examples.rst.ftl";
+    return this.pluginData.getSourceConnectors().stream()
+        .map(connectorTemplate -> connectorRstTest(
+            connectorTemplate.confluentExampleRst(this.confluentDocsDir), connectorTemplate, templateName, true)
+        );
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> confluentSinks() {
+    final String templateName = "confluent/sink.rst.ftl";
+    return this.pluginData.getSinkConnectors().stream()
+        .map(connectorTemplate -> connectorRstTest(
+            connectorTemplate.confluentConnectorRst(this.confluentDocsDir), connectorTemplate, templateName, false)
+        );
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> confluentSinkConfigs() {
+    final String templateName = "confluent/config.rst.ftl";
+    return this.pluginData.getSinkConnectors().stream()
+        .map(connectorTemplate -> connectorRstTest(
+            connectorTemplate.confluentConfigRst(this.confluentDocsDir), connectorTemplate, templateName, false)
+        );
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> confluentSinkExamples() {
+    final String templateName = "confluent/examples.rst.ftl";
+    return this.pluginData.getSinkConnectors().stream()
+        .map(connectorTemplate -> connectorRstTest(
+            connectorTemplate.confluentExampleRst(this.confluentDocsDir), connectorTemplate, templateName, true)
+        );
   }
 }
