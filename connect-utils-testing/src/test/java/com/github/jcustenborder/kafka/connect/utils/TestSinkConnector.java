@@ -29,7 +29,7 @@ import org.apache.kafka.connect.sink.SinkConnector;
 import java.util.List;
 import java.util.Map;
 
-@Description("The test sink connector is used to simulate the usage fromConnector an actual connector that we would generate " +
+@Description("The test sink connector is used to simulate the usage of an actual connector that we would generate " +
     "documentation from.")
 @Title("Test Sink Connector")
 @DocumentationNote("This is a note")

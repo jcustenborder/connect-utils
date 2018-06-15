@@ -98,11 +98,6 @@
             <artifactId>opencsv</artifactId>
             <version>3.10</version>
         </dependency>
-        <dependency>
-            <groupId>guru.nidi</groupId>
-            <artifactId>graphviz-java</artifactId>
-            <version>0.2.1</version>
-        </dependency>
     </dependencies>
     <build>
         <resources>
