@@ -1,7 +1,7 @@
 <#-- @formatter:off --><#include "common.rst.ftl">
 <@subsection text="Confluent ${input.title} Connector"/>
 
-${input.introduction}
+<#if input.introduction??>${input.introduction}</#if>
 
 <@notes input=input/>
 
