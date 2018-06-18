@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jcustenborder.kafka.connect.utils;
+package com.github.jcustenborder.kafka.connect.utils.nodoc;
 
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationDanger;
@@ -28,7 +28,7 @@ import org.apache.kafka.connect.transforms.Transformation;
 
 import java.util.Map;
 
-public abstract class TestTransformation<R extends ConnectRecord<R>> implements Transformation<R> {
+public abstract class NoDocTestTransformation<R extends ConnectRecord<R>> implements Transformation<R> {
   @Override
   public R apply(R sourceRecord) {
     return null;
@@ -50,25 +50,11 @@ public abstract class TestTransformation<R extends ConnectRecord<R>> implements 
 
   }
 
-  @Title("NoDocTestTransformation(Key)")
-  @Description("This transformation is used to rename fields in the key.")
-  @DocumentationNote("This is a note")
-  @DocumentationTip("This is a tip")
-  @DocumentationImportant("This is important")
-  @DocumentationDanger("This is a danger")
-  @DocumentationWarning("This is a warning")
-  public static class Key<R extends ConnectRecord<R>> extends TestTransformation<R> {
+  public static class Key<R extends ConnectRecord<R>> extends NoDocTestTransformation<R> {
 
   }
 
-  @Title("NoDocTestTransformation(Value)")
-  @Description("This transformation is used to rename fields in the value.")
-  @DocumentationNote("This is a note")
-  @DocumentationTip("This is a tip")
-  @DocumentationImportant("This is important")
-  @DocumentationDanger("This is a danger")
-  @DocumentationWarning("This is a warning")
-  public static class Value<R extends ConnectRecord<R>> extends TestTransformation<R> {
+  public static class Value<R extends ConnectRecord<R>> extends NoDocTestTransformation<R> {
 
   }
 }
