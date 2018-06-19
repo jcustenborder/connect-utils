@@ -15,7 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
-import com.google.common.base.MoreObjects;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
@@ -72,9 +72,6 @@ public class ValidEnum implements ConfigDef.Validator {
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
-        .add("enum", this.enumClass.getSimpleName())
-        .add("allowed", this.validEnums)
-        .toString();
+    return "``" + Joiner.on("``, ``").join(this.validEnums) + "``";
   }
 }
