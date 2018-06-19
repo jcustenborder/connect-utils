@@ -56,8 +56,6 @@ public class ValidPattern implements ConfigDef.Validator {
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
-        .add("pattern", this.pattern.pattern())
-        .toString();
+    return String.format("Matches regex( %s )", this.pattern.pattern());
   }
 }
