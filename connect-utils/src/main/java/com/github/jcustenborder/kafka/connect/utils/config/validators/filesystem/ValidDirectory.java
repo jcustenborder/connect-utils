@@ -46,4 +46,9 @@ public class ValidDirectory extends ValidFileSystem {
   public static ValidDirectory of() {
     return new ValidDirectory();
   }
+
+  @Override
+  public String toString() {
+    return "Absolute path to a directory that exists.";
+  }
 }

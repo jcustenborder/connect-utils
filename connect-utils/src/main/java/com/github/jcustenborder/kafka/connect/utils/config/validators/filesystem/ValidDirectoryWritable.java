@@ -39,4 +39,9 @@ public class ValidDirectoryWritable extends ValidDirectory {
   public static ValidDirectoryWritable of() {
     return new ValidDirectoryWritable();
   }
+
+  @Override
+  public String toString() {
+    return "Absolute path to a directory that exists and is writable.";
+  }
 }
