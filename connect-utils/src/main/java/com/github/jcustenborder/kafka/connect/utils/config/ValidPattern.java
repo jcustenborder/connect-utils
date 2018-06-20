@@ -15,7 +15,6 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
