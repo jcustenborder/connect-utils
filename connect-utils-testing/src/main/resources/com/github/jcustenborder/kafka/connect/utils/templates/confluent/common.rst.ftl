@@ -3,8 +3,7 @@
 Quickstart
 ----------
 
-A simple demo of how to use the ${text} is
-available in the :ref:`Kafka Connect quick start guide <connect_quickstart>`.
+A simple demo of how to use the ${text} is available in the :ref:`Kafka Connect quick start guide <connect_quickstart>`.
 
 </#macro>
 <#macro section text>
@@ -142,8 +141,7 @@ converter
 
 <#macro configProperties connector>
 
-This configuration is used typically along with `standalone mode
-<http://docs.confluent.io/current/connect/concepts.html#standalone-workers>`_.
+This configuration is used typically along with :ref:`standalone workers <standalone-workers>`.
 
 ${rstHelper.propertiesExample(connector)}
 
@@ -152,11 +150,10 @@ ${rstHelper.propertiesExample(connector)}
 
 <#macro configJson connector>
 
-This configuration is used typically along with `distributed mode
-<http://docs.confluent.io/current/connect/concepts.html#distributed-workers>`_.
+This configuration is used typically along with :ref:`distributed workers <distributed-workers>`.
 Write the following json to `connector.json`, configure all of the required values, and use the command below to
 post the configuration to one the distributed connect worker(s). Check here for more information about the
-`Kafka Connect REST Interface. <https://docs.confluent.io/current/connect/restapi.html>`_
+Kafka Connect :ref:`Rest API <connect_userguide_rest>`
 
 ${rstHelper.jsonExample(connector)}
 

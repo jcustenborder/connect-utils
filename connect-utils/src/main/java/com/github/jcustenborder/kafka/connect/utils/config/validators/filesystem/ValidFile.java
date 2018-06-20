@@ -45,4 +45,9 @@ public class ValidFile extends ValidFileSystem {
   public static ValidFile of() {
     return new ValidFile();
   }
+
+  @Override
+  public String toString() {
+    return "Absolute path to a file that exists.";
+  }
 }

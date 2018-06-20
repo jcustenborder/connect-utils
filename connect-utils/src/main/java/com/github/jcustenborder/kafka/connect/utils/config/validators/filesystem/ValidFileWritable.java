@@ -38,4 +38,9 @@ public class ValidFileWritable extends ValidFile {
   public static ValidFileWritable of() {
     return new ValidFileWritable();
   }
+
+  @Override
+  public String toString() {
+    return "Absolute path to a file that exists and is writable.";
+  }
 }

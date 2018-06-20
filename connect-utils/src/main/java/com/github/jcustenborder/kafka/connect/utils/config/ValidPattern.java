@@ -15,7 +15,6 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
@@ -56,8 +55,6 @@ public class ValidPattern implements ConfigDef.Validator {
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
-        .add("pattern", this.pattern.pattern())
-        .toString();
+    return String.format("Matches regex( %s )", this.pattern.pattern());
   }
 }
