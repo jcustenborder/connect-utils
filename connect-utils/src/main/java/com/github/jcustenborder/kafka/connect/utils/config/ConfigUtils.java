@@ -26,6 +26,8 @@ import org.apache.kafka.common.config.ConfigException;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -237,5 +239,45 @@ public class ConfigUtils {
     }
     return ImmutableList.copyOf(result);
   }
+  
+  static URI uri(String key, String value) {
+    try {
+      return new URI(value);
+    } catch (URISyntaxException e) {
+      ConfigException configException = new ConfigException(
+          key, value, "Could not parse to URI."
+      );
+      configException.initCause(e);
 
+      throw configException;
+    }
+  }
+
+  /**
+   * Method is used to retrieve a URI from a configuration key.
+   *
+   * @param config Config to read
+   * @param key    Key to read
+   * @return URI for the value.
+   */
+  public static URI uri(AbstractConfig config, String key) {
+    final String value = config.getString(key);
+    return uri(key, value);
+  }
+
+  /**
+   * Method is used to retrieve a list of URI(s) from a configuration key.
+   *
+   * @param config Config to read
+   * @param key    Key to read
+   * @return URI for the value.
+   */
+  public static List<URI> uris(AbstractConfig config, String key) {
+    List<URI> result = new ArrayList<>();
+    List<String> input = config.getList(key);
+    for (String s : input) {
+      result.add(uri(key, s));
+    }
+    return ImmutableList.copyOf(result);
+  }
 }
