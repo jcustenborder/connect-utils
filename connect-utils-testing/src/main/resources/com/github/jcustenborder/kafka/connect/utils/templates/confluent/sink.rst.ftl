@@ -8,4 +8,4 @@ ${input.description}
 
 <@notes input=input/>
 
-<#--<@configExamples input=input />-->
+<@configExamples input=input />

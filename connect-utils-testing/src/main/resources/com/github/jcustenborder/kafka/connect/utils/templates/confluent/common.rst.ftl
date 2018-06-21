@@ -24,32 +24,33 @@ ${text}
 <#macro notes input>
 
 <#if input.danger??>
-.. DANGER::
+.. danger::
     ${input.danger}
 
 
 </#if><#if input.warning??>
-.. WARNING::
+.. warning::
     ${input.warning}
 
 
 </#if><#if input.important??>
-.. IMPORTANT::
+.. important::
     ${input.important}
 
 
 </#if><#if input.tip??>
-.. TIP::
+.. tip::
     ${input.tip}
 
 
 </#if><#if input.note??>
-.. NOTE::
+.. note::
     ${input.note}
 
 
 </#if>
 </#macro>
+
 
 <#macro connectorTag connector>
 .. ${connector.rstConnectorTag}:
@@ -73,7 +74,7 @@ ${text}
 <#list group.items as item>
 
 ``${item.name}``
-${item.doc}
+  ${item.doc}
 
   * Type: ${item.type}
   * Importance: ${item.importance}
@@ -88,6 +89,8 @@ ${item.doc}
 
 
 <#macro configExamples input>
+<@connectorExampleTag connector=input/>
+<@subsection text="Examples"/>
 
 <#if input.examples?has_content>
 <#list input.examples as example>

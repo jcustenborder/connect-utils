@@ -417,15 +417,6 @@ public abstract class BaseDocumentationTest {
   }
 
   @TestFactory
-  public Stream<DynamicTest> confluentSourceExamples() {
-    final String templateName = "confluent/examples.rst.ftl";
-    return this.pluginData.getSourceConnectors().stream()
-        .map(connectorTemplate -> connectorRstTest(
-            connectorTemplate.confluentExampleRst(this.confluentDocsDir), connectorTemplate, templateName, true)
-        );
-  }
-
-  @TestFactory
   public Stream<DynamicTest> confluentSinks() {
     final String templateName = "confluent/sink.rst.ftl";
     return this.pluginData.getSinkConnectors().stream()
@@ -440,15 +431,6 @@ public abstract class BaseDocumentationTest {
     return this.pluginData.getSinkConnectors().stream()
         .map(connectorTemplate -> connectorRstTest(
             connectorTemplate.confluentConfigRst(this.confluentDocsDir), connectorTemplate, templateName, false)
-        );
-  }
-
-  @TestFactory
-  public Stream<DynamicTest> confluentSinkExamples() {
-    final String templateName = "confluent/examples.rst.ftl";
-    return this.pluginData.getSinkConnectors().stream()
-        .map(connectorTemplate -> connectorRstTest(
-            connectorTemplate.confluentExampleRst(this.confluentDocsDir), connectorTemplate, templateName, true)
         );
   }
 }
