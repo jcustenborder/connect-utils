@@ -51,6 +51,7 @@ ${text}
 </#if>
 </#macro>
 
+
 <#macro connectorTag connector>
 .. ${connector.rstConnectorTag}:
 
@@ -88,6 +89,8 @@ ${text}
 
 
 <#macro configExamples input>
+<@connectorExampleTag connector=input/>
+<@subsection text="Examples"/>
 
 <#if input.examples?has_content>
 <#list input.examples as example>
