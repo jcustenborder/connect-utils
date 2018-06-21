@@ -24,27 +24,27 @@ ${text}
 <#macro notes input>
 
 <#if input.danger??>
-.. DANGER::
+.. danger::
     ${input.danger}
 
 
 </#if><#if input.warning??>
-.. WARNING::
+.. warning::
     ${input.warning}
 
 
 </#if><#if input.important??>
-.. IMPORTANT::
+.. important::
     ${input.important}
 
 
 </#if><#if input.tip??>
-.. TIP::
+.. tip::
     ${input.tip}
 
 
 </#if><#if input.note??>
-.. NOTE::
+.. note::
     ${input.note}
 
 
