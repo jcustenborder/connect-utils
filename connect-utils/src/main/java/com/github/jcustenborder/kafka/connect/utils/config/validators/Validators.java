@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,4 +34,13 @@ public class Validators {
     return BlankOrValidator.of(validator);
   }
 
+  /**
+   * Method will return a validator that will ensure that a String or List contains a URI with the
+   * proper systax
+   * @param schemes The uri schemes that are valid. If empty anything can be accepted.
+   * @return
+   */
+  public static Validator validURI(String... schemes) {
+    return new ValidURI(schemes);
+  }
 }
