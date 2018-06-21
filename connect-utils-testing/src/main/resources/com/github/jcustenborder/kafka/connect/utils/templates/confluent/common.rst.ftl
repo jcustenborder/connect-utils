@@ -73,7 +73,7 @@ ${text}
 <#list group.items as item>
 
 ``${item.name}``
-${item.doc}
+  ${item.doc}
 
   * Type: ${item.type}
   * Importance: ${item.importance}
