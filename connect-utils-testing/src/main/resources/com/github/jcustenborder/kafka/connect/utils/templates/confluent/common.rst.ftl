@@ -131,11 +131,11 @@ converter
 
 </#list>
 <#else >
-<@subsubsection text="Property based example" />
+<@subsubsection text="Property based" />
 
 <@configProperties connector=input />
 
-<@subsubsection text="Rest based example" />
+<@subsubsection text="Rest based" />
 
 <@configJson connector=input />
 </#if>
