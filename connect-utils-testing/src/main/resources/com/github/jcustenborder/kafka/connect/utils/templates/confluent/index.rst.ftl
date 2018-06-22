@@ -10,7 +10,7 @@ Contents:
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
 
 <#if input.sourceConnectors?has_content><#list input.sourceConnectors as source>   ${source.confluentConnectorFileName}
    ${source.confluentConnectorConfigFileName}
