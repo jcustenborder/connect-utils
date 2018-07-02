@@ -18,6 +18,7 @@ package com.github.jcustenborder.kafka.connect.utils.config;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
 import com.google.common.primitives.Ints;
 import org.apache.kafka.common.config.AbstractConfig;
@@ -31,6 +32,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 
 public class ConfigUtils {
@@ -149,8 +151,9 @@ public class ConfigUtils {
 
   /**
    * Method is used to parse a string ConfigDef item to a HostAndPort
-   * @param config Config to read from
-   * @param key ConfigItem to get the host string from.
+   *
+   * @param config      Config to read from
+   * @param key         ConfigItem to get the host string from.
    * @param defaultPort The default port to use if a port was not specified. Can be null.
    * @return HostAndPort based on the ConfigItem.
    */
@@ -161,8 +164,9 @@ public class ConfigUtils {
 
   /**
    * Method is used to parse a string ConfigDef item to a HostAndPort
+   *
    * @param config Config to read from
-   * @param key ConfigItem to get the host string from.
+   * @param key    ConfigItem to get the host string from.
    * @return HostAndPort based on the ConfigItem.
    */
   public static HostAndPort hostAndPort(AbstractConfig config, String key) {
@@ -171,10 +175,10 @@ public class ConfigUtils {
 
   /**
    * Method is used to parse a list ConfigDef item to a list of HostAndPort
-   * @param config Config to read from
-   * @param key ConfigItem to get the host string from.
+   *
+   * @param config      Config to read from
+   * @param key         ConfigItem to get the host string from.
    * @param defaultPort The default port to use if a port was not specified. Can be null.
-   * @return HostAndPort based on the ConfigItem.
    * @return
    */
   public static List<HostAndPort> hostAndPorts(AbstractConfig config, String key, Integer defaultPort) {
@@ -239,7 +243,7 @@ public class ConfigUtils {
     }
     return ImmutableList.copyOf(result);
   }
-  
+
   static URI uri(String key, String value) {
     try {
       return new URI(value);
@@ -279,5 +283,18 @@ public class ConfigUtils {
       result.add(uri(key, s));
     }
     return ImmutableList.copyOf(result);
+  }
+
+  /**
+   * Method is used to retrieve a list and convert it to an immutable set.
+   *
+   * @param config Config to read
+   * @param key    Key to read
+   * @return ImmutableSet with the contents of the config key.
+   * @see com.google.common.collect.ImmutableSet
+   */
+  public static Set<String> getSet(AbstractConfig config, String key) {
+    List<String> value = config.getList(key);
+    return ImmutableSet.copyOf(value);
   }
 }
