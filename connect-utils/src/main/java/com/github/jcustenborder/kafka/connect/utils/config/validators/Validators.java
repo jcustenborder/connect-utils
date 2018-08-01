@@ -26,6 +26,7 @@ public class Validators {
   /**
    * Method will return a validator that will accept a blank string. Any other value will be passed
    * on to the supplied validator.
+   *
    * @param validator Validator to test non blank values with.
    * @return
    */
@@ -36,11 +37,28 @@ public class Validators {
 
   /**
    * Method will return a validator that will ensure that a String or List contains a URI with the
-   * proper systax
+   * proper syntax.
+   *
    * @param schemes The uri schemes that are valid. If empty anything can be accepted.
    * @return
    */
   public static Validator validURI(String... schemes) {
     return new ValidURI(schemes);
+  }
+
+  /**
+   * Method will return a validator that will ensure that a String or List contains a charset that
+   * is supported by the system.
+   *
+   * @param charsets The charsets that are allowed. If empty all of the available charsets on the
+   *                 system will be included.
+   * @return
+   */
+  public static Validator validCharset(String... charsets) {
+    if (null == charsets || charsets.length == 0) {
+      return new ValidCharset();
+    } else {
+      return new ValidCharset(charsets);
+    }
   }
 }
