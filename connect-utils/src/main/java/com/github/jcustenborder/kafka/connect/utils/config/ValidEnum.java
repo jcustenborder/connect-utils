@@ -72,6 +72,6 @@ public class ValidEnum implements ConfigDef.Validator {
 
   @Override
   public String toString() {
-    return "``" + Joiner.on("``, ``").join(this.validEnums) + "``";
+    return "Matches: ``" + Joiner.on("``, ``").join(this.validEnums) + "``";
   }
 }

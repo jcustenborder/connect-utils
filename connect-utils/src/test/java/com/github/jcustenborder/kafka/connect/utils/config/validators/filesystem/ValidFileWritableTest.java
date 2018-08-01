@@ -27,11 +27,12 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ValidDirectoryWritableTests extends FileSystemTests<ValidDirectoryWritable> {
+public class ValidFileWritableTest extends FileSystemTest<ValidFileWritable> {
   @Override
-  public ValidDirectoryWritable createValidator() {
-    return ValidDirectoryWritable.of();
+  public ValidFileWritable createValidator() {
+    return ValidFileWritable.of();
   }
 
   @Test
@@ -40,7 +41,7 @@ public class ValidDirectoryWritableTests extends FileSystemTests<ValidDirectoryW
         PosixFilePermission.OWNER_READ,
         PosixFilePermission.OWNER_WRITE
     ));
-    final Path path = createTempDirectory(attr);
+    final Path path = createTempFile(attr);
     this.validator.ensureValid("testing", path.toString());
   }
 
@@ -49,7 +50,7 @@ public class ValidDirectoryWritableTests extends FileSystemTests<ValidDirectoryW
     final FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(EnumSet.of(
         PosixFilePermission.OWNER_READ
     ));
-    final Path path = createTempDirectory(attr);
+    final Path path = createTempFile(attr);
 
     assertThrows(ConfigException.class, () -> {
       this.validator.ensureValid("testing", path.toString());

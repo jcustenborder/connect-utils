@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ValidEnumTests {
+public class ValidEnumTest {
 
   @Test
   public void valid() {
@@ -47,7 +47,7 @@ public class ValidEnumTests {
 
   @Test
   public void display() {
-    final String expected = "ValidEnum{enum=TestEnum, allowed=[one, two, three]}";
+    final String expected = "Matches: ``one``, ``two``, ``three``";
     ValidEnum validEnum = ValidEnum.of(TestEnum.class);
     assertEquals(expected, validEnum.toString());
   }

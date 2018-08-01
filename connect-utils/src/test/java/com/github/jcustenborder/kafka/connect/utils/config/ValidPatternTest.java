@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ValidPatternTests {
+public class ValidPatternTest {
 
   @Test
   public void ensureValid() {
@@ -56,7 +56,7 @@ public class ValidPatternTests {
 
   @Test
   public void display() {
-    final String expected = "ValidPattern{pattern=.*\\.csv$}";
+    final String expected = "Matches regex( .*\\.csv$ )";
     ValidPattern validPattern = ValidPattern.of(".*\\.csv$");
     assertEquals(expected, validPattern.toString());
   }
