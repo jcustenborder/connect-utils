@@ -15,7 +15,10 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config.recommenders;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.kafka.common.config.ConfigDef;
+
+import java.nio.charset.Charset;
 
 public class Recommenders {
   private Recommenders() {
@@ -55,4 +58,19 @@ public class Recommenders {
     return new EnumRecommender(enumClass, visible, excludes);
   }
 
+  public static ConfigDef.Recommender charset() {
+    return charset(VisibleCallback.ALWAYS_VISIBLE, Charset.availableCharsets().keySet());
+  }
+
+  public static ConfigDef.Recommender charset(VisibleCallback visible) {
+    return charset(visible, Charset.availableCharsets().keySet());
+  }
+
+  public static ConfigDef.Recommender charset(VisibleCallback visible, String... charsets) {
+    return charset(visible, ImmutableList.copyOf(charsets));
+  }
+
+  public static ConfigDef.Recommender charset(VisibleCallback visible, Iterable<String> charsets) {
+    return new CharsetRecommender(charsets, visible);
+  }
 }

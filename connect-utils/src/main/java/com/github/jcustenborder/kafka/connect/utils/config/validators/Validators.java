@@ -61,4 +61,14 @@ public class Validators {
       return new ValidCharset(charsets);
     }
   }
+
+  /**
+   * Method will return a validator that will ensure that a String or List contains a charset that
+   * is supported by the system.
+   *
+   * @return
+   */
+  public static Validator validCharset() {
+    return new ValidCharset();
+  }
 }
