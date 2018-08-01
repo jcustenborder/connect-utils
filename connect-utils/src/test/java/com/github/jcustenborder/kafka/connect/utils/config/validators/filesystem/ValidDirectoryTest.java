@@ -16,7 +16,6 @@
 package com.github.jcustenborder.kafka.connect.utils.config.validators.filesystem;
 
 import org.apache.kafka.common.config.ConfigException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -24,24 +23,39 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+public class ValidDirectoryTest extends FileSystemTest<ValidDirectory> {
 
-public class ValidFileTests extends FileSystemTests<ValidFile> {
   @Override
-  public ValidFile createValidator() {
-    return ValidFile.of();
+  public ValidDirectory createValidator() {
+    return ValidDirectory.of();
   }
+
+  @Test
+  public void ensureValid_nullSetting() {
+    assertThrows(ConfigException.class, () -> {
+      this.validator.ensureValid("test", null);
+    });
+  }
+
+  @Test
+  public void ensureValid_blankSetting() {
+    assertThrows(ConfigException.class, () -> {
+      this.validator.ensureValid("test", "");
+    });
+  }
+
 
   @Test
   public void fileIsDirectory() throws IOException {
     final Path input = createTempDirectory();
-    assertThrows(ConfigException.class, () -> {
-      this.validator.ensureValid("test", input.toString());
-    });
+    this.validator.ensureValid("test", input.toString());
   }
 
   @Test
   public void fileIsFile() throws IOException {
     final Path input = createTempFile();
-    this.validator.ensureValid("test", input.toString());
+    assertThrows(ConfigException.class, () -> {
+      this.validator.ensureValid("test", input.toString());
+    });
   }
 }

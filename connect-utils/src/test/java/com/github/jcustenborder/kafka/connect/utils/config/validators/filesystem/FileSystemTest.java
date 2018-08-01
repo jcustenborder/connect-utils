@@ -16,19 +16,44 @@
 package com.github.jcustenborder.kafka.connect.utils.config.validators.filesystem;
 
 import org.apache.kafka.common.config.ConfigException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ValidDirectoryTests extends FileSystemTests<ValidDirectory> {
+public abstract class FileSystemTest<T extends ValidFileSystem> {
+  private static final Logger log = LoggerFactory.getLogger(FileSystemTest.class);
+  protected T validator;
+  Set<Path> cleanup;
 
-  @Override
-  public ValidDirectory createValidator() {
-    return ValidDirectory.of();
+  public abstract T createValidator();
+
+  @BeforeEach
+  public void beforeEach() {
+    this.cleanup = new HashSet<>();
+    this.validator = createValidator();
+  }
+
+  protected Path createTempFile(FileAttribute<?>... attrs) throws IOException {
+    Path result = Files.createTempFile("test", "test", attrs);
+    this.cleanup.add(result);
+    return result;
+  }
+
+  protected Path createTempDirectory(FileAttribute<?>... attrs) throws IOException {
+    Path result = Files.createTempDirectory("test", attrs);
+    this.cleanup.add(result);
+    return result;
   }
 
   @Test
@@ -45,18 +70,17 @@ public class ValidDirectoryTests extends FileSystemTests<ValidDirectory> {
     });
   }
 
-
   @Test
-  public void fileIsDirectory() throws IOException {
-    final Path input = createTempDirectory();
-    this.validator.ensureValid("test", input.toString());
+  public void ensureValid_notString() {
+    assertThrows(ConfigException.class, () -> {
+      this.validator.ensureValid("test", 1);
+    });
   }
 
-  @Test
-  public void fileIsFile() throws IOException {
-    final Path input = createTempFile();
-    assertThrows(ConfigException.class, () -> {
-      this.validator.ensureValid("test", input.toString());
-    });
+  @AfterEach
+  public void afterEach() throws IOException {
+    for (Path p : this.cleanup) {
+      Files.deleteIfExists(p);
+    }
   }
 }

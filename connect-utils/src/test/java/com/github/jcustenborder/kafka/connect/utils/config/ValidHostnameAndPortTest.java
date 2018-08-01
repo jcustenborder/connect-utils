@@ -24,7 +24,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ValidHostnameAndPortTests {
+public class ValidHostnameAndPortTest {
 
   ValidHostnameAndPort validator;
 
