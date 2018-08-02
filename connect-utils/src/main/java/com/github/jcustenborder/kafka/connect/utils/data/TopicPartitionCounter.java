@@ -19,12 +19,20 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.connect.sink.SinkRecord;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class TopicPartitionCounter {
   private final Map<TopicPartition, Long> data = new ConcurrentHashMap<>(100);
+
+  public void increment(SinkRecord record) {
+    Preconditions.checkNotNull(record, "record cannot be null");
+    increment(record.topic(), record.kafkaPartition(), record.kafkaOffset());
+  }
 
   public void increment(TopicPartition topicPartition, long offset) {
     Preconditions.checkNotNull(topicPartition, "topicPartition cannot be null.");
@@ -45,5 +53,11 @@ public class TopicPartitionCounter {
 
   public Map<TopicPartition, Long> data() {
     return ImmutableMap.copyOf(this.data);
+  }
+
+  public List<SinkOffsetState> offsetStates() {
+    return data().entrySet().stream()
+        .map(e -> SinkOffsetState.of(e.getKey(), e.getValue()))
+        .collect(Collectors.toList());
   }
 }

@@ -15,11 +15,15 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.data;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.sink.SinkRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,6 +80,40 @@ public class TopicPartitionCounterTest {
 
     assertEquals(expected, this.counter.data());
   }
+
+  @Test
+  public void incrementSinkRecord() {
+    final TopicPartition topicPartition = new TopicPartition("test", 1);
+    final Map<TopicPartition, Long> expected = ImmutableMap.of(
+        topicPartition, 123L
+    );
+
+    SinkRecord record = new SinkRecord(
+        topicPartition.topic(),
+        topicPartition.partition(),
+        Schema.STRING_SCHEMA,
+        "",
+        Schema.STRING_SCHEMA,
+        "",
+        123L
+    );
+    this.counter.increment(record);
+    assertEquals(expected, this.counter.data());
+  }
+
+  @Test
+  public void offsetStates() {
+    final List<SinkOffsetState> expected = ImmutableList.of(
+        SinkOffsetState.of(new TopicPartition("foo", 1), 123L),
+        SinkOffsetState.of(new TopicPartition("foo", 2), 231L)
+    );
+    final TopicPartitionCounter counter = new TopicPartitionCounter();
+    counter.increment("foo", 1, 123L);
+    counter.increment("foo", 2, 231L);
+    final List<SinkOffsetState> actual = counter.offsetStates();
+    assertEquals(expected, actual);
+  }
+
 
   @Test
   public void nullTopic() {
