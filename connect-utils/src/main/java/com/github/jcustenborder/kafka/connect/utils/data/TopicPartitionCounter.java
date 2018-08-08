@@ -36,7 +36,7 @@ public class TopicPartitionCounter {
 
   public void increment(TopicPartition topicPartition, long offset) {
     Preconditions.checkNotNull(topicPartition, "topicPartition cannot be null.");
-    Preconditions.checkState(offset > 0, "offset must be greater than 0.");
+    Preconditions.checkState(offset >= 0, "offset must be greater than or equal 0.");
     synchronized (this.data) {
       long current = data.getOrDefault(topicPartition, Long.MIN_VALUE);
 
