@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class ConfigUtils {
   /**
@@ -296,5 +298,29 @@ public class ConfigUtils {
   public static Set<String> getSet(AbstractConfig config, String key) {
     List<String> value = config.getList(key);
     return ImmutableSet.copyOf(value);
+  }
+
+  /**
+   * Method is used to create a pattern based on the config element.
+   *
+   * @param config
+   * @param key
+   * @return
+   */
+  public static Pattern pattern(AbstractConfig config, String key) {
+    String pattern = config.getString(key);
+
+    try {
+      return Pattern.compile(pattern);
+    } catch (PatternSyntaxException e) {
+      throw new ConfigException(
+          key,
+          pattern,
+          String.format(
+              "Could not compile regex '%s'.",
+              pattern
+          )
+      );
+    }
   }
 }
