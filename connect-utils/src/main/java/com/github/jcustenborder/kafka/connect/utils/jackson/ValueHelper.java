@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.data.Time;
 import org.apache.kafka.connect.data.Timestamp;
+import org.apache.kafka.connect.errors.DataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,6 +195,15 @@ class ValueHelper {
             for (Map.Entry<String, Object> kvp : map.entrySet()) {
               log.trace("field {}", kvp.getKey());
               Field field = schema.field(kvp.getKey());
+              if (null == field) {
+                throw new DataException(
+                    String.format(
+                        "Could not find field '%s' of schema '%s'",
+                        field.name(),
+                        kvp.getKey()
+                    )
+                );
+              }
               struct.put(field, kvp.getValue());
             }
             result = struct;
