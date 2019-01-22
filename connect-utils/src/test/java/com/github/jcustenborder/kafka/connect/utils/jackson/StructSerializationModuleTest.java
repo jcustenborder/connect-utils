@@ -71,26 +71,6 @@ public class StructSerializationModuleTest {
         }));
   }
 
-
-  @Test
-  public void foo() throws IOException {
-    File outputPath = new File("src/test/resources/com/github/jcustenborder/kafka/connect/utils/jackson");
-
-    File inputFile = new File(outputPath, "test.cases");
-    try (JsonParser parser = ObjectMapperFactory.INSTANCE.getJsonFactory().createParser(inputFile)) {
-      MappingIterator<ObjectNode> nodes = ObjectMapperFactory.INSTANCE.readValues(parser, ObjectNode.class);
-
-      int index = 1;
-      while (nodes.hasNext()) {
-        File outputFile = new File(outputPath, String.format("struct%03d.json", index));
-        ObjectNode node = nodes.next();
-        ObjectMapperFactory.INSTANCE.writeValue(outputFile, node);
-        index++;
-      }
-    }
-  }
-
-
   @TestFactory
   public Stream<DynamicTest> roundtrip() {
 
