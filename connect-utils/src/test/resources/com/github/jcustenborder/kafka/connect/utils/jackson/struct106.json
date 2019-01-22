@@ -1,0 +1,134 @@
+{
+  "schema" : {
+    "name" : "com.example.users.User",
+    "type" : "STRUCT",
+    "isOptional" : false,
+    "fieldSchemas" : {
+      "id" : {
+        "type" : "INT64",
+        "isOptional" : false
+      },
+      "first_name" : {
+        "type" : "STRING",
+        "isOptional" : true
+      },
+      "last_name" : {
+        "type" : "STRING",
+        "isOptional" : true
+      },
+      "email" : {
+        "type" : "STRING",
+        "isOptional" : true
+      },
+      "gender" : {
+        "type" : "STRING",
+        "isOptional" : true
+      },
+      "ip_address" : {
+        "type" : "STRING",
+        "isOptional" : true
+      },
+      "last_login" : {
+        "name" : "org.apache.kafka.connect.data.Timestamp",
+        "type" : "INT64",
+        "version" : 1,
+        "isOptional" : true
+      },
+      "account_balance" : {
+        "name" : "org.apache.kafka.connect.data.Decimal",
+        "type" : "BYTES",
+        "version" : 1,
+        "parameters" : {
+          "scale" : "2"
+        },
+        "isOptional" : true
+      },
+      "country" : {
+        "type" : "STRING",
+        "isOptional" : true
+      },
+      "favorite_color" : {
+        "type" : "STRING",
+        "isOptional" : true
+      }
+    }
+  },
+  "fieldValues" : [ {
+    "name" : "id",
+    "schema" : {
+      "type" : "INT64",
+      "isOptional" : false
+    },
+    "storage" : 15
+  }, {
+    "name" : "first_name",
+    "schema" : {
+      "type" : "STRING",
+      "isOptional" : true
+    },
+    "storage" : "Norma"
+  }, {
+    "name" : "last_name",
+    "schema" : {
+      "type" : "STRING",
+      "isOptional" : true
+    },
+    "storage" : "Wilson"
+  }, {
+    "name" : "email",
+    "schema" : {
+      "type" : "STRING",
+      "isOptional" : true
+    },
+    "storage" : "nwilsone@google.com.br"
+  }, {
+    "name" : "gender",
+    "schema" : {
+      "type" : "STRING",
+      "isOptional" : true
+    },
+    "storage" : "Female"
+  }, {
+    "name" : "ip_address",
+    "schema" : {
+      "type" : "STRING",
+      "isOptional" : true
+    },
+    "storage" : "18.246.76.220"
+  }, {
+    "name" : "last_login",
+    "schema" : {
+      "name" : "org.apache.kafka.connect.data.Timestamp",
+      "type" : "INT64",
+      "version" : 1,
+      "isOptional" : true
+    },
+    "storage" : 1443319848000
+  }, {
+    "name" : "account_balance",
+    "schema" : {
+      "name" : "org.apache.kafka.connect.data.Decimal",
+      "type" : "BYTES",
+      "version" : 1,
+      "parameters" : {
+        "scale" : "2"
+      },
+      "isOptional" : true
+    },
+    "storage" : -65.19
+  }, {
+    "name" : "country",
+    "schema" : {
+      "type" : "STRING",
+      "isOptional" : true
+    },
+    "storage" : "SE"
+  }, {
+    "name" : "favorite_color",
+    "schema" : {
+      "type" : "STRING",
+      "isOptional" : true
+    },
+    "storage" : "#645119"
+  } ]
+}
