@@ -185,7 +185,7 @@ class ValueHelper {
         } else if (value instanceof Map) {
           log.trace("Map");
           Map<String, Object> map = (Map<String, Object>) value;
-          if (map.containsKey("schema") && map.get("keyValues") instanceof List) {
+          if (map.containsKey("schema") && map.get("fieldValues") instanceof List) {
             log.trace("struct stored as map.");
             Struct struct = ObjectMapperFactory.INSTANCE.convertValue(value, Struct.class);
             result = struct;
@@ -199,8 +199,8 @@ class ValueHelper {
                 throw new DataException(
                     String.format(
                         "Could not find field '%s' of schema '%s'",
-                        field.name(),
-                        kvp.getKey()
+                        kvp.getKey(),
+                        schema.name()
                     )
                 );
               }
