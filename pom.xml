@@ -58,12 +58,12 @@
         <url>https://github.com/jcustenborder/connect-utils/issues</url>
     </issueManagement>
     <properties>
-        <guava.version>18.0</guava.version>
+        <kafka.version>2.1.0-cp1</kafka.version>
+        <guava.version>27.0.1-jre</guava.version>
         <jackson.version>[2.9.8,)</jackson.version>
-        <kafka.version>2.0.0</kafka.version>
         <reflections.version>0.9.10</reflections.version>
-        <mockito.version>2.6.3</mockito.version>
-        <junit.version>5.0.0</junit.version>
+        <mockito.version>2.24.0</mockito.version>
+        <junit.version>5.3.0</junit.version>
         <junit.surefire.plugin.version>1.0.0</junit.surefire.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
