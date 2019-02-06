@@ -50,14 +50,13 @@ public class ValidHostAndPort implements ConfigDef.Validator {
       hostAndPort.withDefaultPort(this.defaultPort);
     }
 
-    if (Strings.isNullOrEmpty(hostAndPort.getHostText())) {
+    if (Strings.isNullOrEmpty(hostAndPort.getHost())) {
       throw new ConfigException(String.format("'%s'(%s) host cannot be blank or null.", setting, input));
     }
 
     if (this.portRequired && !hostAndPort.hasPort()) {
       throw new ConfigException(String.format("'%s'(%s) must specify a port.", setting, input));
     }
-
   }
 
 
