@@ -22,6 +22,12 @@ import org.apache.kafka.common.config.ConfigException;
 
 import java.util.List;
 
+/**
+ * Validator to ensure that a configuration setting is a hostname and port.
+ * @see Validators#validHostAndPort()
+ * @see Validators#validHostAndPort(Integer, boolean, boolean)
+ */
+@Deprecated
 public class ValidHostAndPort implements ConfigDef.Validator {
   final Integer defaultPort;
   final boolean requireBracketsForIPv6;

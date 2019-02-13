@@ -23,7 +23,11 @@ import org.apache.kafka.common.config.ConfigException;
 
 /**
  * Validator is used to validate that the config setting is in the proper range for a TCP or UDP port.
+ *
+ * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validPort()
+ * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validPort(int, int)
  */
+@Deprecated
 public class ValidPort implements ConfigDef.Validator {
   final int start;
   final int end;
