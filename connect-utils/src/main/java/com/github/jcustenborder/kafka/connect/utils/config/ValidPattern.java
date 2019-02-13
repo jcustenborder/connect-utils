@@ -22,6 +22,12 @@ import org.apache.kafka.common.config.ConfigException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Validator used to ensure that a value matches a regular expression.
+ * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#patternMatches(String)
+ * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#patternMatches(Pattern)
+ */
+@Deprecated
 public class ValidPattern implements ConfigDef.Validator {
   final Pattern pattern;
 

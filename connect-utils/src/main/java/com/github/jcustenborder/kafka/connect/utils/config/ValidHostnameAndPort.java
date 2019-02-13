@@ -27,7 +27,10 @@ import java.util.regex.Pattern;
 
 /**
  * Validator is used to validate that a hostname:port string is valid.
+ * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validHostAndPort()
+ * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validHostAndPort(Integer, boolean, boolean)
  */
+@Deprecated
 public class ValidHostnameAndPort implements ConfigDef.Validator {
   private static final Logger log = LoggerFactory.getLogger(ValidHostnameAndPort.class);
 

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,8 +15,13 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config.validators;
 
+import com.github.jcustenborder.kafka.connect.utils.config.ValidEnum;
+import com.github.jcustenborder.kafka.connect.utils.config.ValidPattern;
+import com.github.jcustenborder.kafka.connect.utils.config.ValidPort;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef.Validator;
+
+import java.util.regex.Pattern;
 
 public class Validators {
   private Validators() {
@@ -24,20 +29,39 @@ public class Validators {
   }
 
   /**
-   * Method will return a validator for regular expressions.
+   * Method will return a validator that will ensure that a regular expression properly compiles.
    *
-   * @return
+   * @return Method will return a validator that will ensure that a regular expression properly compiles.
    */
   public static Validator pattern() {
     return new PatternValidator();
   }
 
   /**
-   * Method will return a validator that will accept a blank string. Any other value will be passed
-   * on to the supplied validator.
+   * Method will return a validator that will validate that a string matches a regular expression
+   * @param pattern
+   * @return Method will return a validator that will validate that a string matches a regular expression
+   * @see java.util.regex.Matcher#matches()
+   */
+  public static Validator patternMatches(String pattern) {
+    return ValidPattern.of(pattern);
+  }
+
+  /**
+   * Method will return a validator that will validate that a string matches a regular expression
+   * @param pattern
+   * @return validator that will validate that a string matches a regular expression
+   * @see java.util.regex.Matcher#matches()
+   */
+  public static Validator patternMatches(Pattern pattern) {
+    return ValidPattern.of(pattern);
+  }
+
+  /**
+   * Method will return a validator that will accept a blank string. Any other value will be passed on to the supplied validator.
    *
    * @param validator Validator to test non blank values with.
-   * @return
+   * @return validator that will accept a blank string. Any other value will be passed on to the supplied validator.
    */
   public static Validator blankOr(Validator validator) {
     Preconditions.checkNotNull(validator, "validator cannot be null.");
@@ -49,11 +73,20 @@ public class Validators {
    * proper syntax.
    *
    * @param schemes The uri schemes that are valid. If empty anything can be accepted.
-   * @return
+   * @return validator
    */
   public static Validator validURI(String... schemes) {
     return new ValidURI(schemes);
   }
+
+  /**
+   * Method will return a validator that will ensure that a String or List contains an Url
+   * @return validator
+   */
+  public static Validator validUrl() {
+    return new ValidUrl();
+  }
+
 
   /**
    * Method will return a validator that will ensure that a String or List contains a charset that
@@ -61,7 +94,7 @@ public class Validators {
    *
    * @param charsets The charsets that are allowed. If empty all of the available charsets on the
    *                 system will be included.
-   * @return
+   * @return validator
    */
   public static Validator validCharset(String... charsets) {
     if (null == charsets || charsets.length == 0) {
@@ -75,9 +108,76 @@ public class Validators {
    * Method will return a validator that will ensure that a String or List contains a charset that
    * is supported by the system.
    *
-   * @return
+   * @return validator
    */
   public static Validator validCharset() {
     return new ValidCharset();
+  }
+
+  /**
+   * Method is used to create a new INSTANCE of the enum validator.
+   *
+   * @param enumClass Enum class with the entries to validate for.
+   * @param excludes  Enum entries to exclude from the validator.
+   * @return  validator
+   */
+  public static Validator validEnum(Class<?> enumClass, String... excludes) {
+    return ValidEnum.of(enumClass, excludes);
+  }
+
+  /**
+   * Method is used to create a new INSTANCE of the enum validator.
+   *
+   * @param enumClass Enum class with the entries to validate for.
+   * @param excludes  Enum entries to exclude from the validator.
+   * @return  validator
+   */
+  public static Validator validEnum(Class<? extends Enum> enumClass, Enum... excludes) {
+    String[] ex = new String[excludes.length];
+    for (int i = 0; i < ex.length; i++) {
+      ex[i] = excludes[i].toString();
+    }
+    return ValidEnum.of(enumClass, ex);
+  }
+
+  /**
+   * Creates a validator in the port range specified.
+   * @return  validator
+   */
+  public static Validator validPort() {
+    return ValidPort.of();
+  }
+
+  /**
+   * Creates a validator in the port range specified.
+   *
+   * @param start The low port of the range.
+   * @param end   The high port of the range.
+   * @return ConfigDef.Validator Validator for the port range specified.
+   * @throws IllegalStateException Throws if the start not a valid port number.
+   * @throws IllegalStateException Throws if the end not a valid port number.
+   * @throws IllegalStateException Throws if the start is greater than end.
+   */
+  public static Validator validPort(int start, int end) {
+    return ValidPort.of(start, end);
+  }
+
+  /**
+   * Validator to ensure that a configuration setting is a hostname and port.
+   * @return validator
+   */
+  public static Validator validHostAndPort() {
+    return ValidHostAndPort.of();
+  }
+
+  /**
+   * Validator to ensure that a configuration setting is a hostname and port.
+   * @param defaultPort
+   * @param requireBracketsForIPv6
+   * @param portRequired
+   * @return validator
+   */
+  public static Validator validHostAndPort(Integer defaultPort, boolean requireBracketsForIPv6, boolean portRequired) {
+    return ValidHostAndPort.of(defaultPort, requireBracketsForIPv6, portRequired);
   }
 }
