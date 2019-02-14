@@ -26,7 +26,7 @@ import java.util.Set;
 
 /**
  * Validator is used to ensure that the input string is an element in the enum.
- * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validEnum(Class, String...)
+ * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validEnum(Class, Enum[])
  */
 @Deprecated()
 public class ValidEnum implements ConfigDef.Validator {
@@ -39,7 +39,7 @@ public class ValidEnum implements ConfigDef.Validator {
    * @param enumClass Enum class with the entries to validate for.
    * @param excludes  Enum entries to exclude from the validator.
    * @return ValidEnum
-   * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validEnum(Class, String...)
+   * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validEnum(Class, Enum[])
    */
   public static ValidEnum of(Class<?> enumClass, String... excludes) {
     return new ValidEnum(enumClass, excludes);
