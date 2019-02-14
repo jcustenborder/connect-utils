@@ -20,7 +20,14 @@ import com.github.jcustenborder.kafka.connect.utils.config.ValidPattern;
 import com.github.jcustenborder.kafka.connect.utils.config.ValidPort;
 import com.google.common.base.Preconditions;
 import org.apache.kafka.common.config.ConfigDef.Validator;
+import org.apache.kafka.common.config.ConfigException;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Pattern;
 
 public class Validators {
@@ -39,6 +46,7 @@ public class Validators {
 
   /**
    * Method will return a validator that will validate that a string matches a regular expression
+   *
    * @param pattern
    * @return Method will return a validator that will validate that a string matches a regular expression
    * @see java.util.regex.Matcher#matches()
@@ -49,6 +57,7 @@ public class Validators {
 
   /**
    * Method will return a validator that will validate that a string matches a regular expression
+   *
    * @param pattern
    * @return validator that will validate that a string matches a regular expression
    * @see java.util.regex.Matcher#matches()
@@ -81,6 +90,7 @@ public class Validators {
 
   /**
    * Method will return a validator that will ensure that a String or List contains an Url
+   *
    * @return validator
    */
   public static Validator validUrl() {
@@ -119,7 +129,7 @@ public class Validators {
    *
    * @param enumClass Enum class with the entries to validate for.
    * @param excludes  Enum entries to exclude from the validator.
-   * @return  validator
+   * @return validator
    */
   public static Validator validEnum(Class<?> enumClass, String... excludes) {
     return ValidEnum.of(enumClass, excludes);
@@ -130,7 +140,7 @@ public class Validators {
    *
    * @param enumClass Enum class with the entries to validate for.
    * @param excludes  Enum entries to exclude from the validator.
-   * @return  validator
+   * @return validator
    */
   public static Validator validEnum(Class<? extends Enum> enumClass, Enum... excludes) {
     String[] ex = new String[excludes.length];
@@ -142,7 +152,8 @@ public class Validators {
 
   /**
    * Creates a validator in the port range specified.
-   * @return  validator
+   *
+   * @return validator
    */
   public static Validator validPort() {
     return ValidPort.of();
@@ -164,6 +175,7 @@ public class Validators {
 
   /**
    * Validator to ensure that a configuration setting is a hostname and port.
+   *
    * @return validator
    */
   public static Validator validHostAndPort() {
@@ -172,6 +184,7 @@ public class Validators {
 
   /**
    * Validator to ensure that a configuration setting is a hostname and port.
+   *
    * @param defaultPort
    * @param requireBracketsForIPv6
    * @param portRequired
@@ -180,4 +193,90 @@ public class Validators {
   public static Validator validHostAndPort(Integer defaultPort, boolean requireBracketsForIPv6, boolean portRequired) {
     return ValidHostAndPort.of(defaultPort, requireBracketsForIPv6, portRequired);
   }
+
+  /**
+   * Validator is used to ensure that the KeyStore type specified is valid.
+   * @return
+   */
+  public static Validator validKeyStoreType() {
+    return (s, o) -> {
+      if (!(o instanceof String)) {
+        throw new ConfigException(s, o, "Must be a string.");
+      }
+
+      String keyStoreType = o.toString();
+      try {
+        KeyStore.getInstance(keyStoreType);
+      } catch (KeyStoreException e) {
+        ConfigException exception = new ConfigException(s, o, "Invalid KeyStore type");
+        exception.initCause(e);
+        throw exception;
+      }
+    };
+  }
+
+  /**
+   * Validator is used to ensure that the KeyManagerFactory Algorithm specified is valid.
+   * @return
+   */
+  public static Validator validKeyManagerFactory() {
+    return (s, o) -> {
+      if (!(o instanceof String)) {
+        throw new ConfigException(s, o, "Must be a string.");
+      }
+
+      String keyStoreType = o.toString();
+      try {
+        KeyManagerFactory.getInstance(keyStoreType);
+      } catch (NoSuchAlgorithmException e) {
+        ConfigException exception = new ConfigException(s, o, "Invalid Algorithm");
+        exception.initCause(e);
+        throw exception;
+      }
+    };
+  }
+
+  /**
+   * Validator is used to ensure that the TrustManagerFactory Algorithm specified is valid.
+   * @return
+   */
+  public static Validator validTrustManagerFactory() {
+    return (s, o) -> {
+      if (!(o instanceof String)) {
+        throw new ConfigException(s, o, "Must be a string.");
+      }
+
+      String keyStoreType = o.toString();
+      try {
+        TrustManagerFactory.getInstance(keyStoreType);
+      } catch (NoSuchAlgorithmException e) {
+        ConfigException exception = new ConfigException(s, o, "Invalid Algorithm");
+        exception.initCause(e);
+        throw exception;
+      }
+    };
+  }
+
+  /**
+   * Validator is used to ensure that the TrustManagerFactory Algorithm specified is valid.
+   * @return
+   */
+  public static Validator validSSLContext() {
+    return (s, o) -> {
+      if (!(o instanceof String)) {
+        throw new ConfigException(s, o, "Must be a string.");
+      }
+
+      String keyStoreType = o.toString();
+      try {
+        SSLContext.getInstance(keyStoreType);
+      } catch (NoSuchAlgorithmException e) {
+        ConfigException exception = new ConfigException(s, o, "Invalid Algorithm");
+        exception.initCause(e);
+        throw exception;
+      }
+    };
+  }
+
+
 }

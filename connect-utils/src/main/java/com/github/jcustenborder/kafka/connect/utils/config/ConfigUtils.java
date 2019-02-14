@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -23,13 +24,21 @@ import com.google.common.net.HostAndPort;
 import com.google.common.primitives.Ints;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigException;
+import org.apache.kafka.common.config.types.Password;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -321,6 +330,134 @@ public class ConfigUtils {
               pattern
           )
       );
+    }
+  }
+
+  /**
+   * Method is used to return an array of bytes representing the password stored in the config.
+   * @param config Config to read from
+   * @param key Key to read from
+   * @return byte array containing the password
+   */
+  public static byte[] passwordBytes(AbstractConfig config, String key) {
+    return passwordBytes(config, key, Charsets.UTF_8);
+  }
+
+  /**
+   * Method is used to return an array of bytes representing the password stored in the config.
+   * @param config Config to read from
+   * @param key Key to read from
+   * @param charset Charset to use
+   * @return byte array containing the password
+   */
+  public static byte[] passwordBytes(AbstractConfig config, String key, String charset) {
+    return passwordBytes(config, key, Charset.forName(charset));
+  }
+
+  /**
+   * Method is used to return an array of bytes representing the password stored in the config.
+   * @param config Config to read from
+   * @param key Key to read from
+   * @param charset Charset to use
+   * @return byte array containing the password
+   */
+  public static byte[] passwordBytes(AbstractConfig config, String key, Charset charset) {
+    final Password password = config.getPassword(key);
+    return password.value().getBytes(charset);
+  }
+
+  /**
+   * Method is used to return an array of characters representing the password stored in the config.
+   * @param config Config to read from
+   * @param key Key to read from
+   * @return char array containing the password
+   */
+  public static char[] passwordCharArray(AbstractConfig config, String key) {
+    final Password password = config.getPassword(key);
+    return password.value().toCharArray();
+  }
+
+  /**
+   * Method will create a KeyStore based on the KeyStore type specified in the config.
+   * @param config Config to read from.
+   * @param key Key to read from
+   * @return KeyStore based on the type specified in the config.
+   */
+  public static KeyStore keyStore(AbstractConfig config, String key) {
+    final String keyStoreType = config.getString(key);
+    try {
+      return KeyStore.getInstance(keyStoreType);
+    } catch (KeyStoreException e) {
+      ConfigException exception = new ConfigException(
+          key,
+          keyStoreType,
+          "Invalid KeyStore type."
+      );
+      exception.initCause(e);
+      throw exception;
+    }
+  }
+
+  /**
+   * Method will create a KeyManagerFactory based on the Algorithm type specified in the config.
+   * @param config Config to read from.
+   * @param key Key to read from
+   * @return KeyManagerFactory based on the type specified in the config.
+   */
+  public static KeyManagerFactory keyManagerFactory(AbstractConfig config, String key) {
+    final String keyManagerFactoryType = config.getString(key);
+    try {
+      return KeyManagerFactory.getInstance(keyManagerFactoryType);
+    } catch (NoSuchAlgorithmException e) {
+      ConfigException exception = new ConfigException(
+          key,
+          keyManagerFactoryType,
+          "Unknown Algorithm."
+      );
+      exception.initCause(e);
+      throw exception;
+    }
+  }
+
+  /**
+   * Method will create a TrustManagerFactory based on the Algorithm type specified in the config.
+   * @param config Config to read from.
+   * @param key Key to read from
+   * @return TrustManagerFactory based on the type specified in the config.
+   */
+  public static TrustManagerFactory trustManagerFactory(AbstractConfig config, String key) {
+    final String trustManagerFactoryType = config.getString(key);
+    try {
+      return TrustManagerFactory.getInstance(trustManagerFactoryType);
+    } catch (NoSuchAlgorithmException e) {
+      ConfigException exception = new ConfigException(
+          key,
+          trustManagerFactoryType,
+          "Unknown Algorithm."
+      );
+      exception.initCause(e);
+      throw exception;
+    }
+  }
+
+  /**
+   * Method will create a SSLContext based on the Algorithm type specified in the config.
+   * @param config Config to read from.
+   * @param key Key to read from
+   * @return SSLContext based on the type specified in the config.
+   */
+  public static SSLContext sslContext(AbstractConfig config, String key) {
+    final String trustManagerFactoryType = config.getString(key);
+    try {
+      return SSLContext.getInstance(trustManagerFactoryType);
+    } catch (NoSuchAlgorithmException e) {
+      ConfigException exception = new ConfigException(
+          key,
+          trustManagerFactoryType,
+          "Unknown Algorithm."
+      );
+      exception.initCause(e);
+      throw exception;
     }
   }
 }
