@@ -131,17 +131,6 @@ public class Validators {
    * @param excludes  Enum entries to exclude from the validator.
    * @return validator
    */
-  public static Validator validEnum(Class<?> enumClass, String... excludes) {
-    return ValidEnum.of(enumClass, excludes);
-  }
-
-  /**
-   * Method is used to create a new INSTANCE of the enum validator.
-   *
-   * @param enumClass Enum class with the entries to validate for.
-   * @param excludes  Enum entries to exclude from the validator.
-   * @return validator
-   */
   public static Validator validEnum(Class<? extends Enum> enumClass, Enum... excludes) {
     String[] ex = new String[excludes.length];
     for (int i = 0; i < ex.length; i++) {
