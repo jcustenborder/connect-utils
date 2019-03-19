@@ -48,26 +48,6 @@ import java.util.regex.PatternSyntaxException;
 
 public class ConfigUtils {
   /**
-   * Method is used to return a class that should be assignable to the expected class. For example when a user implements
-   * an interface that is loaded at runtime. It is good to ensure that the proper interface has been implemented.
-   *
-   * @param config   config that has the class setting
-   * @param key      key to read
-   * @param expected expected parent class or interface
-   * @param <T>      Class type to return.
-   * @return Returns a class if it's assignable from the specified class.
-   * @throws IllegalStateException Thrown if it fails expected.isAssignableFrom(cls).
-   */
-  public static <T> Class<T> getClass(AbstractConfig config, String key, Class<T> expected) {
-    Preconditions.checkNotNull(config, "config cannot be null");
-    Preconditions.checkNotNull(key, "key cannot be null");
-    Preconditions.checkNotNull(expected, "expected cannot be null");
-    Class<?> cls = config.getClass(key);
-    Preconditions.checkState(expected.isAssignableFrom(cls), "'%s' is not assignable from '%s'", expected.getSimpleName(), cls.getSimpleName());
-    return (Class<T>) cls;
-  }
-
-  /**
    * Method is used to return an enum value from a given string.
    *
    * @param enumClass Class for the resulting enum value
@@ -107,7 +87,13 @@ public class ConfigUtils {
     Preconditions.checkNotNull(config, "config cannot be null");
     String path = config.getString(key);
     File file = new File(path);
-    Preconditions.checkState(file.isAbsolute(), "'%s' must be an absolute path.", key);
+    if (!file.isAbsolute()) {
+      throw new ConfigException(
+          key,
+          path,
+          "Must be an absolute path."
+      );
+    }
     return new File(path);
   }
 
@@ -335,8 +321,9 @@ public class ConfigUtils {
 
   /**
    * Method is used to return an array of bytes representing the password stored in the config.
+   *
    * @param config Config to read from
-   * @param key Key to read from
+   * @param key    Key to read from
    * @return byte array containing the password
    */
   public static byte[] passwordBytes(AbstractConfig config, String key) {
@@ -345,8 +332,9 @@ public class ConfigUtils {
 
   /**
    * Method is used to return an array of bytes representing the password stored in the config.
-   * @param config Config to read from
-   * @param key Key to read from
+   *
+   * @param config  Config to read from
+   * @param key     Key to read from
    * @param charset Charset to use
    * @return byte array containing the password
    */
@@ -356,8 +344,9 @@ public class ConfigUtils {
 
   /**
    * Method is used to return an array of bytes representing the password stored in the config.
-   * @param config Config to read from
-   * @param key Key to read from
+   *
+   * @param config  Config to read from
+   * @param key     Key to read from
    * @param charset Charset to use
    * @return byte array containing the password
    */
@@ -368,8 +357,9 @@ public class ConfigUtils {
 
   /**
    * Method is used to return an array of characters representing the password stored in the config.
+   *
    * @param config Config to read from
-   * @param key Key to read from
+   * @param key    Key to read from
    * @return char array containing the password
    */
   public static char[] passwordCharArray(AbstractConfig config, String key) {
@@ -379,8 +369,9 @@ public class ConfigUtils {
 
   /**
    * Method will create a KeyStore based on the KeyStore type specified in the config.
+   *
    * @param config Config to read from.
-   * @param key Key to read from
+   * @param key    Key to read from
    * @return KeyStore based on the type specified in the config.
    */
   public static KeyStore keyStore(AbstractConfig config, String key) {
@@ -400,8 +391,9 @@ public class ConfigUtils {
 
   /**
    * Method will create a KeyManagerFactory based on the Algorithm type specified in the config.
+   *
    * @param config Config to read from.
-   * @param key Key to read from
+   * @param key    Key to read from
    * @return KeyManagerFactory based on the type specified in the config.
    */
   public static KeyManagerFactory keyManagerFactory(AbstractConfig config, String key) {
@@ -421,8 +413,9 @@ public class ConfigUtils {
 
   /**
    * Method will create a TrustManagerFactory based on the Algorithm type specified in the config.
+   *
    * @param config Config to read from.
-   * @param key Key to read from
+   * @param key    Key to read from
    * @return TrustManagerFactory based on the type specified in the config.
    */
   public static TrustManagerFactory trustManagerFactory(AbstractConfig config, String key) {
@@ -442,8 +435,9 @@ public class ConfigUtils {
 
   /**
    * Method will create a SSLContext based on the Algorithm type specified in the config.
+   *
    * @param config Config to read from.
-   * @param key Key to read from
+   * @param key    Key to read from
    * @return SSLContext based on the type specified in the config.
    */
   public static SSLContext sslContext(AbstractConfig config, String key) {
