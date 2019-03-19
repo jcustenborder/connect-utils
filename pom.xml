@@ -22,12 +22,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.jcustenborder.kafka.connect</groupId>
     <artifactId>connect-utils-parent</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>connect-utils-parent</name>
     <description>A helper library for building Kafka Connect Connectors.</description>
     <url>https://github.com/jcustenborder/connect-utils</url>
-    <inceptionYear>2016</inceptionYear>
+    <inceptionYear>2019</inceptionYear>
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
@@ -35,6 +35,9 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    <prerequisites>
+        <maven>3.3.0</maven>
+    </prerequisites>
     <developers>
         <developer>
             <id>jcustenborder</id>
@@ -58,12 +61,16 @@
         <url>https://github.com/jcustenborder/connect-utils/issues</url>
     </issueManagement>
     <properties>
-        <kafka.version>2.1.0-cp1</kafka.version>
-        <guava.version>27.0.1-jre</guava.version>
+        <kafka.version>2.1.1-cp1</kafka.version>
+        <guava.version>27.1-jre</guava.version>
+        <freemarker.version>2.3.28</freemarker.version>
         <jackson.version>[2.9.8,)</jackson.version>
         <reflections.version>0.9.10</reflections.version>
-        <mockito.version>2.24.0</mockito.version>
+        <mockito.version>2.25.1</mockito.version>
+        <immutables.version>2.7.5</immutables.version>
         <junit.version>5.3.0</junit.version>
+
+        <maven.checkstyle.version>3.0.0</maven.checkstyle.version>
         <junit.surefire.plugin.version>1.0.0</junit.surefire.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -89,9 +96,14 @@
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-            <version>2.3.25-incubating</version>
+            <version>${freemarker.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
+            <version>${immutables.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

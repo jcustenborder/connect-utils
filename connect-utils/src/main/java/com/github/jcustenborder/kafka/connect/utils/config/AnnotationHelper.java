@@ -88,4 +88,14 @@ public class AnnotationHelper {
     Title annotation = p.getAnnotation(Title.class);
     return (null != annotation) ? annotation.value() : CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, p.getName());
   }
+
+  public static String pluginOwner(Package p) {
+    PluginOwner annotation = p.getAnnotation(PluginOwner.class);
+    return (null != annotation) ? annotation.value() : null;
+  }
+
+  public static String pluginName(Package p) {
+    PluginName annotation = p.getAnnotation(PluginName.class);
+    return (null != annotation) ? annotation.value() : null;
+  }
 }

@@ -1,46 +1,35 @@
 <#-- @formatter:off --><#include "common.md.ftl">
 # Introduction
+<#assign documentationRoot = "https://jcustenborder.github.io/kafka-connect-documentation/projects/${input.pluginName}">
+[Documentation](${documentationRoot})
+
+Installation through the [Confluent Hub Client](https://docs.confluent.io/current/connect/managing/confluent-hub/client.html)
 
 <#if input.introduction?has_content>${input.introduction}</#if>
 
-<@banners connector=input/>
-
 <#if input.sourceConnectors?has_content>
-# Source Connectors
+    <#list input.sourceConnectors as connector>
+## [${connector.title}](${documentationRoot}/sources/${connector.cls.simpleName}.html)
 
-<#list input.sourceConnectors as connector>
-
-<@details connector=connector/>
-
-<@config connector=connector/>
-
-</#list>
+<#if connector.description??>${connector.description}</#if>
+    </#list>
 </#if>
 
 <#if input.sinkConnectors?has_content>
-# Sink Connectors
+    <#list input.sinkConnectors as connector>
+## [${connector.title}](${documentationRoot}/sinks/${connector.cls.simpleName}.html)
 
-<#list input.sinkConnectors as connector>
-
-<@details connector=connector/>
-
-<@config connector=connector/>
-
-<@examples connector=connector/>
-
-</#list>
+<#if connector.description??>${connector.description}</#if>
+    </#list>
 </#if>
 
 <#if input.transformations?has_content>
-# Transformations
+    <#list input.transformations as transformation>
+## [${transformation.title}](${documentationRoot}/transformations/${transformation.cls.simpleName}.html)
 
-<#list input.transformations as transformation>
-
-<@details connector=transformation/>
-
-<@config connector=transformation/>
-
-</#list>
+<#if transformation.description??>${transformation.description}</#if>
+    </#list>
+</#if>
 
 # Development
 
@@ -49,5 +38,3 @@
 ```bash
 mvn clean package
 ```
-
-</#if>

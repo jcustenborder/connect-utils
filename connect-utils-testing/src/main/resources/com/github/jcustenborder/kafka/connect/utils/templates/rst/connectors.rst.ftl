@@ -1,5 +1,10 @@
 <#-- @formatter:off --><#include "common.rst.ftl">
-<@section text="${input.title} Connectors"/>
+<@section text="${input.title}"/>
+
+${input.introduction}
+
+
+<@notes input=input/>
 
 <#if input.sourceConnectors?has_content>
 .. toctree::
