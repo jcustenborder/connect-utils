@@ -99,6 +99,7 @@ public abstract class BaseDocumentationTest {
     configuration.setDefaultEncoding("UTF-8");
     configuration.setTemplateLoader(loader);
     configuration.setObjectWrapper(new BeansWrapper(Configuration.getVersion()));
+    configuration.setNumberFormat("computer");
   }
 
 
@@ -459,7 +460,6 @@ public abstract class BaseDocumentationTest {
                 log.trace("delta: start={} end={}", delta.getTarget().getPosition(), delta.getTarget().last());
                 final int lineStart = delta.getTarget().getPosition() + 1;
                 final int lineEnd = lineStart + delta.getTarget().size() - 1;
-
                 for (int i = lineStart; i <= lineEnd; i++) {
                   builder.addOutputEmphasizeLines(i);
                 }
