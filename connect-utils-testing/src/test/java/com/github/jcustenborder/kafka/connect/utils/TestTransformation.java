@@ -22,6 +22,7 @@ import com.github.jcustenborder.kafka.connect.utils.config.DocumentationNote;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationTip;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationWarning;
 import com.github.jcustenborder.kafka.connect.utils.config.Title;
+import com.google.common.collect.ImmutableList;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.ConnectRecord;
 import org.apache.kafka.connect.transforms.Transformation;
@@ -44,7 +45,15 @@ public class TestTransformation<R extends ConnectRecord<R>> implements Transform
   @Override
   public ConfigDef config() {
     return new ConfigDef()
-        .define("important", ConfigDef.Type.STRING, ConfigDef.Importance.HIGH, "This is an important value.");
+        .define("important", ConfigDef.Type.STRING, ConfigDef.Importance.HIGH, "This is an important value.")
+        .define("int", ConfigDef.Type.INT, Integer.MAX_VALUE, ConfigDef.Importance.HIGH, "This is an important value.")
+        .define("short", ConfigDef.Type.SHORT, Short.MAX_VALUE, ConfigDef.Importance.HIGH, "This is an important value.")
+        .define("long", ConfigDef.Type.LONG, Long.MAX_VALUE, ConfigDef.Importance.HIGH, "This is an important value.")
+        .define("double", ConfigDef.Type.DOUBLE, Double.MAX_VALUE, ConfigDef.Importance.HIGH, "This is an important value.")
+        .define("boolean", ConfigDef.Type.BOOLEAN, Boolean.TRUE, ConfigDef.Importance.HIGH, "This is an important value.")
+        .define("list", ConfigDef.Type.LIST, ImmutableList.of("one", "two", "three"), ConfigDef.Importance.HIGH, "This is an important value.")
+        .define("password", ConfigDef.Type.PASSWORD, "password", ConfigDef.Importance.HIGH, "This is an important value.")
+        ;
   }
 
   @Override
