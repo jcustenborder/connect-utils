@@ -68,7 +68,7 @@ ${item.doc}
 
 **Type:** ${item.type}
 
-<#if item.defaultValue?has_content>**Default Value:** ${item.defaultValue}
+<#if item.defaultValue?has_content>**Default Value:** ${item.defaultValue?string}
 
 </#if>
 <#if item.validator?has_content>**Validator:** ${item.validator}
@@ -86,14 +86,6 @@ ${item.doc}
 <#macro headerBar columnLengths column character="="><#list 0..<columnLengths[column] as i>${character}</#list></#macro>
 
 <#macro tablePadText columnLengths column text><#assign pad=columnLengths[column] -1><#if text??> ${text?right_pad(pad)}<#else>${" "?right_pad(pad)}</#if></#macro>
-
-<#macro configTable configs lengths>
-+<@tableBar columnLengths=lengths column="name" />+<@tableBar columnLengths=lengths column="type" />+<@tableBar columnLengths=lengths column="importance" />+<@tableBar columnLengths=lengths column="defaultValue" />+<@tableBar columnLengths=lengths column="validator" />+<@tableBar columnLengths=lengths column="doc" />+
-<#list configs as config>
-|<@tablePadText columnLengths=lengths column="name" text=config.name() />|<@tablePadText columnLengths=lengths column="type" text=":ref:`configuration-${config.type()}`" />|<@tablePadText columnLengths=lengths column="importance" text=config.importance() />|<@tablePadText columnLengths=lengths column="defaultValue" text=config.defaultValue() />|<@tablePadText columnLengths=lengths column="validator" text=config.validator() />|<@tablePadText columnLengths=lengths column="doc" text=config.doc() />|
-+<@tableBar columnLengths=lengths column="name" />+<@tableBar columnLengths=lengths column="type" />+<@tableBar columnLengths=lengths column="importance" />+<@tableBar columnLengths=lengths column="defaultValue" />+<@tableBar columnLengths=lengths column="validator" />+<@tableBar columnLengths=lengths column="doc" />+
-</#list>
-</#macro>
 
 <#macro configExamples input>
     <#if input.examples?has_content>
