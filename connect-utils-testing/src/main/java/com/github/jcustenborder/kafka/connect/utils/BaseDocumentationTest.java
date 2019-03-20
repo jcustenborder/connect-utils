@@ -157,37 +157,6 @@ public abstract class BaseDocumentationTest {
     }
   }
 
-//  protected List<Map.Entry<String, ConfigDef.ConfigKey>> required(ConfigDef configDef) {
-//    List<Map.Entry<String, ConfigDef.ConfigKey>> entries = new ArrayList<>();
-//
-//    for (Map.Entry<String, ConfigDef.ConfigKey> kvp : configDef.configKeys().entrySet()) {
-//      if (!kvp.getValue().hasDefault()) {
-//        entries.add(kvp);
-//      }
-//    }
-//
-//    return ImmutableList.copyOf(entries);
-//  }
-
-//  DynamicTest connectorRstTest(final File outputFile, Configurable configurable, final String templateName, final boolean writeExamples) {
-//    final File parentDirectory = outputFile.getParentFile();
-//    if (!parentDirectory.isDirectory()) {
-//      parentDirectory.mkdirs();
-//    }
-//
-//    return dynamicTest(configurable.getSimpleName(), () -> {
-//      write(outputFile, configurable, templateName);
-//
-//      if (writeExamples) {
-//        for (Example example : configurable.getExamples()) {
-//          example.writeJsonExample(parentDirectory);
-//          example.writePropertiesExample(parentDirectory);
-//        }
-//      }
-//
-//    });
-//  }
-
   DynamicTest connectorRstTest(final File outputFile, Plugin.Configurable configurable, final String templateName, final boolean writeExamples) {
     return dynamicTest(configurable.getCls().getSimpleName(), () -> {
       write(outputFile, configurable, templateName);
@@ -201,26 +170,6 @@ public abstract class BaseDocumentationTest {
       process(writer, template, input);
     }
   }
-
-//  DynamicTest transformRstTest(TransformationData transformationTemplate, final String templateName, final File parentDirectory) {
-//    if (!parentDirectory.isDirectory()) {
-//      parentDirectory.mkdirs();
-//    }
-//
-//    final String testName = transformationTemplate.getTestName();
-//
-//    return dynamicTest(testName, () -> {
-//      final File outputFile = new File(parentDirectory, testName.toLowerCase() + ".rst");
-//
-//      for (Example example : transformationTemplate.getExamples()) {
-//        example.writeJsonExample(parentDirectory);
-//        example.writePropertiesExample(parentDirectory);
-//      }
-//
-//      write(outputFile, transformationTemplate, templateName);
-//    });
-//  }
-
 
   @TestFactory
   public Stream<DynamicTest> rstSources() {
