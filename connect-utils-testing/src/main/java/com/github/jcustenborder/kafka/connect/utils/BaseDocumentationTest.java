@@ -29,6 +29,7 @@ import com.github.jcustenborder.kafka.connect.utils.templates.Plugin;
 import com.github.jcustenborder.kafka.connect.utils.templates.PluginLoader;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -281,15 +282,18 @@ public abstract class BaseDocumentationTest {
       config.put(e.getKey(), e.getValue());
     }
 
-    for (Map.Entry<String, Map<String, String>> transform : example.transformations().entrySet()) {
-      assertTrue(
-          transform.getValue().containsKey("type"),
-          String.format("Transform '%s' does not have a type property.", transform.getKey())
-      );
+    if (null != example.transformations() && !example.transformations().isEmpty()) {
+      config.put("transforms", Joiner.on(',').join(example.transformations().keySet()));
+      for (Map.Entry<String, Map<String, String>> transform : example.transformations().entrySet()) {
+        assertTrue(
+            transform.getValue().containsKey("type"),
+            String.format("Transform '%s' does not have a type property.", transform.getKey())
+        );
 
-      for (Map.Entry<String, String> entry : transform.getValue().entrySet()) {
-        String key = String.format("transforms.%s.%s", transform.getKey(), entry.getKey());
-        config.put(key, entry.getValue());
+        for (Map.Entry<String, String> entry : transform.getValue().entrySet()) {
+          String key = String.format("transforms.%s.%s", transform.getKey(), entry.getKey());
+          config.put(key, entry.getValue());
+        }
       }
     }
 
