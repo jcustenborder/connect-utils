@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,26 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
-import com.google.common.collect.ImmutableMap;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 public class ConfigUtilsTest {
 
-  @Test
-  public void getClassValid() {
-    ConfigUtilsTestConfig config = new ConfigUtilsTestConfig(ImmutableMap.of());
-    Class<ConfigUtilsTestInterface> actual = ConfigUtils.getClass(config, ConfigUtilsTestConfig.TEST_CLASS_CONF, ConfigUtilsTestInterface.class);
-  }
-
-  @Test
-  public void getClassInValid() {
-    assertThrows(IllegalStateException.class, () -> {
-      ConfigUtilsTestConfig config = new ConfigUtilsTestConfig(ImmutableMap.of());
-      Class<String> actual = ConfigUtils.getClass(config, ConfigUtilsTestConfig.TEST_CLASS_CONF, String.class);
-    });
-
-  }
 
 }

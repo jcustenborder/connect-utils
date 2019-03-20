@@ -51,9 +51,4 @@ public class DocumentationTest extends BaseDocumentationTest {
         )
     );
   }
-
-  @Override
-  protected String[] packages() {
-    return new String[]{this.getClass().getPackage().getName()};
-  }
 }

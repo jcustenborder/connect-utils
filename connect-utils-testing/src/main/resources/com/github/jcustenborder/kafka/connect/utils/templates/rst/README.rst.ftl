@@ -3,6 +3,12 @@
 Introduction
 ============
 
+${input.introduction}
+
+
+<@notes input=input/>
+
+
 <#if input.sourceConnectors?has_content>
 =================
 Source Connectors

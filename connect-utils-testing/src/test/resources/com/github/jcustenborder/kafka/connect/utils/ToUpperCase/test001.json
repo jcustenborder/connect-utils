@@ -1,0 +1,26 @@
+{
+  "input" : {
+    "topic" : "topic",
+    "kafkaPartition" : 1,
+    "keySchema" : {
+      "type" : "STRING",
+      "isOptional" : false
+    },
+    "key" : "five",
+    "valueSchema" : {
+      "type" : "STRING",
+      "isOptional" : false
+    },
+    "value" : "5",
+    "timestamp" : 1530286549123,
+    "timestampType" : "CREATE_TIME",
+    "offset" : 91283741,
+    "headers" : [ ]
+  },
+  "description" : "This example takes the key of the message and uppercases it.",
+  "name" : "Simple",
+  "config" : {
+    "foo" : "bar"
+  },
+  "childClass" : "Key"
+}

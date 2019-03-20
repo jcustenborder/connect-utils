@@ -22,7 +22,7 @@ ${text}
 This configuration is used typically along with `standalone mode
 <http://docs.confluent.io/current/connect/concepts.html#standalone-workers>`_.
 
-${rstHelper.propertiesExample(connector)}
+<#--${rstHelper.propertiesExample(connector)}-->
 
 
 </#macro>
@@ -35,7 +35,7 @@ Write the following json to `connector.json`, configure all of the required valu
 post the configuration to one the distributed connect worker(s). Check here for more information about the
 `Kafka Connect REST Interface. <https://docs.confluent.io/current/connect/restapi.html>`_
 
-${rstHelper.jsonExample(connector)}
+<#--${rstHelper.jsonExample(connector)}-->
 
 Use curl to post the configuration to one of the Kafka Connect Workers. Change `http://localhost:8083/` the the endpoint of
 one of your Kafka Connect worker(s).
@@ -49,13 +49,13 @@ one of your Kafka Connect worker(s).
 .. code-block:: bash
     :caption: Update an existing connector
 
-    curl -s -X PUT -H 'Content-Type: application/json' --data @connector.json http://localhost:8083/connectors/${connector.simpleName}1/config
+    curl -s -X PUT -H 'Content-Type: application/json' --data @connector.json http://localhost:8083/connectors/${connector.cls.simpleName}1/config
 
 
 </#macro>
 
 <#macro configuration configurable>
-<#list configurable.config.groups as group>
+<#list configurable.configuration.groups as group>
 <@subsection text = group.name />
 
 <#list group.items as item>
@@ -96,60 +96,16 @@ ${item.doc}
 </#macro>
 
 <#macro configExamples input>
-<@subsection text="Configuration"/>
+    <#if input.examples?has_content>
+.. toctree::
+    :maxdepth: 1
+    :caption: Examples:
+    :glob:
 
-<@configuration configurable=input />
+    examples/${input.cls.simpleName}.*
+    </#if>
 
-<@subsection text="Examples"/>
-
-<#if input.examples?has_content>
-<#list input.examples as example>
-<@subsubsection text="${example.name}" />
-
-${example.description}
-
-<@notes input=example />
-
-Select one of the following configuration methods based on how you have deployed Kafka Connect.
-Distributed Mode will the the JSON / REST examples. Standalone mode will use the properties based
-example.
-
-<#if example.type == "Connector">
-
-**Distributed Mode Json**
-
-${rstHelper.jsonExample(example)}
-
-**Standalone Mode Properties**
-
-${rstHelper.propertiesExample(example)}
-
-<#elseif example.type == "Transformation">
-
-**Distributed Mode Json**
-
-${rstHelper.jsonExample(example)}
-
-**Standalone Mode Properties**
-
-${rstHelper.propertiesExample(example)}
-
-<#elseif example.type == "Converter">
-converter
-
-</#if>
-
-</#list>
-<#else >
-<@subsubsection text="Property based example" />
-
-<@configProperties connector=input />
-
-<@subsubsection text="Rest based example" />
-
-<@configJson connector=input />
-</#if>
-
+<@configuration configurable=input/>
 </#macro>
 
 <#macro notes input>

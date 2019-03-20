@@ -30,9 +30,6 @@ class ConfigUtilsTestConfig extends AbstractConfig {
     FOUR
   }
 
-  public static String TEST_CLASS_CONF = "test.class";
-  public static String TEST_CLASS_DOC = "test.class";
-
   public static String TEMP_DIR_CONF = "tmp.dir";
   public static String TEMP_DIR_DOC = "tmp.dir";
 
@@ -52,7 +49,6 @@ class ConfigUtilsTestConfig extends AbstractConfig {
 
   public static ConfigDef getConf() {
     return new ConfigDef()
-        .define(TEST_CLASS_CONF, ConfigDef.Type.CLASS, ConfigUtilsTestClass.class.getName(), ConfigDef.Importance.HIGH, TEST_CLASS_DOC)
         .define(TEMP_DIR_CONF, ConfigDef.Type.STRING, "/tmp", ConfigDef.Importance.HIGH, TEMP_DIR_DOC)
         .define(ENUM_VALUE_CONF, ConfigDef.Type.STRING, EnumTest.ONE.name(), ConfigDef.Importance.HIGH, ENUM_VALUE_DOC);
   }

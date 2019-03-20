@@ -28,14 +28,14 @@ import org.apache.kafka.connect.transforms.Transformation;
 
 import java.util.Map;
 
-@Title("TestTransformation")
+@Title("TestKeyAndValueTransformation")
 @Description("This transformation is used to rename fields in the key.")
 @DocumentationNote("This is a note")
 @DocumentationTip("This is a tip")
 @DocumentationImportant("This is important")
 @DocumentationDanger("This is a danger")
 @DocumentationWarning("This is a warning")
-public class TestTransformation<R extends ConnectRecord<R>> implements Transformation<R> {
+public abstract class TestKeyAndValueTransformation<R extends ConnectRecord<R>> implements Transformation<R> {
   @Override
   public R apply(R sourceRecord) {
     return null;
@@ -54,6 +54,14 @@ public class TestTransformation<R extends ConnectRecord<R>> implements Transform
 
   @Override
   public void configure(Map<String, ?> map) {
+
+  }
+
+  public static class Key<R extends ConnectRecord<R>> extends TestKeyAndValueTransformation<R> {
+
+  }
+
+  public static class Value<R extends ConnectRecord<R>> extends TestKeyAndValueTransformation<R> {
 
   }
 }
