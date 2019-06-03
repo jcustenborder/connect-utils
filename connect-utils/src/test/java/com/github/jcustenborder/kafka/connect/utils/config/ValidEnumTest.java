@@ -15,6 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.kafka.common.config.ConfigException;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,11 @@ public class ValidEnumTest {
   public void valid() {
     ValidEnum validEnum = ValidEnum.of(TestEnum.class);
     validEnum.ensureValid("testing", TestEnum.one.name());
+  }
+  @Test
+  public void validList() {
+    ValidEnum validEnum = ValidEnum.of(TestEnum.class);
+    validEnum.ensureValid("testing", ImmutableList.of(TestEnum.one.name()));
   }
 
   @Test

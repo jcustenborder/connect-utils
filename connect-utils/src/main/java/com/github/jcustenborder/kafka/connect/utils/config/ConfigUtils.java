@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
 import com.google.common.primitives.Ints;
 import org.apache.kafka.common.config.AbstractConfig;
+import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.config.types.Password;
 
@@ -55,13 +56,39 @@ public class ConfigUtils {
    * @param key       key for the value
    * @param <T>       Enum class to return type for.
    * @return enum value for the given key.
-   * @see ValidEnum
+   * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validEnum(Class, Enum[])
    */
   public static <T extends Enum<T>> T getEnum(Class<T> enumClass, AbstractConfig config, String key) {
     Preconditions.checkNotNull(enumClass, "enumClass cannot be null");
     Preconditions.checkState(enumClass.isEnum(), "enumClass must be an enum.");
     String textValue = config.getString(key);
     return Enum.valueOf(enumClass, textValue);
+  }
+
+  /**
+   * Method is used to return enums from a list.
+   *
+   * @param enumClass
+   * @param config
+   * @param key
+   * @param <T>
+   * @return
+   * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validEnum(Class, Enum[])
+   */
+  public static <T extends Enum<T>> List<T> getEnums(Class<T> enumClass, AbstractConfig config, String key) {
+    Preconditions.checkNotNull(enumClass, "enumClass cannot be null");
+    Preconditions.checkState(enumClass.isEnum(), "enumClass must be an enum.");
+    Preconditions.checkState(
+        ConfigDef.Type.LIST == config.typeOf(key),
+        "'%s' must be a list",
+        key
+    );
+    List<T> result = new ArrayList<>();
+    List<String> values = config.getList(key);
+    for (String value : values) {
+      result.add(Enum.valueOf(enumClass, value));
+    }
+    return result;
   }
 
   /**
