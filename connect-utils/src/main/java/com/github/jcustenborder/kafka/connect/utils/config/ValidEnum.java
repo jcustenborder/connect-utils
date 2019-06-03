@@ -22,10 +22,12 @@ import org.apache.kafka.common.config.ConfigException;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Validator is used to ensure that the input string is an element in the enum.
+ *
  * @see com.github.jcustenborder.kafka.connect.utils.config.validators.Validators#validEnum(Class, Enum[])
  */
 @Deprecated()
@@ -60,17 +62,33 @@ public class ValidEnum implements ConfigDef.Validator {
 
   @Override
   public void ensureValid(String s, Object o) {
-    if (!validEnums.contains(o)) {
+
+    if (o instanceof String) {
+      if (!validEnums.contains(o)) {
+        throw new ConfigException(
+            s,
+            String.format(
+                "'%s' is not a valid value for %s. Valid values are %s.",
+                o,
+                enumClass.getSimpleName(),
+                ConfigUtils.enumValues(enumClass)
+            )
+        );
+      }
+    } else if (o instanceof List) {
+      List list = (List) o;
+      for (Object i : list) {
+        ensureValid(s, i);
+      }
+    } else {
       throw new ConfigException(
           s,
-          String.format(
-              "'%s' is not a valid value for %s. Valid values are %s.",
-              o,
-              enumClass.getSimpleName(),
-              ConfigUtils.enumValues(enumClass)
-          )
+          o,
+          "Must be a String or List"
       );
     }
+
+
   }
 
   @Override

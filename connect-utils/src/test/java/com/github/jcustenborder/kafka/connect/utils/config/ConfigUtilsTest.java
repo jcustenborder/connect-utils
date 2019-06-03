@@ -15,7 +15,26 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
+import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtilsTestConfig.EnumTest;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class ConfigUtilsTest {
 
+
+  @Test
+  public void getEnums() {
+    ConfigUtilsTestConfig config = new ConfigUtilsTestConfig(
+        ImmutableMap.of()
+    );
+    List<EnumTest> actual = ConfigUtils.getEnums(EnumTest.class, config, ConfigUtilsTestConfig.ENUMS_VALUE_CONF);
+    assertEquals(ImmutableList.of(EnumTest.ONE), actual);
+
+  }
 
 }

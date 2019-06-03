@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.config;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
 
@@ -36,6 +37,9 @@ class ConfigUtilsTestConfig extends AbstractConfig {
   public static String ENUM_VALUE_CONF = "enum.value";
   public static String ENUM_VALUE_DOC = "enum.value";
 
+  public static String ENUMS_VALUE_CONF = "enums.value";
+  public static String ENUMS_VALUE_DOC = "enums.value";
+
   public final File tmpDir;
   public final EnumTest enumTest;
 
@@ -50,6 +54,7 @@ class ConfigUtilsTestConfig extends AbstractConfig {
   public static ConfigDef getConf() {
     return new ConfigDef()
         .define(TEMP_DIR_CONF, ConfigDef.Type.STRING, "/tmp", ConfigDef.Importance.HIGH, TEMP_DIR_DOC)
-        .define(ENUM_VALUE_CONF, ConfigDef.Type.STRING, EnumTest.ONE.name(), ConfigDef.Importance.HIGH, ENUM_VALUE_DOC);
+        .define(ENUM_VALUE_CONF, ConfigDef.Type.STRING, EnumTest.ONE.name(), ConfigDef.Importance.HIGH, ENUM_VALUE_DOC)
+        .define(ENUMS_VALUE_CONF, ConfigDef.Type.LIST, ImmutableList.of(EnumTest.ONE.name()), ConfigDef.Importance.HIGH, ENUMS_VALUE_DOC);
   }
 }
