@@ -3,7 +3,7 @@
 
 Installation through the `Confluent Hub Client <https://docs.confluent.io/current/connect/managing/confluent-hub/client.html>`_.
 
-.. code-block:: json
+.. code-block:: bash
 
     confluent-hub install ${input.pluginOwner}/${input.pluginName}:latest
 
