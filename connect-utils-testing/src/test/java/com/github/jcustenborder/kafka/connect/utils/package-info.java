@@ -17,8 +17,16 @@
 @Title("Testing")
 @PluginName("connect-utils")
 @PluginOwner("jcustenborder")
+@DocumentationNote("This is a note")
+@DocumentationDanger("This is a danger.")
+@DocumentationImportant("This is important.")
+@DocumentationWarning("This is important.")
 package com.github.jcustenborder.kafka.connect.utils;
 
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationDanger;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationImportant;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationNote;
+import com.github.jcustenborder.kafka.connect.utils.config.DocumentationWarning;
 import com.github.jcustenborder.kafka.connect.utils.config.Introduction;
 import com.github.jcustenborder.kafka.connect.utils.config.PluginName;
 import com.github.jcustenborder.kafka.connect.utils.config.PluginOwner;
