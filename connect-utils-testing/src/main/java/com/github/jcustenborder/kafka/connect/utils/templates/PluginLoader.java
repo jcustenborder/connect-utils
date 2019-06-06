@@ -319,6 +319,7 @@ public class PluginLoader {
     builder.note(AnnotationHelper.note(cls));
     builder.tip(AnnotationHelper.tip(cls));
     builder.title(AnnotationHelper.title(cls));
+    builder.warning(AnnotationHelper.warning(cls));
     return builder.build();
   }
 
@@ -330,6 +331,7 @@ public class PluginLoader {
     builder.tip(AnnotationHelper.tip(pkg));
     builder.introduction(AnnotationHelper.introduction(pkg));
     builder.title(AnnotationHelper.title(pkg));
+    builder.warning(AnnotationHelper.warning(pkg));
     return builder.build();
   }
 }

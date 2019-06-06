@@ -62,6 +62,7 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,8 +128,9 @@ public abstract class BaseDocumentationTest {
   final File transformationsDirectory = new File(this.outputDirectory, "transformations");
   final File transformationsExampleDirectory = new File(this.transformationsDirectory, "examples");
 
-  PluginLoader pluginLoader;
   Plugin plugin;
+
+  static Map<Package, Plugin> pluginCache = new HashMap<>();
 
   @BeforeEach
   public void before() throws MalformedURLException {
@@ -147,15 +149,13 @@ public abstract class BaseDocumentationTest {
         .filter(f -> !f.isDirectory())
         .forEach(File::mkdirs);
 
-
     log.info("before() - {}", this.getClass());
     Package pkg = this.getPackage();
 
-    if (null == this.pluginLoader || null == this.plugin) {
-      log.info("before() - Loading plugin");
-      this.pluginLoader = new PluginLoader(pkg);
-      this.plugin = this.pluginLoader.load();
-    }
+    this.plugin = pluginCache.computeIfAbsent(pkg, aPackage -> {
+      PluginLoader loader = new PluginLoader(aPackage);
+      return loader.load();
+    });
   }
 
   DynamicTest connectorRstTest(final File outputFile, Plugin.Configurable configurable, final String templateName, final boolean writeExamples) {
