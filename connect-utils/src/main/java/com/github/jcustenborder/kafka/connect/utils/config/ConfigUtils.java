@@ -37,6 +37,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -481,4 +482,48 @@ public class ConfigUtils {
       throw exception;
     }
   }
+
+  /**
+   * Method is used to return a charset for a string key.
+   *
+   * @param config Config to read from.
+   * @param key    Key to read from
+   * @return
+   */
+  public static Charset charset(AbstractConfig config, String key) {
+    final String charsetName = config.getString(key);
+    try {
+      return Charset.forName(charsetName);
+    } catch (final UnsupportedCharsetException ex) {
+      ConfigException exception = new ConfigException(key, charsetName, "Invalid charset.");
+      exception.initCause(ex);
+      throw exception;
+    }
+  }
+
+  /**
+   * Method is used to return a charset(s) for a list key.
+   *
+   * @param config Config to read from.
+   * @param key    Key to read from
+   * @return
+   */
+  public static List<Charset> charsets(AbstractConfig config, String key) {
+    final List<String> charsetNames = config.getList(key);
+    final List<Charset> result = new ArrayList<>(charsetNames.size());
+
+    for (String charsetName : charsetNames) {
+      try {
+        Charset charset = Charset.forName(charsetName);
+        result.add(charset);
+      } catch (final UnsupportedCharsetException ex) {
+        ConfigException exception = new ConfigException(key, charsetName, "Invalid charset.");
+        exception.initCause(ex);
+        throw exception;
+      }
+
+    }
+    return result;
+  }
+
 }
