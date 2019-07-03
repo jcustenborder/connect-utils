@@ -165,10 +165,10 @@ public class ConfigUtils {
   }
 
   static HostAndPort hostAndPort(String input, Integer defaultPort) {
-    final HostAndPort result = HostAndPort.fromString(input);
+    HostAndPort result = HostAndPort.fromString(input);
 
     if (null != defaultPort) {
-      result.withDefaultPort(defaultPort);
+      result = result.withDefaultPort(defaultPort);
     }
 
     return result;
