@@ -18,6 +18,7 @@ package com.github.jcustenborder.kafka.connect.utils.config;
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtilsTestConfig.EnumTest;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.net.HostAndPort;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -34,7 +35,13 @@ public class ConfigUtilsTest {
     );
     List<EnumTest> actual = ConfigUtils.getEnums(EnumTest.class, config, ConfigUtilsTestConfig.ENUMS_VALUE_CONF);
     assertEquals(ImmutableList.of(EnumTest.ONE), actual);
+  }
 
+  @Test
+  public void testDefaultPortHostConfig() {
+    HostAndPort hostAndPort = ConfigUtils.hostAndPort("123.4.2.3", 6432);
+    HostAndPort intended = HostAndPort.fromString("123.4.2.3:6432");
+    assertEquals(hostAndPort, intended);
   }
 
 }
