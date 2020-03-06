@@ -61,7 +61,7 @@
         <url>https://github.com/jcustenborder/connect-utils/issues</url>
     </issueManagement>
     <properties>
-        <kafka.version>2.1.1-cp1</kafka.version>
+        <kafka.version>2.4.0</kafka.version>
         <guava.version>27.1-jre</guava.version>
         <freemarker.version>2.3.28</freemarker.version>
         <jackson.version>[2.9.8,)</jackson.version>

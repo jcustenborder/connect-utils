@@ -47,6 +47,7 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.transforms.Transformation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -102,6 +103,7 @@ public abstract class BaseDocumentationTest {
     configuration.setTemplateLoader(loader);
     configuration.setObjectWrapper(new BeansWrapper(Configuration.getVersion()));
     configuration.setNumberFormat("computer");
+    configuration.setAPIBuiltinEnabled(true);
   }
 
 
@@ -450,19 +452,34 @@ public abstract class BaseDocumentationTest {
     );
   }
 
+  @Disabled
+  @Test
+  public void writeDataFile() throws IOException {
+    final File outputFile = new File(outputDirectory, "data.json");
+    ObjectMapperFactory.INSTANCE.configure(SerializationFeature.INDENT_OUTPUT, true);
+    ObjectMapperFactory.INSTANCE.writeValue(outputFile, this.plugin);
+  }
+
 
   @TestFactory
   public Stream<DynamicTest> rstTransformations() throws IOException, TemplateException {
-    if (!this.plugin.getTransformations().isEmpty()) {
-      final File outputFile = new File(outputDirectory, "transformations.rst");
-
-      Template template = configuration.getTemplate("rst/transformations.rst.ftl");
-      try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
-        process(writer, template, this.plugin);
-      }
-    }
-
     final String templateName = "rst/transformation.rst.ftl";
+
+    return this.plugin.getTransformations()
+        .stream()
+        .map(sc -> connectorRstTest(
+            outputRST(this.transformationsDirectory, sc.getCls()),
+            sc,
+            templateName,
+            true
+            )
+        );
+  }
+
+
+  @TestFactory
+  public Stream<DynamicTest> rstConverters() throws IOException, TemplateException {
+    final String templateName = "rst/converter.rst.ftl";
 
     return this.plugin.getTransformations()
         .stream()
@@ -532,20 +549,6 @@ public abstract class BaseDocumentationTest {
     Template template = configuration.getTemplate(templateName);
     try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
       process(writer, template, this.plugin);
-    }
-  }
-
-  @Test
-  public void rstConnectors() throws IOException, TemplateException {
-    final File outputFile = new File(outputDirectory, "connectors.rst");
-    final String templateName = "rst/connectors.rst.ftl";
-
-    if (!this.plugin.getSinkConnectors().isEmpty() ||
-        !this.plugin.getSourceConnectors().isEmpty()) {
-      Template template = configuration.getTemplate(templateName);
-      try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
-        process(writer, template, this.plugin);
-      }
     }
   }
 

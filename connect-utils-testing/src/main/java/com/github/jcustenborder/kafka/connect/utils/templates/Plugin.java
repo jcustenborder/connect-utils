@@ -31,8 +31,6 @@ import java.util.Map;
 
 @Value.Immutable
 public interface Plugin extends Notes {
-  Package getPackage();
-
   String getIntroduction();
 
   String getPluginName();
@@ -44,6 +42,8 @@ public interface Plugin extends Notes {
   List<SinkConnector> getSinkConnectors();
 
   List<SourceConnector> getSourceConnectors();
+
+  List<Converter> getConverters();
 
   @Value.Immutable
   interface Item {
@@ -71,6 +71,11 @@ public interface Plugin extends Notes {
     String getName();
 
     List<Item> getItems();
+  }
+
+  @Value.Immutable
+  interface Converter extends Notes {
+    Class getCls();
   }
 
   interface Configurable extends Notes {

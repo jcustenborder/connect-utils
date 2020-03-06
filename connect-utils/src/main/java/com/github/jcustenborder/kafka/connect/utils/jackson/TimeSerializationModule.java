@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.kafka.common.utils.Time;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 public class TimeSerializationModule extends SimpleModule {
 
@@ -66,6 +67,12 @@ public class TimeSerializationModule extends SimpleModule {
       final Storage storage = jsonParser.readValueAs(Storage.class);
 
       return new Time() {
+
+        @Override
+        public void waitObject(Object o, Supplier<Boolean> supplier, long l) throws InterruptedException {
+
+        }
+
         @Override
         public long milliseconds() {
           return storage.milliseconds;
