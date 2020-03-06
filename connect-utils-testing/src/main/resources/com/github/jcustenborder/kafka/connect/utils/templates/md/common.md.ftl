@@ -1,7 +1,7 @@
 <#-- @formatter:off --><#macro config connector>
 ### Configuration
 
-<#list connector.config.groups as group>
+<#list connector.configuration.groups as group>
 #### ${group.name}
 
 <#list group.items as item >
@@ -14,7 +14,7 @@ ${item.doc}
 
 *Type:* ${item.type}
 
-<#if item.defaultValue?has_content>*Default Value:* ${item.defaultValue}
+<#if item.defaultValue?has_content>*Default Value:* ${item.defaultValue?api.toString()}
 
 </#if>
 <#if item.validator?has_content>*Validator:* ${item.validator}

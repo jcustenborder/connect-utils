@@ -26,6 +26,7 @@ import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Connector;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.apache.kafka.connect.source.SourceConnector;
+import org.apache.kafka.connect.storage.Converter;
 import org.apache.kafka.connect.transforms.Transformation;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -54,6 +55,7 @@ public class PluginLoader {
   private List<Plugin.SourceConnector> sourceConnectors;
   private List<Plugin.SinkConnector> sinkConnectors;
   private List<Plugin.Transformation> transformations;
+  private List<Plugin.Converter> converters;
   private Set<String> allResources;
 
   public PluginLoader(Package pkg) {
@@ -131,6 +133,18 @@ public class PluginLoader {
         .collect(Collectors.toSet());
   }
 
+  Set<Class<? extends Converter>> findConverters() {
+    return this.reflections.getSubTypesOf(Converter.class)
+        .stream()
+        .filter(c -> c.getName().startsWith(pkg.getName()))
+        .filter(c -> Modifier.isPublic(c.getModifiers()))
+        .filter(c -> !Modifier.isAbstract(c.getModifiers()))
+        .filter((Predicate<Class<? extends Converter>>) aClass -> Arrays.stream(aClass.getConstructors())
+            .filter(c -> Modifier.isPublic(c.getModifiers()))
+            .anyMatch(c -> c.getParameterCount() == 0))
+        .collect(Collectors.toSet());
+  }
+
   Plugin.Configuration config(ConfigDef config) {
     ImmutableConfiguration.Builder configBuilder = ImmutableConfiguration.builder();
     Map<String, ImmutableGroup.Builder> groupBuilderCache = new LinkedHashMap<>();
@@ -170,7 +184,6 @@ public class PluginLoader {
   public Plugin load() {
     ImmutablePlugin.Builder builder = ImmutablePlugin.builder()
         .from(notes(this.pkg))
-        .getPackage(this.pkg)
         .pluginName(AnnotationHelper.pluginName(this.pkg))
         .pluginOwner(AnnotationHelper.pluginOwner(this.pkg));
     List<Plugin.Transformation> transformations = loadTransformations();
@@ -179,7 +192,27 @@ public class PluginLoader {
     builder.addAllSinkConnectors(sinkConnectors);
     List<Plugin.SourceConnector> sourceConnectors = loadSourceConnectors();
     builder.addAllSourceConnectors(sourceConnectors);
+    List<Plugin.Converter> converters = loadConverters();
+    builder.addAllConverters(converters);
     return builder.build();
+  }
+
+  private List<Plugin.Converter> loadConverters() {
+    if (null != this.converters) {
+      return this.converters;
+    }
+    List<Plugin.Converter> result = new ArrayList<>();
+    Set<Class<? extends Converter>> converters = findConverters();
+
+    for (Class<? extends Converter> cls : converters) {
+      log.trace("loadConverters() - processing {}", cls.getName());
+      ImmutableConverter.Builder builder = ImmutableConverter.builder()
+          .cls(cls)
+          .from(notes(cls));
+      result.add(builder.build());
+    }
+
+    return (this.converters = result);
   }
 
   private List<Plugin.SourceConnector> loadSourceConnectors() {

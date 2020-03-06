@@ -31,3 +31,13 @@ ${input.introduction}
 
     transformations/*
 </#if>
+
+
+<#if input.converters?has_content>
+.. toctree::
+    :maxdepth: 1
+    :caption: Converters:
+    :glob:
+
+    converters/*
+</#if>
