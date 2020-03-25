@@ -31,6 +31,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -42,11 +43,17 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ConfigUtils {
   /**
@@ -92,11 +99,53 @@ public class ConfigUtils {
     return result;
   }
 
+  public static <T extends Enum<T>> String enumDescription(Class<T> enumClass, T... excludes) {
+    Preconditions.checkNotNull(enumClass, "enumClass cannot be null");
+    Preconditions.checkState(enumClass.isEnum(), "enumClass must be an enum.");
+    Set<T> exclude = ImmutableSet.copyOf(excludes);
+    T[] constants = enumClass.getEnumConstants();
+    Map<T, String> descriptions = Stream.of(constants)
+        .filter(e -> !exclude.contains(e))
+        .sorted(Comparator.comparing(Enum::name))
+        .collect(
+            Collectors.toMap(
+                Function.identity(),
+                enumConstant -> {
+                  try {
+                    Field enumField = enumClass.getField(enumConstant.name());
+                    Description descriptionAttribute = enumField.getAnnotation(Description.class);
+                    String description = null != descriptionAttribute ? descriptionAttribute.value() : null;
+                    return description;
+                  } catch (NoSuchFieldException ex) {
+                    throw new IllegalStateException("Could not find field " + enumConstant.name(), ex);
+                  }
+                }, (u, v) -> {
+                  throw new IllegalStateException(String.format("Duplicate key %s", u));
+                }, LinkedHashMap::new)
+        );
+
+    return enumDescription(descriptions);
+  }
+
+  public static <T extends Enum<T>> String enumDescription(Map<T, String> descriptions) {
+    StringBuilder builder = new StringBuilder();
+    descriptions.forEach((key, value) -> {
+      if (builder.length() > 0) {
+        builder.append(", ");
+      }
+      builder.append('`');
+      builder.append(key.toString());
+      builder.append("` - ");
+      builder.append(value);
+    });
+    return builder.toString();
+  }
+
   /**
    * Method is used to return the values for an enum.
    *
    * @param enumClass Enum class to return the constants for.
-   * @return Returns a comma seperated string of all of the values in the enum.
+   * @return Returns a comma separated string of all of the values in the enum.
    */
   public static String enumValues(Class<?> enumClass) {
     Preconditions.checkNotNull(enumClass, "enumClass cannot be null");

@@ -27,12 +27,12 @@ public class ValidEnumTest {
   @Test
   public void valid() {
     ValidEnum validEnum = ValidEnum.of(TestEnum.class);
-    validEnum.ensureValid("testing", TestEnum.one.name());
+    validEnum.ensureValid("testing", TestEnum.first.name());
   }
   @Test
   public void validList() {
     ValidEnum validEnum = ValidEnum.of(TestEnum.class);
-    validEnum.ensureValid("testing", ImmutableList.of(TestEnum.one.name()));
+    validEnum.ensureValid("testing", ImmutableList.of(TestEnum.first.name()));
   }
 
   @Test
@@ -46,14 +46,14 @@ public class ValidEnumTest {
   @Test
   public void excluded() {
     assertThrows(ConfigException.class, () -> {
-      ValidEnum validEnum = ValidEnum.of(TestEnum.class, "two");
-      validEnum.ensureValid("testing", "two");
+      ValidEnum validEnum = ValidEnum.of(TestEnum.class, "second");
+      validEnum.ensureValid("testing", "second");
     });
   }
 
   @Test
   public void display() {
-    final String expected = "Matches: ``one``, ``two``, ``three``";
+    final String expected = "Matches: ``first``, ``second``, ``third``";
     ValidEnum validEnum = ValidEnum.of(TestEnum.class);
     assertEquals(expected, validEnum.toString());
   }
