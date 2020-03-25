@@ -44,4 +44,12 @@ public class ConfigUtilsTest {
     assertEquals(hostAndPort, intended);
   }
 
+  @Test
+  public void enumDescription() {
+    final String expected = "`first` - This is the first enum value, `second` - This is the second enum value, `third` - This is the third enum value";
+    String actual = ConfigUtils.enumDescription(TestEnum.class);
+    assertEquals(expected, actual);
+  }
+
+
 }
