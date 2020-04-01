@@ -14,7 +14,7 @@ ${item.doc}
 
 *Type:* ${item.type}
 
-<#if item.defaultValue?has_content>*Default Value:* ${item.defaultValue?api.toString()}
+<#if item.defaultValue?has_content>*Default Value:* ${item.defaultValue?string}
 
 </#if>
 <#if item.validator?has_content>*Validator:* ${item.validator}
