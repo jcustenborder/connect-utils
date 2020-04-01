@@ -1,13 +1,33 @@
 <#-- @formatter:off --><#include "common.md.ftl">
 # Introduction
 <#assign documentationRoot = "https://jcustenborder.github.io/kafka-connect-documentation/projects/${input.pluginName}">
-[Documentation](${documentationRoot})
-
-Installation through the [Confluent Hub Client](https://docs.confluent.io/current/connect/managing/confluent-hub/client.html)
+[Documentation](${documentationRoot}) | [Confluent Hub](https://www.confluent.io/hub/${input.pluginOwner}/${input.pluginName})
 
 <#if input.introduction?has_content>${input.introduction}</#if>
 
-<#if input.sourceConnectors?has_content>
+# Installation
+
+## Confluent Hub
+
+The following command can be used to install the plugin directly from the Confluent Hub using the
+[Confluent Hub Client](https://docs.confluent.io/current/connect/managing/confluent-hub/client.html).
+
+```bash
+confluent-hub install ${input.pluginOwner}/${input.pluginName}:latest
+```
+
+## Manually
+
+The zip file that is deployed to the [Confluent Hub](https://www.confluent.io/hub/${input.pluginOwner}/${input.pluginName}) is available under
+`target/components/packages/`. You can manually extract this zip file which includes all dependencies. All the dependencies
+that are required to deploy the plugin are under `target/kafka-connect-target` as well. Make sure that you include all the dependencies that are required
+to run the plugin.
+
+1. Create a directory under the `plugin.path` on your Connect worker.
+2. Copy all of the dependencies under the newly created subdirectory.
+3. Restart the Connect worker.
+
+<#if input.converters?has_content>
 # Converters
     <#list input.converters as converter>
 ## [${converter.title}](${documentationRoot}/sources/${converter.cls.simpleName}.html)
@@ -83,3 +103,11 @@ ${transformation.cls.name}
 ```bash
 mvn clean package
 ```
+
+## Contributions
+
+Contributions are always welcomed! Before you start any development please create an issue and
+start a discussion. Create a pull request against your newly created issue and we're happy to see
+if we can merge your pull request. First and foremost any time you're adding code to the code base
+you need to include test coverage. Make sure that you run `mvn clean package` before submitting your
+pull to ensure that all of the tests, checkstyle rules, and the package can be successfully built.
