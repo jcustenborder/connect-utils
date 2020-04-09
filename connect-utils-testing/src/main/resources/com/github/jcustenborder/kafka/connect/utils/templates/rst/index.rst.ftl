@@ -7,8 +7,20 @@ ${input.introduction}
 
 .. toctree::
     :maxdepth: 1
-    :caption: Connectors:
+    :caption: Source Connectors:
+    :hidden:
     :glob:
+
+    sources/*
+
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Sink Connectors:
+    :hidden:
+    :glob:
+
+    sinks/*
 
 
 .. toctree::
