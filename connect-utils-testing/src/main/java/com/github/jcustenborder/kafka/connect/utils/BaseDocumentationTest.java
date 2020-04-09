@@ -322,7 +322,7 @@ public abstract class BaseDocumentationTest {
           builder.config(config);
 
           if (null != example.getOutput()) {
-            builder.outputJson(ObjectMapperFactory.INSTANCE.writeValueAsString(example.getOutput()));
+            builder.outputJson(writeValueAsIndentedString(example.getOutput()));
           }
 
           write(rstOutputFile, builder.build(), "rst/sourceConnectorExample.rst.ftl");

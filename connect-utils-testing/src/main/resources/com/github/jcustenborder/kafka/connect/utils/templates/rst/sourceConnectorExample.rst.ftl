@@ -22,5 +22,6 @@ Data similar to the following will be emitted by this connector.
     <#if input.outputEmphasizeLines?has_content>:emphasize-lines: ${input.outputEmphasizeLines?join(", ")}</#if>
 
 ${input.outputJson}
+
 </#if>
 
