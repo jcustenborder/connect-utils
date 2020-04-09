@@ -24,6 +24,7 @@ import java.util.List;
 
 /**
  * Validator to ensure that a configuration setting is a hostname and port.
+ *
  * @see Validators#validHostAndPort()
  * @see Validators#validHostAndPort(Integer, boolean, boolean)
  */
@@ -79,5 +80,16 @@ public class ValidHostAndPort implements ConfigDef.Validator {
     } else {
       throw new ConfigException(String.format("'%s' must be a String or List", setting));
     }
+  }
+
+  @Override
+  public String toString() {
+    String result;
+    if (this.portRequired) {
+      result = "hostname:port";
+    } else {
+      result = "hostname[:port]";
+    }
+    return result;
   }
 }
