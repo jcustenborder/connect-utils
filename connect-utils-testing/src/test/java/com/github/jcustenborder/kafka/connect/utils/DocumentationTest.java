@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,8 +25,33 @@ public class DocumentationTest extends BaseDocumentationTest {
 
   @Override
   protected List<Schema> schemas() {
+    Schema person = SchemaBuilder.struct()
+        .name("com.github.jcustenborder.kafka.connect.utils.Person")
+        .doc("This schema represents a person.")
+        .field("firstName", SchemaBuilder.string().doc("The first name of the person").build())
+        .field("lastName", SchemaBuilder.string().doc("The last name of the person").build())
+        .build();
+    Schema simpleMapSchema = SchemaBuilder
+        .map(Schema.STRING_SCHEMA, Schema.STRING_SCHEMA)
+        .build();
+    Schema structMap = SchemaBuilder
+        .map(
+            Schema.STRING_SCHEMA,
+            person
+        ).build();
+    Schema listSchema = SchemaBuilder.array(person).optional().build();
+    Schema nestedSchema = SchemaBuilder.struct()
+        .name("com.github.jcustenborder.kafka.connect.utils.NestedSchema")
+        .doc("This schema is an example of nesting.")
+        .field("simpleMapSchema", simpleMapSchema)
+        .field("structMap", structMap)
+        .field("listSchema", listSchema)
+        .field("person", person)
+        .build();
+
     return Arrays.asList(
         Schema.STRING_SCHEMA,
+        nestedSchema,
         SchemaBuilder.struct()
             .name("com.github.jcustenborder.kafka.connect.utils.DocumentationTest")
             .doc("This is a test schema used for the documentation.")
@@ -48,7 +73,8 @@ public class DocumentationTest extends BaseDocumentationTest {
         SchemaBuilder.map(
             Schema.STRING_SCHEMA,
             Schema.STRING_SCHEMA
-        )
+        ).doc("This is something")
+            .build()
     );
   }
 }

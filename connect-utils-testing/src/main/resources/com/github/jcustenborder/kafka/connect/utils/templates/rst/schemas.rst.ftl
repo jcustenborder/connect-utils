@@ -1,5 +1,5 @@
 <#-- @formatter:off --><#include "common.rst.ftl">
-<@section text="${input.title} Schemas"/>
+<@section text="Schemas"/>
 
 .. toctree::
     :maxdepth: 0

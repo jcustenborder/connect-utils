@@ -6,37 +6,42 @@ ${input.introduction}
 <@notes input=input/>
 
 .. toctree::
-    :maxdepth: 1
-    :caption: Source Connectors:
     :hidden:
+    :maxdepth: 1
     :glob:
 
     sources/*
 
 
 .. toctree::
-    :maxdepth: 1
-    :caption: Sink Connectors:
     :hidden:
+    :maxdepth: 1
     :glob:
 
     sinks/*
 
 
 .. toctree::
+    :hidden:
     :maxdepth: 1
-    :caption: Transformations:
     :glob:
 
     transformations/*
 
 
 .. toctree::
+    :hidden:
     :maxdepth: 1
-    :caption: Converters:
     :glob:
 
     converters/*
+
+
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    schemas
 
 
 <@subsection text="Installation"/>
