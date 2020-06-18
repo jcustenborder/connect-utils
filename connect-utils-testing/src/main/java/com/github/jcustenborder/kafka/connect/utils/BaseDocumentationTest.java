@@ -22,6 +22,7 @@ import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
 import com.github.jcustenborder.kafka.connect.utils.jackson.ObjectMapperFactory;
+import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableSchemaInput;
 import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableSinkConnectorExampleInput;
 import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableSourceConnectorExampleInput;
 import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableTransformationExampleInput;
@@ -42,6 +43,7 @@ import freemarker.template.TemplateException;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigValue;
 import org.apache.kafka.connect.connector.Connector;
+import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.transforms.Transformation;
@@ -64,9 +66,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -468,7 +472,7 @@ public abstract class BaseDocumentationTest {
   }
 
 
-//  @TestFactory
+  //  @TestFactory
 //  public Stream<DynamicTest> rstConverters() throws IOException, TemplateException {
 //    final String templateName = "rst/converter.rst.ftl";
 //
@@ -482,55 +486,93 @@ public abstract class BaseDocumentationTest {
 //            )
 //        );
 //  }
+  Plugin.SchemaInput buildSchemaInput(Schema schema) {
+    return buildSchemaInput(schema, null);
+  }
 
-//  @Disabled
-//  @TestFactory
-//  public Stream<DynamicTest> rstSchemas() throws IOException, TemplateException {
-//    final File parentDirectory = new File(outputDirectory, "schemas");
-//    final List<Schema> schemas = schemas();
-//
-//    if (!schemas.isEmpty()) {
-//      if (!parentDirectory.exists()) {
-//        parentDirectory.mkdirs();
-//      }
-//
-//      final File outputFile = new File(outputDirectory, "schemas.rst");
-//      final String templateName = "rst/schemas.rst.ftl";
-//
-//      if (!this.pluginData.getSinkConnectors().isEmpty() ||
-//          !this.pluginData.getSourceConnectors().isEmpty()) {
-//        Template template = configuration.getTemplate(templateName);
-//        try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
-//          process(writer, template, this.pluginData);
-//        }
-//      }
-//    }
-//
-//    final String templateName = "rst/schema.rst.ftl";
-//    return this.schemas().stream()
-//        .filter(schema -> !Strings.isNullOrEmpty(schema.name()))
-//
-//        .map(schema -> dynamicTest(String.format("%s.%s", schema.type(), schema.name()), () -> {
-//          StringBuilder filenameBuilder = new StringBuilder()
-//              .append(schema.type().toString().toLowerCase());
-//          if (!Strings.isNullOrEmpty(schema.name())) {
-//            filenameBuilder.append('.').append(schema.name());
-//          }
-//          filenameBuilder.append(".rst");
-//          File outputFile = new File(parentDirectory, filenameBuilder.toString());
-//          Template template = configuration.getTemplate(templateName);
-//          log.info("Writing {}", outputFile);
-//
-//
-//          try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
-//            Map<String, Object> variables = ImmutableMap.of(
-//                "input", SchemaData.of(schema),
-//                "helper", new RstTemplateHelper()
-//            );
-//            template.process(variables, writer);
-//          }
-//        }));
-//  }
+  Plugin.SchemaInput buildSchemaInput(Schema schema, String fieldName) {
+    ImmutableSchemaInput.Builder schemaInput = ImmutableSchemaInput.builder()
+        .name(schema.name())
+        .doc(schema.doc())
+        .type(schema.type())
+        .fieldName(fieldName)
+        .isOptional(schema.isOptional());
+
+    if (Schema.Type.STRUCT == schema.type()) {
+      for (Field field : schema.fields()) {
+        Plugin.SchemaInput fieldSchema = buildSchemaInput(field.schema(), field.name());
+        schemaInput.addFields(fieldSchema);
+      }
+    } else if (Schema.Type.MAP == schema.type()) {
+      schemaInput.key(buildSchemaInput(schema.keySchema()));
+      schemaInput.value(buildSchemaInput(schema.valueSchema()));
+    } else if (Schema.Type.ARRAY == schema.type()) {
+      schemaInput.value(buildSchemaInput(schema.valueSchema()));
+    }
+
+    return schemaInput.build();
+  }
+
+  void findAllSchemas(Set<Schema> schemas, Schema schema) {
+    schemas.add(schema);
+    if (Schema.Type.STRUCT == schema.type()) {
+      for (Field field : schema.fields()) {
+        findAllSchemas(schemas, field.schema());
+      }
+    } else if (Schema.Type.MAP == schema.type()) {
+      findAllSchemas(schemas, schema.keySchema());
+      findAllSchemas(schemas, schema.valueSchema());
+    } else if (Schema.Type.ARRAY == schema.type()) {
+      findAllSchemas(schemas, schema.valueSchema());
+    }
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> rstSchemas() throws IOException, TemplateException {
+    final File parentDirectory = new File(outputDirectory, "schemas");
+    final List<Schema> schemas = schemas();
+    final Set<Schema> allSchemas = new LinkedHashSet<>();
+    for (Schema s : schemas) {
+      findAllSchemas(allSchemas, s);
+    }
+
+
+    if (!schemas.isEmpty()) {
+      if (!parentDirectory.exists()) {
+        parentDirectory.mkdirs();
+      }
+      final File outputFile = new File(outputDirectory, "schemas.rst");
+      final String templateName = "rst/schemas.rst.ftl";
+      Template template = configuration.getTemplate(templateName);
+      try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+        process(writer, template, this.plugin);
+      }
+    }
+
+    final String templateName = "rst/schema.rst.ftl";
+    return allSchemas.stream()
+        .filter(schema -> !Strings.isNullOrEmpty(schema.name()))
+        .map(schema -> dynamicTest(String.format("%s.%s", schema.type(), schema.name()), () -> {
+          Plugin.SchemaInput schemaInput = buildSchemaInput(schema);
+          StringBuilder filenameBuilder = new StringBuilder()
+              .append(schema.type().toString().toLowerCase());
+          if (!Strings.isNullOrEmpty(schema.name())) {
+            filenameBuilder.append('.').append(schema.name());
+          }
+          filenameBuilder.append(".rst");
+          File outputFile = new File(parentDirectory, filenameBuilder.toString());
+          Template template = configuration.getTemplate(templateName);
+          log.info("Writing {}", outputFile);
+
+
+          try (Writer writer = Files.newWriter(outputFile, Charsets.UTF_8)) {
+            Map<String, Object> variables = ImmutableMap.of(
+                "input", schemaInput
+            );
+            template.process(variables, writer);
+          }
+        }));
+  }
 
   @Test
   public void rstIndex() throws IOException, TemplateException {
