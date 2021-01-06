@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.jcustenborder.kafka.connect</groupId>
     <artifactId>connect-utils-parent</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>connect-utils-parent</name>
     <description>A helper library for building Kafka Connect Connectors.</description>
@@ -64,7 +64,7 @@
         <kafka.version>2.4.0</kafka.version>
         <guava.version>27.1-jre</guava.version>
         <freemarker.version>2.3.28</freemarker.version>
-        <jackson.version>[2.9.8,)</jackson.version>
+        <jackson.version>[2.10.5,)</jackson.version>
         <reflections.version>0.9.10</reflections.version>
         <mockito.version>2.25.1</mockito.version>
         <immutables.version>2.7.5</immutables.version>
@@ -224,6 +224,9 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <configuration>
+                            <source>8</source>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
