@@ -16,8 +16,8 @@
 package com.github.jcustenborder.kafka.connect.utils.data;
 
 import com.github.jcustenborder.kafka.connect.utils.jackson.ObjectMapperFactory;
-import com.google.common.base.Preconditions;
-import com.google.common.io.Files;
+import shaded.com.google.common.base.Preconditions;
+import shaded.com.google.common.io.Files;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.FilterBuilder;

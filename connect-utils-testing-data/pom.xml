@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.github.jcustenborder.kafka.connect</groupId>
         <artifactId>connect-utils-parent</artifactId>
-        <version>0.5-SNAPSHOT</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
     <artifactId>connect-utils-testing-data</artifactId>
     <name>connect-utils-testing-data</name>
@@ -67,7 +67,6 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>connect-utils</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -89,6 +88,10 @@
             <artifactId>reflections</artifactId>
             <version>${reflections.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>connect-api</artifactId>
         </dependency>
     </dependencies>
     <build>

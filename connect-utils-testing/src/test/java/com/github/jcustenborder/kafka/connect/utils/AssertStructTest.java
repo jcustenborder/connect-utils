@@ -15,9 +15,9 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import shaded.com.google.common.collect.ImmutableList;
+import shaded.com.google.common.collect.ImmutableMap;
+import shaded.com.google.common.collect.Lists;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
