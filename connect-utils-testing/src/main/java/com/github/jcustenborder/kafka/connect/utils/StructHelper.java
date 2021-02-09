@@ -15,8 +15,8 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import shaded.com.google.common.base.Preconditions;
+import shaded.com.google.common.base.Strings;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaAndValue;

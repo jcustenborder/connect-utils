@@ -18,10 +18,10 @@ package com.github.jcustenborder.kafka.connect.utils.templates;
 
 import com.github.jcustenborder.kafka.connect.utils.config.AnnotationHelper;
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigKeyComparator;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
+import shaded.com.google.common.base.Function;
+import shaded.com.google.common.base.Predicate;
+import shaded.com.google.common.base.Strings;
+import shaded.com.google.common.collect.ImmutableSet;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Connector;
 import org.apache.kafka.connect.sink.SinkConnector;

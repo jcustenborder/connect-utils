@@ -1,6 +1,6 @@
 package com.github.jcustenborder.kafka.connect.utils;
 
-import com.google.common.collect.ImmutableMap;
+import shaded.com.google.common.collect.ImmutableMap;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Schema.Type;

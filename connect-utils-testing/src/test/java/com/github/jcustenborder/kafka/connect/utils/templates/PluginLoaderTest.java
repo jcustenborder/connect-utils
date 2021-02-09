@@ -1,6 +1,6 @@
 package com.github.jcustenborder.kafka.connect.utils.templates;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
+import shaded.com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.jcustenborder.kafka.connect.utils.TestKeyAndValueTransformation;
 import com.github.jcustenborder.kafka.connect.utils.TestSinkConnector;
 import com.github.jcustenborder.kafka.connect.utils.TestSourceConnector;
@@ -10,8 +10,8 @@ import com.github.jcustenborder.kafka.connect.utils.jackson.ObjectMapperFactory;
 import com.github.jcustenborder.kafka.connect.utils.nodoc.NoDocTestSinkConnector;
 import com.github.jcustenborder.kafka.connect.utils.nodoc.NoDocTestSourceConnector;
 import com.github.jcustenborder.kafka.connect.utils.nodoc.NoDocTestTransformation;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import shaded.com.google.common.collect.ImmutableMap;
+import shaded.com.google.common.collect.ImmutableSet;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaAndValue;
 import org.apache.kafka.connect.data.SchemaBuilder;
