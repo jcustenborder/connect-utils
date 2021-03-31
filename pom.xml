@@ -62,7 +62,7 @@
     </issueManagement>
     <properties>
         <kafka.version>2.6.1</kafka.version>
-        <guava.version>27.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <freemarker.version>2.3.28</freemarker.version>
         <jackson.version>[2.10.5,)</jackson.version>
         <reflections.version>0.9.10</reflections.version>
