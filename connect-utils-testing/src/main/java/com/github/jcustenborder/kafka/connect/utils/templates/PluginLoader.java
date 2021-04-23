@@ -18,11 +18,8 @@ package com.github.jcustenborder.kafka.connect.utils.templates;
 
 import com.github.jcustenborder.kafka.connect.utils.config.AnnotationHelper;
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigKeyComparator;
-import shaded.com.google.common.base.Function;
-import shaded.com.google.common.base.Predicate;
-import shaded.com.google.common.base.Strings;
-import shaded.com.google.common.collect.ImmutableSet;
 import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.common.config.provider.ConfigProvider;
 import org.apache.kafka.connect.connector.Connector;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.apache.kafka.connect.source.SourceConnector;
@@ -34,6 +31,9 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -44,6 +44,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class PluginLoader {
@@ -56,6 +57,7 @@ public class PluginLoader {
   private List<Plugin.SinkConnector> sinkConnectors;
   private List<Plugin.Transformation> transformations;
   private List<Plugin.Converter> converters;
+  private List<Plugin.ConfigProvider> configProviders;
   private Set<String> allResources;
 
   public PluginLoader(Package pkg) {
@@ -82,6 +84,31 @@ public class PluginLoader {
       throw new IllegalStateException(e);
     }
   }
+
+  ConfigDef configConfig(Class<?> configClass) {
+    ConfigDef result;
+    if (!configClass.isAssignableFrom(Config.class)) {
+      result = null;
+    } else {
+      try {
+        Config config = (Config) configClass.newInstance();
+        result = config.config();
+      } catch (InstantiationException | IllegalAccessException e) {
+        throw new IllegalStateException(e);
+      }
+    }
+    return result;
+  }
+
+
+  ConfigDef configProvider(Class<? extends ConfigProvider> converterClass) {
+    return configConfig(converterClass);
+  }
+
+  ConfigDef converterConfig(Class<? extends Converter> converterClass) {
+    return configConfig(converterClass);
+  }
+
 
   Set<Class<? extends Transformation>> findTransformations() {
     Set<Class<? extends Transformation>> transforms = this.reflections.getSubTypesOf(Transformation.class)
@@ -115,7 +142,7 @@ public class PluginLoader {
         .filter(c -> c.getName().startsWith(pkg.getName()))
         .filter(c -> Modifier.isPublic(c.getModifiers()))
         .filter(c -> !Modifier.isAbstract(c.getModifiers()))
-        .filter((Predicate<Class<? extends SinkConnector>>) aClass -> Arrays.stream(aClass.getConstructors())
+        .filter(aClass -> Arrays.stream(aClass.getConstructors())
             .filter(c -> Modifier.isPublic(c.getModifiers()))
             .anyMatch(c -> c.getParameterCount() == 0))
         .collect(Collectors.toSet());
@@ -127,7 +154,7 @@ public class PluginLoader {
         .filter(c -> c.getName().startsWith(pkg.getName()))
         .filter(c -> Modifier.isPublic(c.getModifiers()))
         .filter(c -> !Modifier.isAbstract(c.getModifiers()))
-        .filter((Predicate<Class<? extends SourceConnector>>) aClass -> Arrays.stream(aClass.getConstructors())
+        .filter(aClass -> Arrays.stream(aClass.getConstructors())
             .filter(c -> Modifier.isPublic(c.getModifiers()))
             .anyMatch(c -> c.getParameterCount() == 0))
         .collect(Collectors.toSet());
@@ -139,7 +166,19 @@ public class PluginLoader {
         .filter(c -> c.getName().startsWith(pkg.getName()))
         .filter(c -> Modifier.isPublic(c.getModifiers()))
         .filter(c -> !Modifier.isAbstract(c.getModifiers()))
-        .filter((Predicate<Class<? extends Converter>>) aClass -> Arrays.stream(aClass.getConstructors())
+        .filter(aClass -> Arrays.stream(aClass.getConstructors())
+            .filter(c -> Modifier.isPublic(c.getModifiers()))
+            .anyMatch(c -> c.getParameterCount() == 0))
+        .collect(Collectors.toSet());
+  }
+
+  Set<Class<? extends ConfigProvider>> findConfigProviders() {
+    return this.reflections.getSubTypesOf(ConfigProvider.class)
+        .stream()
+        .filter(c -> c.getName().startsWith(pkg.getName()))
+        .filter(c -> Modifier.isPublic(c.getModifiers()))
+        .filter(c -> !Modifier.isAbstract(c.getModifiers()))
+        .filter(aClass -> Arrays.stream(aClass.getConstructors())
             .filter(c -> Modifier.isPublic(c.getModifiers()))
             .anyMatch(c -> c.getParameterCount() == 0))
         .collect(Collectors.toSet());
@@ -194,6 +233,8 @@ public class PluginLoader {
     builder.addAllSourceConnectors(sourceConnectors);
     List<Plugin.Converter> converters = loadConverters();
     builder.addAllConverters(converters);
+    List<Plugin.ConfigProvider> configProviders = loadConfigProviders();
+    builder.addAllConfigProviders(configProviders);
     return builder.build();
   }
 
@@ -209,11 +250,42 @@ public class PluginLoader {
       ImmutableConverter.Builder builder = ImmutableConverter.builder()
           .cls(cls)
           .from(notes(cls));
+      ConfigDef configDef = converterConfig(cls);
+      if (null != configDef) {
+        Plugin.Configuration configuration = config(configDef);
+        builder.configuration(configuration);
+      }
       result.add(builder.build());
     }
 
     return (this.converters = result);
   }
+
+  private List<Plugin.ConfigProvider> loadConfigProviders() {
+    if (null != this.configProviders) {
+      return this.configProviders;
+    }
+    List<Plugin.ConfigProvider> result = new ArrayList<>();
+    Set<Class<? extends ConfigProvider>> configProviders = findConfigProviders();
+
+    for (Class<? extends ConfigProvider> cls : configProviders) {
+      log.trace("loadConfigProviders() - processing {}", cls.getName());
+      ImmutableConfigProvider.Builder builder = ImmutableConfigProvider.builder()
+          .cls(cls)
+          .from(notes(cls));
+      ConfigDef configDef = configProvider(cls);
+
+      if (null != configDef) {
+        Plugin.Configuration configuration = config(configDef);
+        builder.configuration(configuration);
+      }
+
+      result.add(builder.build());
+    }
+
+    return (this.configProviders = result);
+  }
+
 
   private List<Plugin.SourceConnector> loadSourceConnectors() {
     if (null != this.sourceConnectors) {

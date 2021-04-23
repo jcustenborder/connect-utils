@@ -15,9 +15,9 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import shaded.com.fasterxml.jackson.core.JsonProcessingException;
-import shaded.com.fasterxml.jackson.databind.SerializationFeature;
-import shaded.com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
@@ -28,13 +28,13 @@ import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableSourceCon
 import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableTransformationExampleInput;
 import com.github.jcustenborder.kafka.connect.utils.templates.Plugin;
 import com.github.jcustenborder.kafka.connect.utils.templates.PluginLoader;
-import shaded.com.google.common.base.CaseFormat;
-import shaded.com.google.common.base.Charsets;
-import shaded.com.google.common.base.Joiner;
-import shaded.com.google.common.base.Predicate;
-import shaded.com.google.common.base.Strings;
-import shaded.com.google.common.collect.ImmutableMap;
-import shaded.com.google.common.io.Files;
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;

@@ -15,9 +15,9 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import shaded.com.google.common.base.Strings;
-import shaded.com.google.common.collect.MapDifference;
-import shaded.com.google.common.collect.Maps;
+import com.google.common.base.Strings;
+import com.google.common.collect.MapDifference;
+import com.google.common.collect.Maps;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

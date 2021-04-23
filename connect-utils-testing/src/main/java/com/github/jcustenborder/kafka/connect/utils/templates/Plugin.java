@@ -51,6 +51,8 @@ public interface Plugin extends Notes {
 
   List<Converter> getConverters();
 
+  List<ConfigProvider> getConfigProviders();
+
   @Value.Immutable
   interface Item {
     String getName();
@@ -80,13 +82,19 @@ public interface Plugin extends Notes {
   }
 
   @Value.Immutable
-  interface Converter extends Notes {
+  interface Converter extends Configurable {
+    Class getCls();
+  }
+
+  @Value.Immutable
+  interface ConfigProvider extends Configurable {
     Class getCls();
   }
 
   interface Configurable extends Notes {
     Class getCls();
 
+    @Nullable
     Configuration getConfiguration();
 
     List<String> getExamples();
