@@ -3,10 +3,11 @@
 
 .. code-block:: text
 
-${input.cls.name}
+    ${input.cls.name}
+
 
 <#if input.description??>
-    ${input.description}
+${input.description}
 </#if>
 
 <@notes input=input/>

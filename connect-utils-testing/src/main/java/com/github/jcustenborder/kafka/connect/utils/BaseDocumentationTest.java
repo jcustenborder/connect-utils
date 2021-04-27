@@ -22,6 +22,8 @@ import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
 import com.github.jcustenborder.kafka.connect.utils.jackson.ObjectMapperFactory;
+import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableConfigProviderExampleInput;
+import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableConverterExampleInput;
 import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableSchemaInput;
 import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableSinkConnectorExampleInput;
 import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableSourceConnectorExampleInput;
@@ -48,6 +50,7 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.transforms.Transformation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -58,6 +61,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
@@ -69,11 +73,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -128,9 +134,14 @@ public abstract class BaseDocumentationTest {
   final File sinksDirectory = new File(this.outputDirectory, "sinks");
   final File sinksExamplesDirectory = new File(this.sinksDirectory, "examples");
   final File transformationsDirectory = new File(this.outputDirectory, "transformations");
-  final File convertersDirectory = new File(this.outputDirectory, "converters");
-  final File configProvidersDirectory = new File(this.outputDirectory, "configProviders");
   final File transformationsExampleDirectory = new File(this.transformationsDirectory, "examples");
+
+  final File convertersDirectory = new File(this.outputDirectory, "converters");
+  final File converterExamplesDirectory = new File(this.convertersDirectory, "examples");
+
+  final File configProvidersDirectory = new File(this.outputDirectory, "configProviders");
+  final File configProviderExamplesDirectory = new File(this.configProvidersDirectory, "examples");
+
 
   Plugin plugin;
 
@@ -150,7 +161,9 @@ public abstract class BaseDocumentationTest {
         this.transformationsDirectory,
         this.transformationsExampleDirectory,
         this.convertersDirectory,
-        this.configProvidersDirectory
+        this.converterExamplesDirectory,
+        this.configProvidersDirectory,
+        this.configProviderExamplesDirectory
     )
         .filter(f -> !f.isDirectory())
         .forEach(File::mkdirs);
@@ -314,39 +327,6 @@ public abstract class BaseDocumentationTest {
         }));
   }
 
-  private String writeValueAsIndentedString(Object o) throws JsonProcessingException {
-    String result = ObjectMapperFactory.INSTANCE.writeValueAsString(o);
-    return result.replaceAll("(?m)^", "    ");
-  }
-
-  private String connectorConfig(Plugin.Connector connector, Plugin.ConnectorExample example) throws JsonProcessingException {
-    ObjectNode config = ObjectMapperFactory.INSTANCE.createObjectNode();
-    config.put("connector.class", connector.getCls().getName());
-    if (connector instanceof Plugin.SinkConnector) {
-      config.put("topic", "<required setting>");
-    }
-    for (Map.Entry<String, String> e : example.getConfig().entrySet()) {
-      config.put(e.getKey(), e.getValue());
-    }
-
-    if (null != example.transformations() && !example.transformations().isEmpty()) {
-      config.put("transforms", Joiner.on(',').join(example.transformations().keySet()));
-      for (Map.Entry<String, Map<String, String>> transform : example.transformations().entrySet()) {
-        assertTrue(
-            transform.getValue().containsKey("type"),
-            String.format("Transform '%s' does not have a type property.", transform.getKey())
-        );
-
-        for (Map.Entry<String, String> entry : transform.getValue().entrySet()) {
-          String key = String.format("transforms.%s.%s", transform.getKey(), entry.getKey());
-          config.put(key, entry.getValue());
-        }
-      }
-    }
-
-    return writeValueAsIndentedString(config);
-  }
-
   @TestFactory
   public Stream<DynamicTest> validateSourceConnectorExamples() {
     Map<File, Plugin.SourceConnector> sourceConnectorExamples = examples(this.plugin.getSourceConnectors());
@@ -373,17 +353,6 @@ public abstract class BaseDocumentationTest {
           write(rstOutputFile, builder.build(), "rst/sourceConnectorExample.rst.ftl");
         }));
   }
-
-  <T extends Plugin.Configurable> Map<File, T> examples(List<T> input) {
-    Map<File, T> result = new LinkedHashMap<>();
-    for (T configurable : input) {
-      for (String example : configurable.getExamples()) {
-        result.put(new File(example), configurable);
-      }
-    }
-    return result;
-  }
-
 
   @TestFactory
   public Stream<DynamicTest> validateTransformationExamples() {
@@ -474,13 +443,157 @@ public abstract class BaseDocumentationTest {
         }));
   }
 
+
+  void converterConfig(
+      Plugin.Converter converter,
+      Plugin.ConverterExample example,
+      ImmutableConverterExampleInput.Builder builder) throws IOException {
+
+    List<String> converters = Arrays.asList("key.converter", "value.converter");
+
+    for (String prefix : converters) {
+      Map<String, String> config = new LinkedHashMap<>();
+      config.put(prefix, converter.getCls().getName());
+      for (Map.Entry<String, String> e : example.getConfig().entrySet()) {
+        config.put(prefix + "." + e.getKey(), e.getValue());
+      }
+
+      String connectorConfig = writeValueAsIndentedString(config);
+      Properties properties = new Properties();
+      properties.putAll(config);
+      String workerConfig = writeAsIndentedString(properties);
+
+      if (prefix.equals("key.converter")) {
+        builder.connectorKeyConfig(connectorConfig);
+        builder.workerKeyConfig(workerConfig);
+      } else {
+        builder.connectorValueConfig(connectorConfig);
+        builder.workerValueConfig(workerConfig);
+      }
+    }
+  }
+
+  void configProviderConfig(
+      Plugin.ConfigProvider converter,
+      Plugin.ConfigProviderExample example,
+      ImmutableConfigProviderExampleInput.Builder builder) throws IOException {
+
+    Properties workerConfig = new Properties();
+    workerConfig.put("config.providers", example.getPrefix());
+    String workerConfigPrefix = String.join(".",
+        "config", "providers", example.getPrefix()
+    );
+    workerConfig.put(workerConfigPrefix + ".class", converter.getCls().getName());
+    for (Map.Entry<String, String> kvp : example.getConfig().entrySet()) {
+      workerConfig.put(workerConfigPrefix + ".param." + kvp.getKey(), kvp.getValue());
+    }
+    builder.config(writeAsIndentedString(workerConfig));
+    builder.connectorConfig(writeValueAsIndentedString(example.getConnectorConfig()));
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> validateConverterExamples() {
+    Map<File, Plugin.Converter> transformationExamples = examples(this.plugin.getConverters());
+
+    return transformationExamples.entrySet().stream()
+        .map(e -> dynamicTest(String.format("%s/%s", e.getValue().getCls().getSimpleName(), e.getKey().getName()), () -> {
+          final Plugin.Converter converter = e.getValue();
+          final File rstOutputFile = outputRST(
+              this.converterExamplesDirectory,
+              converter.getCls(),
+              e.getKey()
+          );
+          final Plugin.ConverterExample example = loadExample(e, Plugin.ConverterExample.class);
+          assertNotNull(converter.getConfiguration(), "Converter does not define configuration");
+          assertConfig(converter.getConfiguration().getConfigDef(), example.getConfig());
+          ImmutableConverterExampleInput.Builder builder = ImmutableConverterExampleInput.builder();
+          builder.example(example);
+          converterConfig(converter, example, builder);
+
+          write(rstOutputFile, builder.build(), "rst/converterExample.rst.ftl");
+        }));
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> validateConfigProviderExamples() {
+    Map<File, Plugin.ConfigProvider> transformationExamples = examples(this.plugin.getConfigProviders());
+
+    return transformationExamples.entrySet().stream()
+        .map(e -> dynamicTest(String.format("%s/%s", e.getValue().getCls().getSimpleName(), e.getKey().getName()), () -> {
+          final Plugin.ConfigProvider configProvider = e.getValue();
+          final File rstOutputFile = outputRST(
+              this.configProviderExamplesDirectory,
+              configProvider.getCls(),
+              e.getKey()
+          );
+          final Plugin.ConfigProviderExample example = loadExample(e, Plugin.ConfigProviderExample.class);
+          assertNotNull(configProvider.getConfiguration(), "ConfigProvider does not define configuration");
+          assertConfig(configProvider.getConfiguration().getConfigDef(), example.getConfig());
+          ImmutableConfigProviderExampleInput.Builder builder = ImmutableConfigProviderExampleInput.builder();
+          builder.example(example);
+          configProviderConfig(configProvider, example, builder);
+          write(rstOutputFile, builder.build(), "rst/configProviderExample.rst.ftl");
+        }));
+  }
+
+  private String writeAsIndentedString(Properties properties) throws IOException {
+    String result;
+    try (StringWriter writer = new StringWriter()) {
+      properties.store(writer, "");
+      result = writer.toString();
+    }
+    return result.replaceAll("(?m)^", "    ");
+  }
+
+  private String writeValueAsIndentedString(Object o) throws JsonProcessingException {
+    String result = ObjectMapperFactory.INSTANCE.writeValueAsString(o);
+    return result.replaceAll("(?m)^", "    ");
+  }
+
+  private String connectorConfig(Plugin.Connector connector, Plugin.ConnectorExample example) throws JsonProcessingException {
+    ObjectNode config = ObjectMapperFactory.INSTANCE.createObjectNode();
+    config.put("connector.class", connector.getCls().getName());
+    if (connector instanceof Plugin.SinkConnector) {
+      config.put("topic", "<required setting>");
+    }
+    for (Map.Entry<String, String> e : example.getConfig().entrySet()) {
+      config.put(e.getKey(), e.getValue());
+    }
+
+    if (null != example.transformations() && !example.transformations().isEmpty()) {
+      config.put("transforms", Joiner.on(',').join(example.transformations().keySet()));
+      for (Map.Entry<String, Map<String, String>> transform : example.transformations().entrySet()) {
+        assertTrue(
+            transform.getValue().containsKey("type"),
+            String.format("Transform '%s' does not have a type property.", transform.getKey())
+        );
+
+        for (Map.Entry<String, String> entry : transform.getValue().entrySet()) {
+          String key = String.format("transforms.%s.%s", transform.getKey(), entry.getKey());
+          config.put(key, entry.getValue());
+        }
+      }
+    }
+
+    return writeValueAsIndentedString(config);
+  }
+
+  <T extends Plugin.Configurable> Map<File, T> examples(List<T> input) {
+    Map<File, T> result = new LinkedHashMap<>();
+    for (T configurable : input) {
+      for (String example : configurable.getExamples()) {
+        result.put(new File(example), configurable);
+      }
+    }
+    return result;
+  }
+
   private <T> T loadExample(Map.Entry<File, ?> e, Class<T> cls) throws IOException {
     log.info("loadExample() - file = '{}'", e.getKey().getAbsolutePath());
     try (InputStream inputStream = this.getClass().getResourceAsStream(e.getKey().getAbsolutePath())) {
       return ObjectMapperFactory.INSTANCE.readValue(inputStream, cls);
     }
   }
-
 
   private File outputRST(File parentDirectory, Class<?> cls) {
     return new File(parentDirectory, cls.getSimpleName() + ".rst");
@@ -597,6 +710,7 @@ public abstract class BaseDocumentationTest {
     }
   }
 
+  @Disabled
   @Test
   public void readmeMD() throws IOException, TemplateException {
     final File outputFile = new File("target", "README.md");

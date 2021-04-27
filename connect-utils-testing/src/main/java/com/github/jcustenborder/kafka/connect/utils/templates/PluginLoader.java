@@ -275,6 +275,8 @@ public class PluginLoader {
       if (null != configuration) {
         builder.configuration(configuration);
       }
+      List<String> examples = findExamples(cls);
+      builder.addAllExamples(examples);
       result.add(builder.build());
     }
 
@@ -297,6 +299,8 @@ public class PluginLoader {
       if (null != configuration) {
         builder.configuration(configuration);
       }
+      List<String> examples = findExamples(cls);
+      builder.addAllExamples(examples);
 
       result.add(builder.build());
     }

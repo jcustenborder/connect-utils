@@ -1,7 +1,7 @@
 <#-- @formatter:off --><#include "common.md.ftl">
 # Introduction
 <#assign documentationRoot = "https://jcustenborder.github.io/kafka-connect-documentation/projects/${input.pluginName}">
-[Documentation](${documentationRoot}) | [Confluent Hub](https://www.confluent.io/hub/${input.pluginOwner}/${input.pluginName})
+[Documentation](${documentationRoot}) | [Download from the Confluent Hub](https://www.confluent.io/hub/${input.pluginOwner}/${input.pluginName})
 
 <#if input.introduction?has_content>${input.introduction}</#if>
 
@@ -36,6 +36,8 @@ to run the plugin.
 ${converter.cls.name}
 ```
 <#if converter.description??>${converter.description}</#if>
+<@banners connector=converter/>
+<@config connector=converter/>
     </#list>
 </#if>
 

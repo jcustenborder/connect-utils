@@ -189,11 +189,56 @@ public interface Plugin extends Notes {
     SinkRecord getInput();
   }
 
+  @Value.Style(jdkOnly = true)
   @Value.Immutable
-  interface TransformationExampleInput {
+  @JsonSerialize(as = ImmutableConverterExample.class)
+  @JsonDeserialize(as = ImmutableConverterExample.class)
+  @JsonPropertyOrder({
+      "title", "warning", "tip", "important",
+      "danger", "note", "settings"})
+  interface ConverterExample extends Example {
+
+  }
+
+  @Value.Style(jdkOnly = true)
+  @Value.Immutable
+  @JsonSerialize(as = ImmutableConfigProviderExample.class)
+  @JsonDeserialize(as = ImmutableConfigProviderExample.class)
+  @JsonPropertyOrder({
+      "title", "warning", "tip", "important",
+      "danger", "note", "settings"})
+  interface ConfigProviderExample extends Example {
+    @JsonProperty("prefix")
+    String getPrefix();
+    @JsonProperty("connectorConfig")
+    Map<String, String> getConnectorConfig();
+  }
+
+  interface ExampleInput<T extends Example> {
     @Nullable
     String getConfig();
 
+    T getExample();
+  }
+
+  @Value.Immutable
+  interface ConfigProviderExampleInput extends ExampleInput<ConfigProviderExample> {
+
+    String getConnectorConfig();
+  }
+
+  @Value.Immutable
+  interface ConverterExampleInput extends ExampleInput<ConverterExample> {
+    String getWorkerKeyConfig();
+    String getWorkerValueConfig();
+    String getConnectorKeyConfig();
+    String getConnectorValueConfig();
+  }
+
+
+
+  @Value.Immutable
+  interface TransformationExampleInput extends ExampleInput<TransformationExample> {
     List<Integer> getInputEmphasizeLines();
 
     @Nullable
@@ -203,17 +248,10 @@ public interface Plugin extends Notes {
 
     @Nullable
     String getOutputJson();
-
-    TransformationExample getExample();
   }
 
   @Value.Immutable
-  interface SinkConnectorExampleInput {
-    @Nullable
-    String getConfig();
-
-    SinkConnectorExample getExample();
-
+  interface SinkConnectorExampleInput extends ExampleInput<SinkConnectorExample> {
     @Nullable
     String getInputJson();
 
@@ -228,18 +266,12 @@ public interface Plugin extends Notes {
   }
 
   @Value.Immutable
-  interface SourceConnectorExampleInput {
-    @Nullable
-    String getConfig();
-
-    SourceConnectorExample getExample();
-
+  interface SourceConnectorExampleInput extends ExampleInput<SourceConnectorExample> {
     @Nullable
     String getOutputJson();
 
     @Nullable
     String getOutputDescription();
-
   }
 
   @Value.Immutable
