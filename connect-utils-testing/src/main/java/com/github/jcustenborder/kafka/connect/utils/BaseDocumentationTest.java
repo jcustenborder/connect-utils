@@ -50,7 +50,6 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.transforms.Transformation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -135,10 +134,8 @@ public abstract class BaseDocumentationTest {
   final File sinksExamplesDirectory = new File(this.sinksDirectory, "examples");
   final File transformationsDirectory = new File(this.outputDirectory, "transformations");
   final File transformationsExampleDirectory = new File(this.transformationsDirectory, "examples");
-
   final File convertersDirectory = new File(this.outputDirectory, "converters");
   final File converterExamplesDirectory = new File(this.convertersDirectory, "examples");
-
   final File configProvidersDirectory = new File(this.outputDirectory, "configProviders");
   final File configProviderExamplesDirectory = new File(this.configProvidersDirectory, "examples");
 
@@ -710,7 +707,6 @@ public abstract class BaseDocumentationTest {
     }
   }
 
-  @Disabled
   @Test
   public void readmeMD() throws IOException, TemplateException {
     final File outputFile = new File("target", "README.md");

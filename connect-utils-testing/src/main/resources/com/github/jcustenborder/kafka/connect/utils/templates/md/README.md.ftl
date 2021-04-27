@@ -27,10 +27,24 @@ to run the plugin.
 2. Copy all of the dependencies under the newly created subdirectory.
 3. Restart the Connect worker.
 
+<#if input.configProviders?has_content>
+# Converters
+<#list input.configProviders as configProvider>
+## [${configProvider.title}](${documentationRoot}/configProviders/${configProvider.cls.simpleName}.html)
+
+```
+${configProvider.cls.name}
+```
+<#if configProvider.description??>${configProvider.description}</#if>
+<@banners connector=configProvider/>
+
+</#list>
+</#if>
+
 <#if input.converters?has_content>
 # Converters
     <#list input.converters as converter>
-## [${converter.title}](${documentationRoot}/sources/${converter.cls.simpleName}.html)
+## [${converter.title}](${documentationRoot}/converters/${converter.cls.simpleName}.html)
 
 ```
 ${converter.cls.name}
@@ -52,7 +66,7 @@ ${connector.cls.name}
 
 <#if connector.description??>${connector.description}</#if>
 <@banners connector=connector/>
-<@config connector=connector/>
+
     </#list>
 </#if>
 
@@ -67,7 +81,7 @@ ${connector.cls.name}
 
 <#if connector.description??>${connector.description}</#if>
 <@banners connector=connector/>
-<@config connector=connector/>
+
     </#list>
 </#if>
 
@@ -93,7 +107,6 @@ ${transformation.cls.name}
 
 <#if transformation.description??>${transformation.description}</#if>
 <@banners connector=transformation/>
-<@config connector=transformation/>
 
     </#list>
 </#if>
