@@ -23,7 +23,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.jcustenborder.kafka.connect</groupId>
     <artifactId>connect-utils-parent</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.7-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>connect-utils-parent</name>
     <description>A helper library for building Kafka Connect Connectors.</description>
