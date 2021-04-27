@@ -42,7 +42,6 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigValue;
-import org.apache.kafka.connect.connector.Connector;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.sink.SinkRecord;
@@ -75,7 +74,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -131,6 +129,7 @@ public abstract class BaseDocumentationTest {
   final File sinksExamplesDirectory = new File(this.sinksDirectory, "examples");
   final File transformationsDirectory = new File(this.outputDirectory, "transformations");
   final File convertersDirectory = new File(this.outputDirectory, "converters");
+  final File configProvidersDirectory = new File(this.outputDirectory, "configProviders");
   final File transformationsExampleDirectory = new File(this.transformationsDirectory, "examples");
 
   Plugin plugin;
@@ -141,7 +140,7 @@ public abstract class BaseDocumentationTest {
   public void before() throws MalformedURLException {
     ObjectMapperFactory.INSTANCE.configure(SerializationFeature.INDENT_OUTPUT, true);
 
-    Arrays.asList(
+    Stream.of(
         this.targetDirectory,
         this.outputDirectory,
         this.sourcesDirectory,
@@ -150,8 +149,9 @@ public abstract class BaseDocumentationTest {
         this.sinksExamplesDirectory,
         this.transformationsDirectory,
         this.transformationsExampleDirectory,
-        this.convertersDirectory
-    ).stream()
+        this.convertersDirectory,
+        this.configProvidersDirectory
+    )
         .filter(f -> !f.isDirectory())
         .forEach(File::mkdirs);
 
@@ -208,6 +208,51 @@ public abstract class BaseDocumentationTest {
         );
   }
 
+  @TestFactory
+  public Stream<DynamicTest> rstTransformations() {
+    final String templateName = "rst/transformation.rst.ftl";
+
+    return this.plugin.getTransformations()
+        .stream()
+        .map(sc -> connectorRstTest(
+            outputRST(this.transformationsDirectory, sc.getCls()),
+            sc,
+            templateName,
+            true
+            )
+        );
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> rstConfigProviders() {
+    final String templateName = "rst/configProvider.rst.ftl";
+
+    return this.plugin.getConfigProviders()
+        .stream()
+        .map(sc -> connectorRstTest(
+            outputRST(this.configProvidersDirectory, sc.getCls()),
+            sc,
+            templateName,
+            true
+            )
+        );
+  }
+
+  @TestFactory
+  public Stream<DynamicTest> rstConverters() {
+    final String templateName = "rst/converter.rst.ftl";
+
+    return this.plugin.getConverters()
+        .stream()
+        .map(sc -> connectorRstTest(
+            outputRST(this.convertersDirectory, sc.getCls()),
+            sc,
+            templateName,
+            true
+            )
+        );
+  }
+
   void process(Writer writer, Template template, Object input) throws IOException, TemplateException {
     Map<String, Object> variables = ImmutableMap.of(
         "input", input
@@ -215,12 +260,7 @@ public abstract class BaseDocumentationTest {
     template.process(variables, writer);
   }
 
-  void assertConfig(Class<? extends Connector> connectorClass, Map<String, String> config) throws IllegalAccessException, InstantiationException {
-    log.info("Creating instance of {}", connectorClass.getName());
-    Connector connector = connectorClass.newInstance();
-    ConfigDef configDef = connector.config();
-    assertNotNull(configDef, "connector.config() should always return a config.");
-
+  void assertConfig(ConfigDef configDef, Map<String, String> config) {
     int errorCount = 0;
     List<ConfigValue> values = configDef.validate(config);
     for (ConfigValue value : values) {
@@ -258,7 +298,8 @@ public abstract class BaseDocumentationTest {
               sinkConnector.getCls(),
               e.getKey()
           );
-          assertConfig(sinkConnector.getCls(), example.getConfig());
+
+          assertConfig(sinkConnector.getConfiguration().getConfigDef(), example.getConfig());
           ImmutableSinkConnectorExampleInput.Builder builder = ImmutableSinkConnectorExampleInput.builder();
           builder.example(example);
           String config = connectorConfig(sinkConnector, example);
@@ -319,7 +360,7 @@ public abstract class BaseDocumentationTest {
               sourceConnector.getCls(),
               e.getKey()
           );
-          assertConfig(sourceConnector.getCls(), example.getConfig());
+          assertConfig(sourceConnector.getConfiguration().getConfigDef(), example.getConfig());
           ImmutableSourceConnectorExampleInput.Builder builder = ImmutableSourceConnectorExampleInput.builder();
           builder.example(example);
           String config = connectorConfig(sourceConnector, example);
@@ -456,36 +497,7 @@ public abstract class BaseDocumentationTest {
     );
   }
 
-  @TestFactory
-  public Stream<DynamicTest> rstTransformations() throws IOException, TemplateException {
-    final String templateName = "rst/transformation.rst.ftl";
 
-    return this.plugin.getTransformations()
-        .stream()
-        .map(sc -> connectorRstTest(
-            outputRST(this.transformationsDirectory, sc.getCls()),
-            sc,
-            templateName,
-            true
-            )
-        );
-  }
-
-
-  //  @TestFactory
-//  public Stream<DynamicTest> rstConverters() throws IOException, TemplateException {
-//    final String templateName = "rst/converter.rst.ftl";
-//
-//    return this.plugin.getConverters()
-//        .stream()
-//        .map(sc -> connectorRstTest(
-//            outputRST(this.convertersDirectory, sc.getCls()),
-//            sc,
-//            templateName,
-//            true
-//            )
-//        );
-//  }
   Plugin.SchemaInput buildSchemaInput(Schema schema) {
     return buildSchemaInput(schema, null);
   }

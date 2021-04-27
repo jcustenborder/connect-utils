@@ -16,8 +16,10 @@
 package com.github.jcustenborder.kafka.connect.utils.templates;
 
 
-import com.github.jcustenborder.kafka.connect.utils.config.AnnotationHelper;
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigKeyComparator;
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.provider.ConfigProvider;
 import org.apache.kafka.connect.connector.Connector;
@@ -31,10 +33,9 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,9 +44,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PluginLoader {
   static final Set<String> KEY_OR_VALUE = ImmutableSet.of("Key", "Value");
@@ -69,46 +71,60 @@ public class PluginLoader {
     );
   }
 
-  ConfigDef transformationConfig(Class<? extends Transformation> transformation) {
-    try {
-      return transformation.newInstance().config();
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new IllegalStateException(e);
-    }
-  }
+//  ConfigDef transformationConfig(Class<? extends Transformation> transformation) {
+//    try {
+//      return transformation.newInstance().config();
+//    } catch (InstantiationException | IllegalAccessException e) {
+//      throw new IllegalStateException(e);
+//    }
+//  }
+//
+//  ConfigDef connectorConfig(Class<? extends Connector> connectorClass) {
+//    try {
+//      return connectorClass.newInstance().config();
+//    } catch (InstantiationException | IllegalAccessException e) {
+//      throw new IllegalStateException(e);
+//    }
+//  }
 
-  ConfigDef connectorConfig(Class<? extends Connector> connectorClass) {
-    try {
-      return connectorClass.newInstance().config();
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  ConfigDef configConfig(Class<?> configClass) {
+  ConfigDef configDef(Class<?> pluginClass) {
     ConfigDef result;
-    if (!configClass.isAssignableFrom(Config.class)) {
-      result = null;
-    } else {
-      try {
-        Config config = (Config) configClass.newInstance();
-        result = config.config();
-      } catch (InstantiationException | IllegalAccessException e) {
-        throw new IllegalStateException(e);
+
+    try {
+      if (Connector.class.isAssignableFrom(pluginClass)) {
+        Connector connector = (Connector) pluginClass.newInstance();
+        result = connector.config();
+      } else if (Transformation.class.isAssignableFrom(pluginClass)) {
+        Transformation<?> connector = (Transformation<?>) pluginClass.newInstance();
+        result = connector.config();
+      } else if (Converter.class.isAssignableFrom(pluginClass) || ConfigProvider.class.isAssignableFrom(pluginClass)) {
+
+        Optional<Method> optionalConfigMethod = Stream.of(pluginClass.getMethods())
+            .filter(method -> Modifier.isPublic(method.getModifiers()))
+            .filter(method -> ConfigDef.class.equals(method.getReturnType()))
+            .findFirst();
+        if (optionalConfigMethod.isPresent()) {
+          Method configMethod = optionalConfigMethod.get();
+          Object instance;
+          if (Modifier.isStatic(configMethod.getModifiers())) {
+            instance = null;
+          } else {
+            instance = pluginClass.newInstance();
+          }
+          result = (ConfigDef) configMethod.invoke(instance);
+        } else {
+          result = null;
+        }
+      } else {
+        throw new UnsupportedOperationException(
+            String.format("Type %s is not supported", pluginClass.getName())
+        );
       }
+    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+      throw new IllegalStateException(e);
     }
     return result;
   }
-
-
-  ConfigDef configProvider(Class<? extends ConfigProvider> converterClass) {
-    return configConfig(converterClass);
-  }
-
-  ConfigDef converterConfig(Class<? extends Converter> converterClass) {
-    return configConfig(converterClass);
-  }
-
 
   Set<Class<? extends Transformation>> findTransformations() {
     Set<Class<? extends Transformation>> transforms = this.reflections.getSubTypesOf(Transformation.class)
@@ -116,7 +132,7 @@ public class PluginLoader {
         .filter(c -> c.getName().startsWith(pkg.getName()))
         .filter(c -> Modifier.isPublic(c.getModifiers()))
         .filter(c -> !Modifier.isAbstract(c.getModifiers()))
-        .filter((Predicate<Class<? extends Transformation>>) aClass -> Arrays.stream(aClass.getConstructors())
+        .filter(aClass -> Arrays.stream(aClass.getConstructors())
             .filter(c -> Modifier.isPublic(c.getModifiers()))
             .anyMatch(c -> c.getParameterCount() == 0))
         .sorted(Comparator.comparing(Class::getName))
@@ -184,8 +200,13 @@ public class PluginLoader {
         .collect(Collectors.toSet());
   }
 
-  Plugin.Configuration config(ConfigDef config) {
-    ImmutableConfiguration.Builder configBuilder = ImmutableConfiguration.builder();
+  Plugin.Configuration config(Class<?> pluginClass) {
+    ConfigDef config = configDef(pluginClass);
+    if (null == config) {
+      return null;
+    }
+    ImmutableConfiguration.Builder configBuilder = ImmutableConfiguration.builder()
+        .configDef(config);
     Map<String, ImmutableGroup.Builder> groupBuilderCache = new LinkedHashMap<>();
     List<ConfigDef.ConfigKey> configKeys = config.configKeys().values()
         .stream()
@@ -222,7 +243,7 @@ public class PluginLoader {
 
   public Plugin load() {
     ImmutablePlugin.Builder builder = ImmutablePlugin.builder()
-        .from(notes(this.pkg))
+        .from(AnnotationHelper.notes(this.pkg))
         .pluginName(AnnotationHelper.pluginName(this.pkg))
         .pluginOwner(AnnotationHelper.pluginOwner(this.pkg));
     List<Plugin.Transformation> transformations = loadTransformations();
@@ -249,10 +270,9 @@ public class PluginLoader {
       log.trace("loadConverters() - processing {}", cls.getName());
       ImmutableConverter.Builder builder = ImmutableConverter.builder()
           .cls(cls)
-          .from(notes(cls));
-      ConfigDef configDef = converterConfig(cls);
-      if (null != configDef) {
-        Plugin.Configuration configuration = config(configDef);
+          .from(AnnotationHelper.notes(cls));
+      Plugin.Configuration configuration = config(cls);
+      if (null != configuration) {
         builder.configuration(configuration);
       }
       result.add(builder.build());
@@ -272,11 +292,9 @@ public class PluginLoader {
       log.trace("loadConfigProviders() - processing {}", cls.getName());
       ImmutableConfigProvider.Builder builder = ImmutableConfigProvider.builder()
           .cls(cls)
-          .from(notes(cls));
-      ConfigDef configDef = configProvider(cls);
-
-      if (null != configDef) {
-        Plugin.Configuration configuration = config(configDef);
+          .from(AnnotationHelper.notes(cls));
+      Plugin.Configuration configuration = config(cls);
+      if (null != configuration) {
         builder.configuration(configuration);
       }
 
@@ -296,12 +314,10 @@ public class PluginLoader {
 
     for (Class<? extends SourceConnector> cls : sourceConnectors) {
       log.trace("loadSourceConnectors() - processing {}", cls.getName());
-      ConfigDef configDef = connectorConfig(cls);
-      Plugin.Configuration configuration = config(configDef);
       ImmutableSourceConnector.Builder builder = ImmutableSourceConnector.builder()
           .cls(cls)
-          .configuration(configuration)
-          .from(notes(cls));
+          .configuration(config(cls))
+          .from(AnnotationHelper.notes(cls));
       List<String> examples = findExamples(cls);
       builder.addAllExamples(examples);
       result.add(builder.build());
@@ -320,12 +336,10 @@ public class PluginLoader {
 
     for (Class<? extends SinkConnector> cls : sinkConnectors) {
       log.trace("loadSinkConnectors() - processing {}", cls.getName());
-      ConfigDef configDef = connectorConfig(cls);
-      Plugin.Configuration configuration = config(configDef);
       ImmutableSinkConnector.Builder builder = ImmutableSinkConnector.builder()
           .cls(cls)
-          .configuration(configuration)
-          .from(notes(cls));
+          .configuration(config(cls))
+          .from(AnnotationHelper.notes(cls));
       List<String> examples = findExamples(cls);
       builder.addAllExamples(examples);
       result.add(builder.build());
@@ -345,7 +359,7 @@ public class PluginLoader {
       log.trace("loadTransformations() - processing {}", cls.getName());
       ImmutableTransformation.Builder builder = ImmutableTransformation.builder()
           .cls(cls)
-          .from(notes(cls));
+          .from(AnnotationHelper.notes(cls));
       Class[] classes = cls.getClasses();
       boolean isKeyValue = false;
       Class keyClass = null;
@@ -371,19 +385,19 @@ public class PluginLoader {
       if (null != valueClass) {
         builder.value(valueClass);
       }
-      ConfigDef configDef;
+      Plugin.Configuration configuration;
       if (isKeyValue) {
         if (null != keyClass) {
-          configDef = transformationConfig(keyClass);
+          configuration = config(keyClass);
         } else if (null != valueClass) {
-          configDef = transformationConfig(valueClass);
+          configuration = config(valueClass);
         } else {
           throw new IllegalStateException("key and value class null");
         }
       } else {
-        configDef = transformationConfig(cls);
+        configuration = config(cls);
       }
-      Plugin.Configuration configuration = config(configDef);
+
       builder.configuration(configuration);
 
       List<String> examples = findExamples(cls);
@@ -416,27 +430,17 @@ public class PluginLoader {
   }
 
 
-  private Notes notes(Class cls) {
-    ImmutableCopy.Builder builder = ImmutableCopy.builder();
-    builder.description(AnnotationHelper.description(cls));
-    builder.danger(AnnotationHelper.danger(cls));
-    builder.important(AnnotationHelper.important(cls));
-    builder.note(AnnotationHelper.note(cls));
-    builder.tip(AnnotationHelper.tip(cls));
-    builder.title(AnnotationHelper.title(cls));
-    builder.warning(AnnotationHelper.warning(cls));
-    return builder.build();
-  }
-
-  private Notes notes(Package pkg) {
-    ImmutableCopy.Builder builder = ImmutableCopy.builder();
-    builder.danger(AnnotationHelper.danger(pkg));
-    builder.important(AnnotationHelper.important(pkg));
-    builder.note(AnnotationHelper.note(pkg));
-    builder.tip(AnnotationHelper.tip(pkg));
-    builder.introduction(AnnotationHelper.introduction(pkg));
-    builder.title(AnnotationHelper.title(pkg));
-    builder.warning(AnnotationHelper.warning(pkg));
-    return builder.build();
-  }
+//  private Notes notes(Class<?> cls) {
+//    Notes packageNotes = AnnotationHelper.notes(cls);
+//    ImmutableCopy.Builder builder = ImmutableCopy.builder()
+//        .from(packageNotes);
+//    return builder.build();
+//  }
+//
+//  private Notes notes(Package pkg) {
+//    Notes packageNotes = AnnotationHelper.notes(pkg);
+//    ImmutableCopy.Builder builder = ImmutableCopy.builder()
+//        .from(packageNotes);
+//    return builder.build();
+//  }
 }

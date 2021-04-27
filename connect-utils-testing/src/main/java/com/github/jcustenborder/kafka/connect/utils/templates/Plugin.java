@@ -53,6 +53,7 @@ public interface Plugin extends Notes {
 
   List<ConfigProvider> getConfigProviders();
 
+
   @Value.Immutable
   interface Item {
     String getName();
@@ -83,12 +84,10 @@ public interface Plugin extends Notes {
 
   @Value.Immutable
   interface Converter extends Configurable {
-    Class getCls();
   }
 
   @Value.Immutable
   interface ConfigProvider extends Configurable {
-    Class getCls();
   }
 
   interface Configurable extends Notes {
@@ -102,6 +101,8 @@ public interface Plugin extends Notes {
 
   @Value.Immutable
   interface Configuration {
+    ConfigDef getConfigDef();
+
     List<Plugin.Group> getGroups();
 
     List<Plugin.Item> getRequiredConfigs();
@@ -400,4 +401,5 @@ public interface Plugin extends Notes {
       return builder.toString();
     }
   }
+
 }

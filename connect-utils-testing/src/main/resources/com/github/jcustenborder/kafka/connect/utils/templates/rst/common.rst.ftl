@@ -108,5 +108,13 @@ ${item.doc}
     ${input.note}
 
 
+</#if><#if input.sections??>
+<#list input.sections as section>
+<@subsection text = section.title />
+
+${section.text}
+
+
+</#list>
 </#if>
 </#macro>

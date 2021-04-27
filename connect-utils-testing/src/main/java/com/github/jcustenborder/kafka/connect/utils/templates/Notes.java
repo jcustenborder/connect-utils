@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public interface Notes {
   @JsonProperty("warning")
@@ -57,8 +58,12 @@ public interface Notes {
   @Nullable
   String getIntroduction();
 
-  @Value.Immutable
-  interface Copy extends Notes {
+  @Nullable
+  List<Section> getSections();
 
+  @Value.Immutable
+  interface Section {
+    String getTitle();
+    String getText();
   }
 }
