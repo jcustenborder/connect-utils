@@ -16,7 +16,6 @@
 package com.github.jcustenborder.kafka.connect.utils.data.type;
 
 
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;

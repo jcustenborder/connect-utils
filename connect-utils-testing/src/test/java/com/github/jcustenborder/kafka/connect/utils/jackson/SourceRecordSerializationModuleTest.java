@@ -15,8 +15,8 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.jackson;
 
+import com.github.jcustenborder.kafka.connect.utils.AssertConnectRecord;
 import com.google.common.collect.ImmutableMap;
-import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -31,7 +31,6 @@ import static com.github.jcustenborder.kafka.connect.utils.AssertConnectRecord.a
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class SourceRecordSerializationModuleTest {
   private static final Logger log = LoggerFactory.getLogger(SourceRecordSerializationModuleTest.class);
@@ -67,7 +66,7 @@ public class SourceRecordSerializationModuleTest {
     final String temp = ObjectMapperFactory.INSTANCE.writeValueAsString(expected);
     log.trace(temp);
     final SourceRecord actual = ObjectMapperFactory.INSTANCE.readValue(temp, SourceRecord.class);
-    assertSourceRecord(expected, actual);
+    AssertConnectRecord.assertSourceRecord(expected, actual);
   }
 
 }

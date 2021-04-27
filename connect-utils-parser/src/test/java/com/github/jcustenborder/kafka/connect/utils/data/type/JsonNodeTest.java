@@ -217,7 +217,7 @@ public class JsonNodeTest {
     Object result = parser.parseJsonNode(schema, input);
     assertNotNull(result);
     assertTrue(result instanceof Struct, "result should be a struct");
-    assertStruct(expected, (Struct) result);
+    AssertStruct.assertStruct(expected, (Struct) result);
   }
 
   @TestFactory

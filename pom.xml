@@ -49,6 +49,8 @@
     </developers>
     <modules>
         <module>connect-utils</module>
+        <module>connect-utils-jackson</module>
+        <module>connect-utils-parser</module>
         <module>connect-utils-testing</module>
         <module>connect-utils-testing-data</module>
     </modules>
@@ -97,6 +99,16 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.github.jcustenborder.kafka.connect</groupId>
+                <artifactId>connect-utils-testing</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.jcustenborder.kafka.connect</groupId>
+                <artifactId>connect-utils-jackson</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>connect-api</artifactId>
                 <version>${kafka.version}</version>
@@ -106,6 +118,12 @@
                 <groupId>org.freemarker</groupId>
                 <artifactId>freemarker</artifactId>
                 <version>${freemarker.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.30</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

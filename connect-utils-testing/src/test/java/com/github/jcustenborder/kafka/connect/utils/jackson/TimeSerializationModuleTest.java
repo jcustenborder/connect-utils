@@ -15,7 +15,6 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.jackson;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.kafka.common.utils.Time;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

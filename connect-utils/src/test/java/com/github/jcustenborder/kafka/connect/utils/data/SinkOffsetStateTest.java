@@ -1,6 +1,6 @@
 package com.github.jcustenborder.kafka.connect.utils.data;
 
-import com.github.jcustenborder.kafka.connect.utils.jackson.ObjectMapperFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.TopicPartition;
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +14,9 @@ public class SinkOffsetStateTest {
 
 
   SinkOffsetState roundTrip(SinkOffsetState input) throws IOException {
-    final byte[] buffer = ObjectMapperFactory.INSTANCE.writeValueAsBytes(input);
-    return ObjectMapperFactory.INSTANCE.readValue(buffer, SinkOffsetState.class);
+    ObjectMapper mapper = new ObjectMapper();
+    final byte[] buffer = mapper.writeValueAsBytes(input);
+    return mapper.readValue(buffer, SinkOffsetState.class);
   }
 
   @Test

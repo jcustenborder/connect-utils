@@ -16,6 +16,7 @@
 package com.github.jcustenborder.kafka.connect.utils.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jcustenborder.kafka.connect.utils.AssertSchema;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,7 +93,7 @@ public class SchemaSerializationModuleTest {
           String input = this.objectMapper.writeValueAsString(expected);
           log.trace("Serialized to \n{}", input);
           Schema actual = this.objectMapper.readValue(input, Schema.class);
-          assertSchema(expected, actual);
+          AssertSchema.assertSchema(expected, actual);
         }
     ));
 

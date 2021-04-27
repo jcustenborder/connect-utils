@@ -15,10 +15,8 @@
  */
 package com.github.jcustenborder.kafka.connect.utils.jackson;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.jcustenborder.kafka.connect.utils.AssertStruct;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.PatternFilenameFilter;
@@ -27,13 +25,11 @@ import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +105,7 @@ public class StructSerializationModuleTest {
       String input = ObjectMapperFactory.INSTANCE.writeValueAsString(expected);
       log.trace(input);
       Struct actual = ObjectMapperFactory.INSTANCE.readValue(input, Struct.class);
-      assertStruct(expected, actual);
+      AssertStruct.assertStruct(expected, actual);
     }));
   }
 
