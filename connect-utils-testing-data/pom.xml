@@ -54,12 +54,6 @@
         <system>github</system>
         <url>https://github.com/jcustenborder/connect-utils/issues</url>
     </issueManagement>
-    <repositories>
-        <repository>
-            <id>confluent</id>
-            <url>http://packages.confluent.io/maven/</url>
-        </repository>
-    </repositories>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
