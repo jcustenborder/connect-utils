@@ -34,6 +34,7 @@ This configuration is used typically along with `standalone mode
 </#macro>
 
 <#macro configuration configurable>
+<#if configurable.configuration?has_content>
 <@subsection text = "Configuration" />
 <#list configurable.configuration.groups as group>
 <@subsubsection text = group.name />
@@ -59,7 +60,7 @@ ${item.doc}
 
 </#list>
 
-
+</#if>
 </#macro>
 
 <#macro tableBar columnLengths column character="-"><#list 0..<columnLengths[column] as i>${character}</#list></#macro>
@@ -107,5 +108,13 @@ ${item.doc}
     ${input.note}
 
 
+</#if><#if input.sections??>
+<#list input.sections as section>
+<@subsection text = section.title />
+
+${section.text}
+
+
+</#list>
 </#if>
 </#macro>

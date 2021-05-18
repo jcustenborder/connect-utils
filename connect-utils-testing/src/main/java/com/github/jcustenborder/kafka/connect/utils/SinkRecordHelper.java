@@ -15,7 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import shaded.com.google.common.base.Preconditions;
+import com.google.common.base.Preconditions;
 import org.apache.kafka.common.record.TimestampType;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaAndValue;

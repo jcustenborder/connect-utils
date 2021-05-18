@@ -5,6 +5,7 @@
 
     ${input.cls.name}
 
+
 <#if input.description??>
 ${input.description}
 </#if>

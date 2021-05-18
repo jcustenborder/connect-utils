@@ -40,6 +40,14 @@ ${input.introduction}
 .. toctree::
     :hidden:
     :maxdepth: 1
+    :glob:
+
+    configProviders/*
+
+
+.. toctree::
+    :hidden:
+    :maxdepth: 1
 
     schemas
 

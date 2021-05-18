@@ -15,7 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import shaded.com.google.common.base.Strings;
+import com.google.common.base.Strings;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Schema;
 

@@ -1,6 +1,6 @@
 package com.github.jcustenborder.kafka.connect.utils.templates;
 
-import shaded.com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.jcustenborder.kafka.connect.utils.TestKeyAndValueTransformation;
 import com.github.jcustenborder.kafka.connect.utils.TestSinkConnector;
 import com.github.jcustenborder.kafka.connect.utils.TestSourceConnector;
@@ -10,12 +10,7 @@ import com.github.jcustenborder.kafka.connect.utils.jackson.ObjectMapperFactory;
 import com.github.jcustenborder.kafka.connect.utils.nodoc.NoDocTestSinkConnector;
 import com.github.jcustenborder.kafka.connect.utils.nodoc.NoDocTestSourceConnector;
 import com.github.jcustenborder.kafka.connect.utils.nodoc.NoDocTestTransformation;
-import shaded.com.google.common.collect.ImmutableMap;
-import shaded.com.google.common.collect.ImmutableSet;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaAndValue;
-import org.apache.kafka.connect.data.SchemaBuilder;
-import org.apache.kafka.connect.data.Struct;
+import com.google.common.collect.ImmutableSet;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.apache.kafka.connect.source.SourceConnector;
 import org.apache.kafka.connect.transforms.Transformation;
@@ -24,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Set;
 
 import static com.github.jcustenborder.kafka.connect.utils.SinkRecordHelper.write;

@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Description("The test source connector is used to simulate the usage fromConnector an actual connector that we would generate " +
     "documentation from.")
-@Title("Test Source Connector")
+@Title("Test Converter without Config")
 @DocumentationNote("This is a note")
 @DocumentationTip("This is a tip")
 @DocumentationImportant("This is important")

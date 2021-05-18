@@ -15,13 +15,36 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
+import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableConfigProvider;
+import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableConfiguration;
+import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableGroup;
+import com.github.jcustenborder.kafka.connect.utils.templates.ImmutableItem;
+import com.github.jcustenborder.kafka.connect.utils.templates.Plugin;
+import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.apache.kafka.common.config.ConfigDef.Importance.HIGH;
+import static org.apache.kafka.common.config.ConfigDef.Type.INT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class DocumentationTest extends BaseDocumentationTest {
+  private static final Logger log = LoggerFactory.getLogger(DocumentationTest.class);
 
   @Override
   protected List<Schema> schemas() {
@@ -76,5 +99,95 @@ public class DocumentationTest extends BaseDocumentationTest {
         ).doc("This is something")
             .build()
     );
+  }
+
+  @Test
+  public void plugin() {
+    assertNotNull(this.plugin);
+    assertEquals("connect-utils", this.plugin.getPluginName());
+    assertEquals("jcustenborder", this.plugin.getPluginOwner());
+  }
+
+  @Disabled
+  @TestFactory
+  public Stream<DynamicTest> testConfigProviders() throws IOException {
+    List<Plugin.ConfigProvider> testCases = Arrays.asList(
+        ImmutableConfigProvider.builder()
+            .cls(TestConfigProvider.class)
+            .warning("This is a warning")
+            .tip("This is a tip")
+            .important("This is important")
+            .danger("This is a danger")
+            .note("This is a note")
+            .title("Test Source Connector")
+            .description("The test source connector is used to simulate the usage fromConnector an actual connector that we would generate documentation from.")
+            .build(),
+        ImmutableConfigProvider.builder()
+            .cls(TestConfigProviderWithConfig.class)
+            .warning("This is a warning")
+            .tip("This is a tip")
+            .important("This is important")
+            .danger("This is a danger")
+            .note("This is a note")
+            .title("Test Config Provider")
+            .description("The test source connector is used to simulate the usage fromConnector an actual connector that we would generate documentation from.")
+            .configuration(
+                ImmutableConfiguration.builder()
+                    .configDef(new ConfigDef())
+                    .addGroups(
+                        ImmutableGroup.builder()
+                            .name("General")
+                            .addItems(
+                                ImmutableItem.builder()
+                                    .name("testing.bar")
+                                    .importance(HIGH)
+                                    .doc("Testing the bar object.")
+                                    .type(INT)
+                                    .group("General")
+                                    .isRequired(true)
+                                    .build(),
+                                ImmutableItem.builder()
+                                    .name("testing.foo")
+                                    .importance(HIGH)
+                                    .doc("Testing the bar object.")
+                                    .type(INT)
+                                    .group("General")
+                                    .isRequired(true)
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .addRequiredConfigs(
+                        ImmutableItem.builder()
+                            .name("testing.bar")
+                            .importance(HIGH)
+                            .doc("Testing the bar object.")
+                            .type(INT)
+                            .group("General")
+                            .isRequired(true)
+                            .build(),
+                        ImmutableItem.builder()
+                            .name("testing.foo")
+                            .importance(HIGH)
+                            .doc("Testing the bar object.")
+                            .type(INT)
+                            .group("General")
+                            .isRequired(true)
+                            .build()
+                    )
+                    .build()
+            )
+            .build()
+    );
+
+    return testCases.stream()
+        .map(expected -> dynamicTest(expected.getCls().getName(), () -> {
+          Optional<Plugin.ConfigProvider> optionalConfigProvider = this.plugin.getConfigProviders().stream()
+              .filter(c -> expected.getCls().equals(c.getCls()))
+              .findFirst();
+          assertTrue(optionalConfigProvider.isPresent(), "ConfigProvider should be present.");
+          Plugin.ConfigProvider actual = optionalConfigProvider.get();
+          assertEquals(expected, actual);
+        }));
   }
 }

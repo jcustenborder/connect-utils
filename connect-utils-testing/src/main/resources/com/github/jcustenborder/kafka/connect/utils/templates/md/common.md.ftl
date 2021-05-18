@@ -1,6 +1,7 @@
 <#-- @formatter:off --><#macro config connector>
 ### Configuration
 
+<#if connector.configuration??>
 <#list connector.configuration.groups as group>
 #### ${group.name}
 
@@ -23,7 +24,7 @@ ${item.doc}
 
 </#list>
 </#list>
-
+</#if>
 </#macro>
 
 <#macro banners connector>

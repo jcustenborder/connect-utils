@@ -15,8 +15,8 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import shaded.com.google.common.base.Strings;
-import shaded.com.google.common.io.BaseEncoding;
+import com.google.common.base.Strings;
+import com.google.common.io.BaseEncoding;
 import org.apache.kafka.connect.data.Date;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Field;

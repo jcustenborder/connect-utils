@@ -15,7 +15,7 @@
  */
 package com.github.jcustenborder.kafka.connect.utils;
 
-import shaded.com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects;
 import org.apache.kafka.connect.data.Decimal;
 import org.apache.kafka.connect.data.Schema;
 import org.junit.jupiter.api.DynamicTest;
