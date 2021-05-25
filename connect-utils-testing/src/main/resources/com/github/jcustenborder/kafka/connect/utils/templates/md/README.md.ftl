@@ -28,7 +28,7 @@ to run the plugin.
 3. Restart the Connect worker.
 
 <#if input.configProviders?has_content>
-# Converters
+# Config Providers
 <#list input.configProviders as configProvider>
 ## [${configProvider.title}](${documentationRoot}/configProviders/${configProvider.cls.simpleName}.html)
 
