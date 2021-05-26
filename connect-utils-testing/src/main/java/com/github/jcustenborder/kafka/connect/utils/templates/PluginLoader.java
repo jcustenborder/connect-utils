@@ -17,7 +17,6 @@ package com.github.jcustenborder.kafka.connect.utils.templates;
 
 
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigKeyComparator;
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import org.apache.kafka.common.config.ConfigDef;
@@ -226,7 +225,7 @@ public class PluginLoader {
           .validator(configKey.validator)
           .build();
 
-      ImmutableGroup.Builder groupBuilder = groupBuilderCache.computeIfAbsent(group, (Function<String, ImmutableGroup.Builder>) s -> ImmutableGroup.builder().name(group));
+      ImmutableGroup.Builder groupBuilder = groupBuilderCache.computeIfAbsent(group, s -> ImmutableGroup.builder().name(group));
       groupBuilder.addItems(item);
       if (item.isRequired()) {
         configBuilder.addRequiredConfigs(item);
