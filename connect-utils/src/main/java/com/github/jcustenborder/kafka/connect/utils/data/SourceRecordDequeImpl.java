@@ -63,9 +63,9 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
     }
     if (size() >= this.maximumCapacity) {
       final long start = this.time.milliseconds();
-      long elapsed = start;
       while (size() >= this.maximumCapacity) {
-        if (elapsed > this.maximumCapacityTimeoutMs) {
+        final long elapsedMs = this.time.milliseconds() - start;
+        if (elapsedMs > this.maximumCapacityTimeoutMs) {
           throw new TimeoutException(
               String.format(
                   "Timeout of %s ms exceeded while waiting for Deque to be drained below %s",
@@ -75,7 +75,6 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
           );
         }
         this.time.sleep(this.maximumCapacityWaitMs);
-        elapsed = (this.time.milliseconds() - start);
       }
     }
   }
