@@ -17,6 +17,7 @@ package com.github.jcustenborder.kafka.connect.utils.data;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.kafka.common.errors.TimeoutException;
+import org.apache.kafka.common.utils.SystemTime;
 import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,6 +104,31 @@ public class SourceRecordDequeTest {
     List<SourceRecord> records =  deque.getBatch();
     assertNull(records, "Records should be null.");
     verify(this.time, atLeastOnce()).sleep(100);
+  }
+
+  @Test
+  public void earlyTimeoutFail() {
+    final int capacity = 5;
+    final int drainDelay = 500;
+
+    SourceRecordDeque deque = SourceRecordDequeBuilder.of()
+            .maximumCapacity(capacity)
+            .maximumCapacityTimeoutMs(2 * drainDelay)
+            .build();
+
+    new Thread(() -> {
+      try {
+        Thread.sleep(drainDelay);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      deque.getBatch();
+    }).start();
+
+
+    for (int i = 0; i < 2 * capacity; ++i) {
+      deque.add(newRecord());
+    }
   }
 
 }
