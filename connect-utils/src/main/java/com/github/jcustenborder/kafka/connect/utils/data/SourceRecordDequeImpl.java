@@ -128,7 +128,7 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
     int count = 0;
     SourceRecord record;
     log.trace("drain() - Attempting to draining {} record(s).", this.batchSize);
-    while (count <= this.batchSize && null != (record = this.poll())) {
+    while (count < this.batchSize && null != (record = this.poll())) {
       result.add(record);
       count++;
     }
@@ -159,7 +159,7 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
     int count = 0;
     SourceRecord record;
     log.trace("drain() - Attempting to draining {} record(s).", this.batchSize);
-    while (count <= this.batchSize && null != (record = this.poll())) {
+    while (count < this.batchSize && null != (record = this.poll())) {
       records.add(record);
       count++;
     }
