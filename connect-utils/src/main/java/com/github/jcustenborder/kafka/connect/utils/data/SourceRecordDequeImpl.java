@@ -63,9 +63,9 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
     }
     if (size() >= this.maximumCapacity) {
       final long start = this.time.milliseconds();
-      long elapsed = start;
       while (size() >= this.maximumCapacity) {
-        if (elapsed > this.maximumCapacityTimeoutMs) {
+        final long elapsedMs = this.time.milliseconds() - start;
+        if (elapsedMs > this.maximumCapacityTimeoutMs) {
           throw new TimeoutException(
               String.format(
                   "Timeout of %s ms exceeded while waiting for Deque to be drained below %s",
@@ -75,7 +75,6 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
           );
         }
         this.time.sleep(this.maximumCapacityWaitMs);
-        elapsed = (this.time.milliseconds() - start);
       }
     }
   }
@@ -129,7 +128,7 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
     int count = 0;
     SourceRecord record;
     log.trace("drain() - Attempting to draining {} record(s).", this.batchSize);
-    while (count <= this.batchSize && null != (record = this.poll())) {
+    while (count < this.batchSize && null != (record = this.poll())) {
       result.add(record);
       count++;
     }
@@ -160,7 +159,7 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
     int count = 0;
     SourceRecord record;
     log.trace("drain() - Attempting to draining {} record(s).", this.batchSize);
-    while (count <= this.batchSize && null != (record = this.poll())) {
+    while (count < this.batchSize && null != (record = this.poll())) {
       records.add(record);
       count++;
     }
