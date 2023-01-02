@@ -63,7 +63,7 @@ class SourceRecordDequeImpl extends ConcurrentLinkedDeque<SourceRecord> implemen
     }
     if (size() >= this.maximumCapacity) {
       final long start = this.time.milliseconds();
-      long elapsed = start;
+      long elapsed = 0;
       while (size() >= this.maximumCapacity) {
         if (elapsed > this.maximumCapacityTimeoutMs) {
           throw new TimeoutException(
