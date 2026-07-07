@@ -17,7 +17,6 @@ package com.github.jcustenborder.kafka.connect.utils.data;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.RateLimiter;
-import org.apache.kafka.common.utils.SystemTime;
 import org.apache.kafka.common.utils.Time;
 
 public class SourceRecordDequeBuilder {
@@ -25,7 +24,7 @@ public class SourceRecordDequeBuilder {
 
   }
 
-  Time time = SystemTime.SYSTEM;
+  Time time = Time.SYSTEM;
   private int maximumCapacity = Integer.MAX_VALUE;
   private int batchSize = 1024;
   private int emptyWaitMs = 0;

@@ -1,0 +1,115 @@
+name: Maven
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Verify
+        run: mvn -B clean verify
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java and Maven Central credentials
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          server-id: oss.sonatype.org
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_TOKEN
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
+
+      - name: Compute release version
+        id: release_version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          snapshot_version="$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)"
+          if [[ ! "${snapshot_version}" =~ ^[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+            echo "Root project version must be major.minor-SNAPSHOT. Found: ${snapshot_version}" >&2
+            exit 1
+          fi
+
+          base_version="${snapshot_version%-SNAPSHOT}"
+          git fetch --tags --force
+
+          latest_patch="$(
+            git tag --list "${base_version}.*" |
+              awk -v base="${base_version}" '
+                index($0, base ".") == 1 {
+                  patch = substr($0, length(base) + 2)
+                  if (patch ~ /^[0-9]+$/) print patch
+                }
+              ' |
+              sort -n |
+              tail -1
+          )"
+
+          if [[ -z "${latest_patch}" ]]; then
+            next_patch=0
+          else
+            next_patch=$((latest_patch + 1))
+          fi
+
+          release_version="${base_version}.${next_patch}"
+          if git rev-parse -q --verify "refs/tags/${release_version}" >/dev/null; then
+            echo "Release tag ${release_version} already exists." >&2
+            exit 1
+          fi
+
+          echo "version=${release_version}" >> "${GITHUB_OUTPUT}"
+          echo "Computed release version: ${release_version}"
+
+      - name: Set Maven release version
+        run: mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion="${{ steps.release_version.outputs.version }}"
+
+      - name: Deploy to Maven Central
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEYNAME: ${{ secrets.GPG_KEYNAME }}
+        run: mvn -B -Pmaven-central -Dgpg.keyname="${GPG_KEYNAME}" clean deploy
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.release_version.outputs.version }}" \
+            --target "${GITHUB_SHA}" \
+            --title "${{ steps.release_version.outputs.version }}" \
+            --generate-notes
